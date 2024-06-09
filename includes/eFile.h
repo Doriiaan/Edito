@@ -6,7 +6,8 @@
 typedef struct efile_s
 {
 	FILE *fp;
-	eLine *elines;
+	/* TODO add mode of file (append, read, write) */
+	eLine *first;
 	int n_elines;
 } eFile;
 

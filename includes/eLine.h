@@ -19,6 +19,6 @@ typedef struct eLine
 	struct eLine *previous; 
 } eLine;
 
-eLine *create_eLine(char *string, int pos, eLine *next, eLine *previous);
+eLine *create_eLine(char *string, eLine *next, eLine *previous);
 
 #endif

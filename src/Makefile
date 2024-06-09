@@ -1,24 +1,26 @@
-CC= gcc
-CFLAGS= -std=c99 -Wall -Wextra -Werror -pedantic-errors
-LDFLAGS= -lncurses
-SRC= $(wildcard *.c) # wildcard permit use of * in Makefile
-OBJ= $(SRC:.c=.o) # replace .c with .o, because .o do not exist at the beginning
-EXEC=edito
+PROJECT_EXEC= $(BUILD_DIR)/edito
+
+DEBUG= -g
+
+PROJECT_CFLAGS= -I$(INC_DIR) -std=c99 -Wall -Wextra -Werror -pedantic-errors $(DEBUG)
+PROJECT_LDFLAGS= -L$(LIB_DIR) -lncurses
+
+# Sources and objects files
+PROJECT_SRC= $(wildcard $(SRC_DIR)/*.c)
+PROJECT_OBJ= $(PROJECT_SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 
 
-# first target so do not need to explicit make all
-all : $(EXEC) 
+# first target
+project : $(PROJECT_EXEC)
 
-$(EXEC) : $(OBJ)
-	$(CC) -o $@ $^ $(LDFLAGS)
+$(PROJECT_EXEC) : $(PROJECT_OBJ)
+	$(CC) -o $@ $^ $(PROJECT_LDFLAGS)
 
 # %.o : %.c decomposose each .o in a target
-%.o : %.c
-	$(CC) -c $< $(CFLAGS) 
+$(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
+	$(CC) -c $< -o $@ $(PROJECT_CFLAGS) 
 
-main.o : util.h
+# TODO declare .h include for each c file
 
-
-.PHONY : clean
-clean : 
-	rm *.o $(EXEC)
+clean_project:
+	rm $(PROJECT_OBJ) $(PROJECT_EXEC)
