@@ -14,12 +14,16 @@
 #include <stdio.h>
 
 #include "eLine.h" 
-#include "eFile.h" 
 
-#define FILENAME "test.txt"
 
 int main()
 {
-	printf("Hello world!\n");
+	char string[32] = "Hello world!";
+	eLine *eline = create_eLine(string, 32, 0, NULL, NULL);
+	
+	insert_eLine(eline, "$baba$", 32, 6);
+	
+	delete_eLine(&eline);
+	
 	return 0;
 }

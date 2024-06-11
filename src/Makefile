@@ -2,7 +2,7 @@ PROJECT_EXEC= $(BUILD_DIR)/edito
 
 DEBUG= -g
 
-PROJECT_CFLAGS= -I$(INC_DIR) -std=c99 -Wall -Wextra -Werror -pedantic-errors $(DEBUG)
+PROJECT_CFLAGS= -I$(INC_DIR) -std=gnu99 -Wall -Wextra -Werror -pedantic-errors $(DEBUG)
 PROJECT_LDFLAGS= -L$(LIB_DIR) -lncurses
 
 # Sources and objects files

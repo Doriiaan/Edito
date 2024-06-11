@@ -3,6 +3,7 @@
 
 
 extern void add_tests_eFile(CU_pSuite pSuite);
+extern void add_tests_eLine(CU_pSuite pSuite);
 
 
 int main(void) 
@@ -14,7 +15,8 @@ int main(void)
 
     /* Suite creation */
     CU_pSuite eFile_pSuite = CU_add_suite("eFile_pSuite", NULL, NULL);
-    if (eFile_pSuite == NULL) 
+    CU_pSuite eLine_pSuite = CU_add_suite("eLine_pSuite", NULL, NULL);
+    if (eFile_pSuite == NULL || eLine_pSuite == NULL) 
 	{
         CU_cleanup_registry();
         return CU_get_error();
@@ -23,6 +25,7 @@ int main(void)
 
     /* Add tests to Suite */
 	add_tests_eFile(eFile_pSuite);
+	add_tests_eLine(eLine_pSuite);
 
 
     /* Basic execution */

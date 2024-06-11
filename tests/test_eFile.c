@@ -9,107 +9,61 @@
 #define FILENAME4 "doesnt_exist" /* The file does not exist */
 #define FILENAME5 "error*!@ /." /* syntax error in filenam */
 
-void test_open_eFile_empty_readonly(void)
-{
-	eFile *result;
-	result = open_eFile(FILENAME1, "r");
-	
-	CU_ASSERT_PTR_NOT_NULL(result);
 
-	if(result != NULL)
-	{
-		CU_ASSERT_PTR_NOT_NULL(result->fp);
-		CU_ASSERT_PTR_NULL(result->first);
-		CU_ASSERT_EQUAL(result->n_elines, 0);
-	}
-}
+void test_open_eFile_empty(eFile *file);
+void test_open_eFile_normal(eFile *file);
+void test_open_eFile_bigline(eFile *file);
 
 
+
+/* Empty file */
 void test_open_eFile_empty_readwrite(void)
 {
-	eFile *result;
-	result = open_eFile(FILENAME1, "r+");
-
-	CU_ASSERT_PTR_NOT_NULL(result);
-
-	if(result != NULL)
-	{
-		CU_ASSERT_PTR_NOT_NULL(result->fp);
-		CU_ASSERT_PTR_NULL(result->first);
-		CU_ASSERT_EQUAL(result->n_elines, 0);
-	}	
+	eFile *file = open_eFile(FILENAME1, "r+");
+	test_open_eFile_empty(file);
 }
 
-
-void test_open_eFile_normal_readonly(void)
+void test_open_eFile_empty_readonly(void)
 {
-	eFile *result;
-	
-	result = open_eFile(FILENAME2, "r+");
+	eFile *file = open_eFile(FILENAME1, "r");
+	test_open_eFile_empty(file);
+}
 
-	CU_ASSERT_PTR_NOT_NULL(result);
-	if(result != NULL)
+void test_open_eFile_empty(eFile *file)
+{
+	CU_ASSERT_PTR_NOT_NULL(file);
+
+	if(file != NULL)
 	{
-		CU_ASSERT_PTR_NOT_NULL(result->fp);
-		
-		eLine *current = result->first;
-		for(int i=0; i<3 ; i++)
-		{
-			CU_ASSERT_PTR_NOT_NULL(current);
-			if(current != NULL)
-			{
-				switch(i)
-				{
-					case 0:
-						CU_ASSERT_PTR_NOT_NULL(current->string);
-						if(current->string != NULL)
-							CU_ASSERT_STRING_EQUAL(current->string, "Hello world!\n");
-				   		CU_ASSERT_EQUAL(current->length, 13);
-						CU_ASSERT_EQUAL(current->pos, 1);
-						CU_ASSERT_PTR_NULL(current->previous);
-						CU_ASSERT_PTR_NOT_NULL(current->next);
-						break;
-					case 1:
-						CU_ASSERT_PTR_NOT_NULL(current->string);
-						if(current->string != NULL)
-							CU_ASSERT_STRING_EQUAL(current->string, "\n");
-					   	CU_ASSERT_EQUAL(current->length, 1);
-						CU_ASSERT_EQUAL(current->pos, 2);
-						CU_ASSERT_PTR_NOT_NULL(current->previous);
-						CU_ASSERT_PTR_NOT_NULL(current->next);
-						break;
-					case 2:
-						CU_ASSERT_PTR_NOT_NULL(current->string);
-						if(current->string != NULL)
-							CU_ASSERT_STRING_EQUAL(current->string, "I'm fine!\n");
-					   	CU_ASSERT_EQUAL(current->length, 10);
-						CU_ASSERT_EQUAL(current->pos, 3);
-						CU_ASSERT_PTR_NOT_NULL(current->previous);
-						CU_ASSERT_PTR_NULL(current->next);
-						break;
-				}
-			
-				current = current->next;
-			}
-		}
-
-		CU_ASSERT_EQUAL(result->n_elines, 3);
+		CU_ASSERT_PTR_NOT_NULL(file->fp);
+		CU_ASSERT_PTR_NULL(file->first);
+		CU_ASSERT_EQUAL(file->n_elines, 0);
 	}
 }
 
+
+/* Normal file */
+void test_open_eFile_normal_readonly(void)
+{
+	eFile *file = open_eFile(FILENAME2, "r");
+	test_open_eFile_normal(file);
+}
 
 void test_open_eFile_normal_readwrite(void)
 {
-	eFile *result;
-	
-	result = open_eFile(FILENAME2, "r+");
+	eFile *file = open_eFile(FILENAME2, "r+");
+	test_open_eFile_normal(file);
+}
 
-	CU_ASSERT_PTR_NOT_NULL(result);
-	if(result != NULL)
+void test_open_eFile_normal(eFile *file)
+{
+
+	CU_ASSERT_PTR_NOT_NULL(file);
+	if(file != NULL)
 	{
-		CU_ASSERT_PTR_NOT_NULL(result->fp);
+		CU_ASSERT_PTR_NOT_NULL(file->fp);
 		
-		eLine *current = result->first;
+		eLine *current = file->first;
 		for(int i=0; i<3 ; i++)
 		{
 			CU_ASSERT_PTR_NOT_NULL(current);
@@ -145,75 +99,53 @@ void test_open_eFile_normal_readwrite(void)
 						CU_ASSERT_PTR_NULL(current->next);
 						break;
 				}
-			
 				current = current->next;
 			}
 		}
-
-		CU_ASSERT_EQUAL(result->n_elines, 3);
+		CU_ASSERT_EQUAL(file->n_elines, 3);
 	}
 }
 
 
 void test_open_eFile_bigline_readonly(void)
 {
-	eFile *result;
-	result = open_eFile(FILENAME3, "r");
-
-	CU_ASSERT_PTR_NOT_NULL(result);
-
-	if(result != NULL)
-	{
-		CU_ASSERT_PTR_NOT_NULL(result->fp);
-		CU_ASSERT_PTR_NOT_NULL(result->first);
-
-		if(result->first != NULL)
-		{
-			char expected_string[30000]; // 30000 'a' + '\n' + '\0'
-    		memset(expected_string, 'a', 30000);
-    		expected_string[30000] = '\n';
-    		expected_string[30001] = '\0';
-
-			CU_ASSERT_PTR_NOT_NULL(result->first->string);
-			CU_ASSERT_STRING_EQUAL(result->first->string, expected_string);
-		  	CU_ASSERT_EQUAL(result->first->length, 30001);
-			CU_ASSERT_EQUAL(result->first->pos, 1);
-			CU_ASSERT_PTR_NULL(result->first->previous);
-			CU_ASSERT_PTR_NULL(result->first->next);
-		}
-		CU_ASSERT_EQUAL(result->n_elines, 1);
-	}	
+	eFile *file = open_eFile(FILENAME3, "r");
+	test_open_eFile_bigline(file);
 }
-
 
 void test_open_eFile_bigline_readwrite(void)
 {
-	eFile *result;
-	result = open_eFile(FILENAME3, "r+");
+	eFile *file = open_eFile(FILENAME3, "r+");
+	test_open_eFile_bigline(file);
+}
 
-	CU_ASSERT_PTR_NOT_NULL(result);
+void test_open_eFile_bigline(eFile *file)
+{
+	CU_ASSERT_PTR_NOT_NULL(file);
 
-	if(result != NULL)
+	if(file != NULL)
 	{
-		CU_ASSERT_PTR_NOT_NULL(result->fp);
-		CU_ASSERT_PTR_NOT_NULL(result->first);
-		if(result->first != NULL)
+		CU_ASSERT_PTR_NOT_NULL(file->fp);
+		CU_ASSERT_PTR_NOT_NULL(file->first);
+
+		if(file->first != NULL)
 		{
-			char expected_string[30000]; // 30000 'a' + '\n' + '\0'
+			char expected_string[30002]; // 30000 'a' + '\n' + '\0'
     		memset(expected_string, 'a', 30000);
     		expected_string[30000] = '\n';
     		expected_string[30001] = '\0';
 
-			CU_ASSERT_PTR_NOT_NULL(result->first->string);
-			CU_ASSERT_STRING_EQUAL(result->first->string, expected_string);
-		  	CU_ASSERT_EQUAL(result->first->length, 30001);
-			CU_ASSERT_EQUAL(result->first->pos, 1);
-			CU_ASSERT_PTR_NULL(result->first->previous);
-			CU_ASSERT_PTR_NULL(result->first->next);
+			CU_ASSERT_PTR_NOT_NULL(file->first->string);
+			CU_ASSERT_STRING_EQUAL(file->first->string, expected_string);
+		  	CU_ASSERT_EQUAL(file->first->length, 30001);
+			CU_ASSERT_EQUAL(file->first->pos, 1);
+			CU_ASSERT_PTR_NULL(file->first->previous);
+			CU_ASSERT_PTR_NULL(file->first->next);
 		}
-		CU_ASSERT_EQUAL(result->n_elines, 1);
+		CU_ASSERT_EQUAL(file->n_elines, 1);
 	}	
 }
+
 
 void add_tests_eFile(CU_pSuite pSuite)
 {
