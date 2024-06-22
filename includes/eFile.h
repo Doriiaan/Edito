@@ -1,6 +1,8 @@
 #ifndef __EFILE_H__
 #define __EFILE_H__
 
+#include <stdio.h> /* FILE */
+
 #include "eLine.h"
 
 typedef struct efile_s
@@ -12,5 +14,6 @@ typedef struct efile_s
 } eFile;
 
 eFile* open_eFile(const char *filename, const char *mode);
+int close_eFile(eFile **ef);
 
 #endif

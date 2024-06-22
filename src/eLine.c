@@ -1,6 +1,7 @@
 #include <string.h> /* strnlen */
 #include <stdlib.h> /* malloc */
 #include <stdio.h> /* EOF */
+
 #include "eLine.h"
 
 unsigned int get_next_power_of_two(unsigned int n);

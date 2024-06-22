@@ -1,6 +1,8 @@
 #ifndef __ELINE_H__
 #define __ELINE_H__
 
+#include <stddef.h> /* size_t */
+
 /* eLine structure */
 typedef struct eLine
 {
