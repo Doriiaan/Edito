@@ -1,16 +1,12 @@
-/* Edito main file
- *
- * ------------------------------------------------
- * Version : 0.0.0.0
- * Date : 01/06/2024
- * Brief : Creation of the file
- * -------------------------------------------------
- *
- *
+/**
+ * @file 		edito.h
+ * @brief 		Contain the main function of edito
+ * @author 		ALARY Dorian
+ * @version 	0.1
+ * @date 		23/06/2024
+ * @copyright 	GNU Public License.
  *
  */
-#include <stdio.h>
-#include <unistd.h>
 
 int main()
 {

@@ -1,190 +1,174 @@
+/**
+ * @file 		eFile.c
+ * @brief 		Contain eFile structure and functions
+ * @author 		ALARY Dorian
+ * @version 	0.1
+ * @date 		23/06/2024
+ * @copyright 	GNU Public License.
+ *
+ * @details 	This file contains all the structures, variables and functions used to manage the file and its contents. 
+ * 				The methods allow you to :
+ * 					- initialize and allocate eFile from the name of a file,
+ * 					- modify the contents of eFile and
+ * 					- write the contents of eFile into the file used for initialization.
+ */
+
 #include <stdio.h> /* printf, FILE */
 #include <stdlib.h> /* malloc */
 #include <string.h> /* strlen, strncpy, strncat */
-#include <sys/stat.h> /* star structure */
 #include <errno.h> /* errno code */
+#include <unistd.h> /* access */
 
 #include "eFile.h"
 #include "eLine.h"
 
-#define BUFFER_LENGTH 256 
+#define BUFFER_LENGTH 256 /* Buffer length of the buffer used to read lines */
 
 
-/* return FILE pointer or NULL, and trace error */
-FILE *open_fd(const char *filename)
+/**
+ * @brief The file_permissions() function return the permission of the file designed by filename.
+ *
+ * @param filename:	Name of the file
+ * @return PERM value defining the permission of the file.
+ */
+PERM file_permissions(const char *filename)
 {
-	int fd; /* file desciptor returned by open */
-	FILE *file=NULL; /* FILE pointer returned by fdopen */
-	struct stat filestat; /* stat structure to test information about the file "filename" */
-	int uid, gid; /* uid and gid of process */
-	int flags=0;
-
-
-	if(stat(&filestat, filename) == -1)
+	errno=0;
+	if(access(filename, R_OK) == -1)
 	{
-		/* If the file does not exist, create it */
-		if(errno == ENOENT) 
+		if(errno==ENOENT)
 		{
-			flags |= O_CREAT;
-		}
-		else 
-		{
-			/*TODO: TRACE */
-			return NULL;
-		}
-	}
-	
-
-	/* Regular file process */
-	if(!IS_REG(filestat.st_mode))
-	{
-		/*TODO:TRACE*/
-		return NULL;
-	}
-	
-
-	uid = getuid();
-	gid = getgid();
-
-	/* If user is the proprietary */
-	if(uid == filestat.st_uid)
-	{
-		/* Do user has read right ? */
-		if(filestat.st_mode & S_IRUSR)
-		{
-			/*TODO: TRACE */
-			return NULL;
-		}
-
-		/* Do user has write right ? */
-		if(filestat.st_mode & S_IWUSR)
-		{
-			flags |= O_RDWR;
+			return p_READWRITE;
 		}
 		else
 		{
-			flags |= O_RDONLY;
+			return p_NOPERM;
 		}
 	}
-	/* Else if user is in the group */
-	else if(gid == filestat.st_gid)
-	{	
-		/* Do group has read right ? */
-		if(filestat.st_mode & S_IRGRP)
-		{
-			/*TODO: TRACE */
-			return NULL;
-		}
-
-		/* Do group has write right ? */
-		if(filestat.st_mode & S_IWGRP)
-		{
-			flags |= O_RDWR;
-		}
-		else
-		{
-			flags |= O_RDONLY;
-		}
-	}
-	/* Else, process as other */
 	else
 	{
-		/* Do other has read right ? */
-		if(filestat.st_mode & S_IROTH)
+		if(access(filename, W_OK) == -1)
 		{
-			/*TODO: TRACE */
-			return NULL;
-		}
-
-		/* Do other has write right ? */
-		if(filestat.st_mode & S_IWOTH)
-		{
-			flags |= O_RDWR;
+			return p_READONLY;
 		}
 		else
 		{
-			flags |= O_RDONLY;
+			return p_READWRITE;
 		}
 	}
 }
 
 
-eFile* open_eFile(const char *filename)
+/**
+ * @brief The create_eFile() function allocate and initialize an eFile structure.
+ *
+ * @param filename:	Name of the file
+ * @return eFile pointer or NULL if it was an error, see logs.
+ *
+ * @note delete_eFile() must be called before exiting.
+ */
+eFile* create_eFile(const char *filename)
 {
 	FILE *fp=NULL;
 	eFile *efile=NULL;
 	eLine *current=NULL, *previous=NULL;
 	char buffer[BUFFER_LENGTH];
-	int pos = 1;
-
-
-	/* Open file */
-	if((fp = fopen(filename, mode)) == NULL)
-	{
-		/* TODO: TRACE */
-		return NULL;
-	}
 
 
 	/* Allocate and fill the data structure */
 	efile = (eFile *) malloc(sizeof(eFile));
-	efile->fp = fp;
+	if(efile == NULL)
+	{
+		/* TODO:TRACE */
+		return NULL;
+	}
+
+
+	if((efile->permissions = file_permissions(filename)) == p_NOPERM)
+	{
+		/* TODO:TRACE */
+		free(efile);
+		return NULL;	
+	}
+
+
+	/* open file to read it */
+	if((fp = fopen(filename, "r")) == NULL)
+	{
+		/* TODO: TRACE */
+		free(efile);
+		return NULL;
+	}
+
+
+	efile->n_elines = 0;
+	efile->filename = filename;
 
 
 	/* Loop to read lines of the file*/
-	while(fgets(buffer, BUFFER_LENGTH, efile->fp) != NULL)
+	while(fgets(buffer, BUFFER_LENGTH, fp) != NULL)
 	{
-		current = create_eLine(buffer, BUFFER_LENGTH, pos, previous, NULL);
-		if(current == NULL)
+		if((current = create_eLine(buffer, BUFFER_LENGTH, efile->n_elines+1, previous, NULL)) == NULL)
 		{
-			/* TODO: TRACE + close eFile */
+			/* TODO: TRACE */
+			delete_eFile(&efile);	
 			return NULL;
 		}
 
+
 		/* If it is not the end of line */
-		while(buffer[strlen(buffer)-1] != '\n' && fgets(buffer, BUFFER_LENGTH, efile->fp) != NULL)
+		while(buffer[strlen(buffer)-1] != '\n' && fgets(buffer, BUFFER_LENGTH, fp) != NULL)
 		{
 			if(insert_eLine(current, buffer, BUFFER_LENGTH, current->length))
 			{
 				/* TODO: TRACE */
-				break;
+				delete_eFile(&efile);
+				return NULL;
 			}
 		}
 
+
 		/* If the last line does not have a \n */
-		if(get_char_eLine(current, get_length_eLine(current)-1)!= '\n')
-			if(insert_eLine(current, buffer, BUFFER_LENGTH, current->length))
+		if(current->string[current->length-1] != '\n')
+			if(insert_eLine(current, "\n", 1, current->length))
 			{
 				/* TODO: TRACE */
+				delete_eFile(&efile);
+				return NULL;
 			}
 
-	   	if(pos==1)
+	   	if(efile->n_elines==0)
 			efile->first = current;
 
 
-		if(get_previous_eLine(current) != NULL)
-			set_next_eLine(get_previous_eLine(current), current);
-
-
 		/* reinit for future lines */
-		pos++;
+		efile->n_elines++;
 		previous = current;
 		current = NULL;
 	}
 
-	efile->n_elines = pos-1;
-
+	fclose(fp);
 	return efile;
 }
 
-int write_eFile(eFile *ef);
-int close_eFile(eFile **ef)
-{
-	int result;
-	eLine *current = (*ef)->first, *temp=NULL;
 
-	if((result = fclose((*ef)->fp)))
-		return result;
+/**
+ * @brief The write_eFile() function write the content of eFile on the file designed by filename stored in the filename attribute.
+ *
+ * @param efile eFile pointer
+ * @return 0 on sucess or -1 in failure, see logs.
+ */
+int write_eFile(eFile *efile);
+
+
+/**
+ * @brief the delete_Efile() delete and deallocate eFile and set the pointer to NULL.
+ *
+ * @param efile eFile pointer pointer
+ */
+void delete_eFile(eFile **efile)
+{
+	eLine *current = (*efile)->first, *temp=NULL;
 
 	while(current->next)
 	{
@@ -193,7 +177,6 @@ int close_eFile(eFile **ef)
 		current = temp;
 	}
 
-	free(*ef);
-	*ef = NULL;
-	return 0;
+	free(*efile);
+	*efile = NULL;
 }

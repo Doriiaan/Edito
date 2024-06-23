@@ -6,62 +6,41 @@
 #define FILENAME1 "text_files/file1.txt" /* Empty */
 #define FILENAME2 "text_files/file2.txt" /* 3 lines, normal file */
 #define FILENAME3 "text_files/file3.txt" /* 30000 'a' and 1 '\n' */
-#define FILENAME4 "doesnt_exist" /* The file does not exist */
-#define FILENAME5 "error*!@ /." /* syntax error in filenam */
-
-
-void test_open_eFile_empty(eFile *file);
-void test_open_eFile_normal(eFile *file);
-void test_open_eFile_bigline(eFile *file);
-
+#define FILENAME4 "text_files/file4.txt" /* Same as FILENAME2 but readonly */
+#define FILENAME5 "text_files/file5.txt" /* No perm */
 
 
 /* Empty file */
-void test_open_eFile_empty_readwrite(void)
+void test_create_eFile_empty(void)
 {
-	eFile *file = open_eFile(FILENAME1, "r+");
-	test_open_eFile_empty(file);
-}
-
-void test_open_eFile_empty_readonly(void)
-{
-	eFile *file = open_eFile(FILENAME1, "r");
-	test_open_eFile_empty(file);
-}
-
-void test_open_eFile_empty(eFile *file)
-{
+	eFile *file = create_eFile(FILENAME1);
 	CU_ASSERT_PTR_NOT_NULL(file);
 
 	if(file != NULL)
 	{
-		CU_ASSERT_PTR_NOT_NULL(file->fp);
+		CU_ASSERT_PTR_NOT_NULL(file->filename);
+		if(file->filename != NULL)
+			CU_ASSERT_STRING_EQUAL(file->filename, FILENAME1);
 		CU_ASSERT_PTR_NULL(file->first);
 		CU_ASSERT_EQUAL(file->n_elines, 0);
+		CU_ASSERT_EQUAL(file->permissions, p_READWRITE);
 	}
 }
 
 
 /* Normal file */
-void test_open_eFile_normal_readonly(void)
+void test_create_eFile_normal(void)
 {
-	eFile *file = open_eFile(FILENAME2, "r");
-	test_open_eFile_normal(file);
-}
-
-void test_open_eFile_normal_readwrite(void)
-{
-	eFile *file = open_eFile(FILENAME2, "r+");
-	test_open_eFile_normal(file);
-}
-
-void test_open_eFile_normal(eFile *file)
-{
+	eFile *file = create_eFile(FILENAME2);
 
 	CU_ASSERT_PTR_NOT_NULL(file);
 	if(file != NULL)
 	{
-		CU_ASSERT_PTR_NOT_NULL(file->fp);
+		CU_ASSERT_PTR_NOT_NULL(file->filename);
+		if(file->filename != NULL)
+			CU_ASSERT_STRING_EQUAL(file->filename, FILENAME2);
+		CU_ASSERT_EQUAL(file->permissions, p_READWRITE);
+		CU_ASSERT_EQUAL(file->n_elines, 3);
 		
 		eLine *current = file->first;
 		for(int i=0; i<3 ; i++)
@@ -102,30 +81,23 @@ void test_open_eFile_normal(eFile *file)
 				current = current->next;
 			}
 		}
-		CU_ASSERT_EQUAL(file->n_elines, 3);
 	}
 }
 
-
-void test_open_eFile_bigline_readonly(void)
+/* Bifline file */
+void test_create_eFile_bigline(void)
 {
-	eFile *file = open_eFile(FILENAME3, "r");
-	test_open_eFile_bigline(file);
-}
+	eFile *file = create_eFile(FILENAME3);
 
-void test_open_eFile_bigline_readwrite(void)
-{
-	eFile *file = open_eFile(FILENAME3, "r+");
-	test_open_eFile_bigline(file);
-}
-
-void test_open_eFile_bigline(eFile *file)
-{
 	CU_ASSERT_PTR_NOT_NULL(file);
 
 	if(file != NULL)
 	{
-		CU_ASSERT_PTR_NOT_NULL(file->fp);
+		CU_ASSERT_PTR_NOT_NULL(file->filename);
+		if(file->filename != NULL)
+			CU_ASSERT_STRING_EQUAL(file->filename, FILENAME3);
+		CU_ASSERT_EQUAL(file->permissions, p_READWRITE);
+		CU_ASSERT_EQUAL(file->n_elines, 1);
 		CU_ASSERT_PTR_NOT_NULL(file->first);
 
 		if(file->first != NULL)
@@ -142,17 +114,76 @@ void test_open_eFile_bigline(eFile *file)
 			CU_ASSERT_PTR_NULL(file->first->previous);
 			CU_ASSERT_PTR_NULL(file->first->next);
 		}
-		CU_ASSERT_EQUAL(file->n_elines, 1);
 	}	
 }
 
+void test_create_eFile_readonly(void)
+{
+	eFile *file = create_eFile(FILENAME4);
+
+	CU_ASSERT_PTR_NOT_NULL(file);
+	if(file != NULL)
+	{
+		CU_ASSERT_PTR_NOT_NULL(file->filename);
+		if(file->filename != NULL)
+			CU_ASSERT_STRING_EQUAL(file->filename, FILENAME4);
+		CU_ASSERT_EQUAL(file->permissions, p_READONLY);
+		CU_ASSERT_EQUAL(file->n_elines, 3);
+		
+		eLine *current = file->first;
+		for(int i=0; i<3 ; i++)
+		{
+			CU_ASSERT_PTR_NOT_NULL(current);
+			if(current != NULL)
+			{
+				switch(i)
+				{
+					case 0:
+						CU_ASSERT_PTR_NOT_NULL(current->string);
+						if(current->string != NULL)
+							CU_ASSERT_STRING_EQUAL(current->string, "Hello world!\n");
+				   		CU_ASSERT_EQUAL(current->length, 13);
+						CU_ASSERT_EQUAL(current->pos, 1);
+						CU_ASSERT_PTR_NULL(current->previous);
+						CU_ASSERT_PTR_NOT_NULL(current->next);
+						break;
+					case 1:
+						CU_ASSERT_PTR_NOT_NULL(current->string);
+						if(current->string != NULL)
+							CU_ASSERT_STRING_EQUAL(current->string, "\n");
+					   	CU_ASSERT_EQUAL(current->length, 1);
+						CU_ASSERT_EQUAL(current->pos, 2);
+						CU_ASSERT_PTR_NOT_NULL(current->previous);
+						CU_ASSERT_PTR_NOT_NULL(current->next);
+						break;
+					case 2:
+						CU_ASSERT_PTR_NOT_NULL(current->string);
+						if(current->string != NULL)
+							CU_ASSERT_STRING_EQUAL(current->string, "I'm fine!\n");
+					   	CU_ASSERT_EQUAL(current->length, 10);
+						CU_ASSERT_EQUAL(current->pos, 3);
+						CU_ASSERT_PTR_NOT_NULL(current->previous);
+						CU_ASSERT_PTR_NULL(current->next);
+						break;
+				}
+				current = current->next;
+			}
+		}
+	}
+
+}
+
+void test_create_eFile_noperm(void)
+{
+	eFile *file = create_eFile(FILENAME5);
+	CU_ASSERT_PTR_NULL(file);
+}
 
 void add_tests_eFile(CU_pSuite pSuite)
 {
-    CU_add_test(pSuite, "open_eFile() with empty file (readonly)", test_open_eFile_empty_readonly);
-    CU_add_test(pSuite, "open_eFile() with empty file (readwrite)", test_open_eFile_empty_readwrite);
-    CU_add_test(pSuite, "open_eFile() with normal file (readonly)", test_open_eFile_normal_readwrite);
-    CU_add_test(pSuite, "open_eFile() with normal file (readwrite)", test_open_eFile_normal_readwrite);
-    CU_add_test(pSuite, "open_eFile() with bigline file (readonly)", test_open_eFile_bigline_readwrite);
-    CU_add_test(pSuite, "open_eFile() with bigline file (readwrite)", test_open_eFile_bigline_readwrite);
+    CU_add_test(pSuite, "create_eFile() with empty file", test_create_eFile_empty);
+    CU_add_test(pSuite, "create_eFile() with normal file", test_create_eFile_normal);
+    CU_add_test(pSuite, "create_eFile() with bigline file", test_create_eFile_bigline);
+    CU_add_test(pSuite, "create_eFile() with readonly file", test_create_eFile_readonly);
+    CU_add_test(pSuite, "create_eFile() with no perm file", test_create_eFile_noperm);
 }

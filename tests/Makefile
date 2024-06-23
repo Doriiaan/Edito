@@ -15,7 +15,7 @@ TESTS_OBJ = $(TESTS_SRC:$(TESTS_DIR)/%.c=$(TESTS_DIR)/%.o)
 
 
 # first target
-tests: $(TESTS_EXEC)
+tests: $(TESTS_EXEC) change_perm
 
 $(TESTS_EXEC): $(TESTS_OBJ) $(USED_PROJECT_OBJ)
 	$(CC) -o $@ $^ $(TESTS_LDFLAGS)

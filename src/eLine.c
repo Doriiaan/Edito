@@ -1,24 +1,41 @@
+/**
+ * @file 		eLine.c
+ * @brief 		Contain eLine structure and functions
+ * @author 		ALARY Dorian
+ * @version 	0.1
+ * @date 		23/06/2024
+ * @copyright 	GNU Public License.
+ *
+ * @details 	This file contains all the structures, variables and functions used to manage lines. 
+ * 				The functions allow you to :
+ * 					- allocate and initialize an eLine,
+ * 					- modify content of a eLine and
+ * 					- delete and deallocate a eLine.
+ */
+
+
 #include <string.h> /* strnlen */
 #include <stdlib.h> /* malloc */
 #include <stdio.h> /* EOF */
 
 #include "eLine.h"
 
+
 unsigned int get_next_power_of_two(unsigned int n);
 
 	
-/*
- * @brief Allocate and complete eLine structure
+/**
+ * @brief The create_eLine() function allocate and initialize an eLine.
  *
- * @param [IN] char *string: string of line.
- * @param [IN] size_t length: length of the string (excluding null terminator)
- * @param [IN] unsigned int pos: position of the line in the file.
- * @param [IN] eLine *next: next line in file.
- * @param [IN] eLine *previous: previous line in file.
+ * @param string: 	String of line.
+ * @param length: 	Length of the string (excluding null terminator)
+ * @param pos: 		Position of the line in the file.
+ * @param next: 	Next line in file.
+ * @param previous: Previous line in file.
  *
- * @return eLine *: pointer on the line structure or NULL if allocation failed.
+ * @return Pointer on the line structure or NULL if allocation failed.
  *
- * @note delete_eLine() must be called before exiting
+ * @note delete_eLine() must be called before exiting.
  */
 eLine *create_eLine(char *string, size_t length, unsigned int pos, eLine *previous, eLine *next)
 {
@@ -45,56 +62,28 @@ eLine *create_eLine(char *string, size_t length, unsigned int pos, eLine *previo
 
 
 	eline->pos = pos;
+
 	eline->next = next;
+	if(eline->next)
+		eline->next->previous = eline;
+
 	eline->previous = previous;
+	if(eline->previous)
+		eline->previous->next = eline;
 
 	return eline;
 }
 
 
-/* GETTERs AND SETTERs */
-size_t get_length_eLine(const eLine *eline)
-{
-	return eline->length;
-}
-
-unsigned int get_pos_eLine(const eLine *eline)
-{
-	return eline->pos;
-}
-
-eLine *get_next_eLine(const eLine *eline)
-{
-	return eline->next;
-}
-
-int get_char_eLine(const eLine *eline, size_t i)
-{
-	if(i < eline->length)
-		return (eline->string)[i];
-	else
-		return EOF;
-}
-
-eLine *get_previous_eLine(const eLine *eline)
-{
-	return eline->previous;
-}
-
-void set_next_eLine(eLine *eline, eLine *next)
-{
-	eline->next = next;
-}
-
-void set_previous_eLine(eLine *eline, eLine *previous)
-{
-	eline->previous = previous;
-}
-
-
-/*
+/**
+ * @brief The insert_eLine() function insert length character of the string in the line at position pos.
  *
+ * @param eline: 	eLine 
+ * @param string: 	The string to insert
+ * @param length:	Number of character to insert from string into the eLine
+ * @param pos:		Position where to insert the string
  *
+ * @return 0 on success, -1 on error, see logs
  *
  */
 int insert_eLine(eLine *eline, const char *string, size_t length, unsigned int pos)
@@ -103,7 +92,10 @@ int insert_eLine(eLine *eline, const char *string, size_t length, unsigned int p
 	size_t new_length = eline->length + string_length;
 	
 	if(pos > eline->length + 1)
+	{
+		/* TODO: TRACE */
 		return -1;
+	}
 
 	if(new_length+1 > eline->alloc_size)
 	{
@@ -121,6 +113,12 @@ int insert_eLine(eLine *eline, const char *string, size_t length, unsigned int p
 	return 0;
 }
 
+
+/**
+ * @brief The delete_eLine() function delete and deallocate eLine and set pointer to NULL
+ *
+ * @param:	eline pointer pointer
+ */
 void delete_eLine(eLine **eline)
 {
 	if(*eline != NULL)
@@ -132,6 +130,14 @@ void delete_eLine(eLine **eline)
 	}
 }
 
+
+/*
+ * @brief The get_next_power_of_two() function is an intern function to calculate the next power of two after a number n.
+ *
+ * @example get_next_power_of_two(7) -> 8
+ * @example get_next_power_of_two(16) -> 32
+ * @example get_next_power_of_two(0) -> 1
+ */
 unsigned int get_next_power_of_two(unsigned int n)
 {
 	return (1 << (sizeof(unsigned int)*8 - __builtin_clz(n)));
