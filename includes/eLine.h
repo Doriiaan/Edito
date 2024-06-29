@@ -68,7 +68,20 @@ eLine *create_eLine(char *string, size_t length, unsigned int pos, eLine *previo
  * @return 0 on success, -1 on error, see logs
  *
  */
-int insert_eLine(eLine *eline, const char *string, size_t length, unsigned int pos);
+int insert_string_eLine(eLine *eline, const char *string, size_t length, unsigned int pos);
+
+
+/**
+ * @brief The insert_char_eLine() function insert a character in the line at position pos.
+ *
+ * @param eline: eLine
+ * @param ch: The character to insert
+ * @param pos: Position where to insert the string
+ *
+ * @return 0 on success, -1 on error, see logs
+ *
+ */
+int insert_char_eLine(eLine *eline, const char ch, unsigned int pos);
 
 
 /**

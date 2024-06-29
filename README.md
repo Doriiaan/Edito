@@ -6,3 +6,4 @@ TODO :
 - [ ] Add .h dependencies into Makefile
 - [ ] Create build/bin and build/obj
 - [ ] Add TRACE 
+- [ ] Add is_saved attribute in eFile 

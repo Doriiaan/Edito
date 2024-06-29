@@ -15,7 +15,7 @@ TESTS_OBJ = $(TESTS_SRC:$(TESTS_DIR)/%.c=$(TESTS_DIR)/%.o)
 
 
 # first target
-tests: $(TESTS_EXEC) change_perm
+tests: $(TESTS_EXEC)
 
 $(TESTS_EXEC): $(TESTS_OBJ) $(USED_PROJECT_OBJ)
 	$(CC) -o $@ $^ $(TESTS_LDFLAGS)
@@ -26,4 +26,4 @@ $(TESTS_DIR)/%.o: $(TESTS_DIR)/%.c
 # TODO: Add .h dependencies
 
 clean_tests:
-	rm $(TESTS_OBJ) $(TESTS_EXEC)
+	-rm -f $(TESTS_OBJ) $(TESTS_EXEC)

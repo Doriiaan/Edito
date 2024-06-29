@@ -1,16 +1,18 @@
 /**
- * @file 		eFile.c
- * @brief 		Contain eFile structure and functions
- * @author 		ALARY Dorian
- * @version 	0.1
- * @date 		23/06/2024
- * @copyright 	GNU Public License.
+ * ===================================================
+ * @file eFile.c
+ * @brief Contain eFile structure and functions
+ * @author ALARY Dorian
+ * @version 0.1
+ * @date 23/06/2024
+ * @copyright GNU Public License.
  *
- * @details 	This file contains all the structures, variables and functions used to manage the file and its contents. 
- * 				The methods allow you to :
- * 					- initialize and allocate eFile from the name of a file,
- * 					- modify the contents of eFile and
- * 					- write the contents of eFile into the file used for initialization.
+ * @details This file contains all the structures, variables and functions used to manage the file and its contents. 
+ *          The methods allow you to :
+ *              - initialize and allocate eFile from the name of a file,
+ *              - modify the contents of eFile and
+ *              - write the contents of eFile into the file used for initialization.
+ * ===================================================
  */
 
 #include <stdio.h> /* printf, FILE */
@@ -28,7 +30,7 @@
 /**
  * @brief The file_permissions() function return the permission of the file designed by filename.
  *
- * @param filename:	Name of the file
+ * @param filename: Name of the file
  * @return PERM value defining the permission of the file.
  */
 PERM file_permissions(const char *filename)
@@ -83,14 +85,12 @@ eFile* create_eFile(const char *filename)
 		return NULL;
 	}
 
-
 	if((efile->permissions = file_permissions(filename)) == p_NOPERM)
 	{
 		/* TODO:TRACE */
 		free(efile);
 		return NULL;	
 	}
-
 
 	/* open file to read it */
 	if((fp = fopen(filename, "r")) == NULL)
@@ -100,10 +100,8 @@ eFile* create_eFile(const char *filename)
 		return NULL;
 	}
 
-
 	efile->n_elines = 0;
 	efile->filename = filename;
-
 
 	/* Loop to read lines of the file*/
 	while(fgets(buffer, BUFFER_LENGTH, fp) != NULL)
@@ -115,11 +113,10 @@ eFile* create_eFile(const char *filename)
 			return NULL;
 		}
 
-
 		/* If it is not the end of line */
 		while(buffer[strlen(buffer)-1] != '\n' && fgets(buffer, BUFFER_LENGTH, fp) != NULL)
 		{
-			if(insert_eLine(current, buffer, BUFFER_LENGTH, current->length))
+			if(insert_string_eLine(current, buffer, BUFFER_LENGTH, current->length))
 			{
 				/* TODO: TRACE */
 				delete_eFile(&efile);
@@ -127,10 +124,9 @@ eFile* create_eFile(const char *filename)
 			}
 		}
 
-
 		/* If the last line does not have a \n */
 		if(current->string[current->length-1] != '\n')
-			if(insert_eLine(current, "\n", 1, current->length))
+			if(insert_string_eLine(current, "\n", 1, current->length))
 			{
 				/* TODO: TRACE */
 				delete_eFile(&efile);
@@ -139,7 +135,6 @@ eFile* create_eFile(const char *filename)
 
 	   	if(efile->n_elines==0)
 			efile->first = current;
-
 
 		/* reinit for future lines */
 		efile->n_elines++;
@@ -158,7 +153,44 @@ eFile* create_eFile(const char *filename)
  * @param efile eFile pointer
  * @return 0 on sucess or -1 in failure, see logs.
  */
-int write_eFile(eFile *efile);
+int write_eFile(eFile *efile)
+{
+	FILE *fp = NULL;
+	eLine *current = NULL;
+
+	if(efile == NULL)
+	{
+		/* TODO: TRACE */
+		return -1;
+	}
+
+	if(efile->permissions == p_NOPERM)
+	{
+		/* TODO: TRACE */
+		return -1;
+	}
+
+	if((fp = fopen(efile->filename, "w")) == NULL)
+	{
+		/* TODO: TRACE */
+		return -1;
+	}
+
+	current = efile->first;
+	while(current)
+	{
+		if(fputs(current->string, fp) == EOF)
+		{
+			/* TODO: TRACE + call a function to write in a temporary file */
+			fclose(fp);
+			return -1;
+		}
+		current=current->next;
+	}
+	
+	fclose(fp);
+	return 0;
+}
 
 
 /**

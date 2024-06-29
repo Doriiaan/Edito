@@ -23,4 +23,4 @@ $(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
 # TODO declare .h include for each c file
 
 clean_project:
-	rm $(PROJECT_OBJ) $(PROJECT_EXEC)
+	-rm -f $(PROJECT_OBJ) $(PROJECT_EXEC)
