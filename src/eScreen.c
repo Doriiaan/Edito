@@ -10,7 +10,7 @@
  * @details This file contains all the structures, variables and functions used to manage the screen and its windows. 
  *          The methods allow you to :
  *              - initialize and allocate eScreen from the width and height of the screen,
- *              - manage content of the screen
+ *              - manage content of the screen.
  * ===================================================
  */
 
@@ -18,8 +18,16 @@
 #include <ncurses.h>
 
 #include "eScreen.h"
-#include "eFile.h"
+#include "eLine.h"
 
+
+/**
+ * @brief The create_eScreen() function allocate and initialize an eScreen structure.
+ *
+ * @return eScreen pointer or NULL if it was an error, see logs.
+ *
+ * @note delete_eScreen() must be called before exiting.
+ */
 eScreen *create_eScreen(int lines, int columns)
 {
 	eScreen *screen;
@@ -73,6 +81,12 @@ eScreen *create_eScreen(int lines, int columns)
 	return screen;
 }
 
+
+/**
+ * @brief The delete_eScreen() function deallocate the eScreen structure and set the pointer to the structure to NULL.
+ *
+ * @param manager eManager pointer pointer
+ */
 void delete_eScreen(eScreen **screen)
 {
 	delete_eWindow(&(*screen)->windows[MENU]);
@@ -86,6 +100,12 @@ void delete_eScreen(eScreen **screen)
 	*screen = NULL;
 }
 
+
+/**
+ * @brief The update_menu_eScreen() function refresh the menu window.
+ *
+ * @param screen eScreen pointer
+ */
 void update_menu_eScreen(eScreen *screen)
 {
 	box(screen->windows[MENU]->window, 0, 0);
@@ -94,6 +114,11 @@ void update_menu_eScreen(eScreen *screen)
 }
 
 
+/*
+ * @brief The update_bar_eScreen() function refresh the bar window.
+ *
+ * @param screen eScreen pointer
+ */
 void update_bar_eScreen(eScreen *screen)
 {
 	box(screen->windows[BAR]->window, 0, 0);
@@ -102,42 +127,117 @@ void update_bar_eScreen(eScreen *screen)
 }
 
 
+/**
+ * @brief The update_file_eScreen() function refresh the file content and file number window.
+ *
+ * @param screen eScreen pointer
+ */
 void update_file_eScreen(eScreen *screen)
 {
-	box(screen->windows[FILE_BOX]->window, 0, 0);
-	wborder(screen->windows[FILE_LINESNUMBER]->window, ' ', 0, ' ', ' ', ' ', ACS_VLINE, ' ', ACS_VLINE);
-
-	wnoutrefresh(screen->windows[FILE_BOX]->window);
 	wnoutrefresh(screen->windows[FILE_LINESNUMBER]->window);
 	wnoutrefresh(screen->windows[FILE_CONTENT]->window);
 	doupdate();
 }
 
 
+/**
+ * @brief the update_all_eScreen() function refresh all the window of the screen.
+ *
+ * @param screen eScreen pointer
+ */
 void update_all_eScreen(eScreen *screen)
 {
 	box(screen->windows[MENU]->window, 0, 0);
 	box(screen->windows[BAR]->window, 0, 0);
 	box(screen->windows[FILE_BOX]->window, 0, 0);
-	wborder(screen->windows[FILE_LINESNUMBER]->window, ' ', 0, ' ', ' ', ' ', ACS_VLINE, ' ', ACS_VLINE);
 
 	for(int i=0 ; i<WINDOWS_NUMBER ; i++)
 	{
-		wnoutrefresh(screen->windows[i]->window);
+		if(screen->windows[i])
+			wnoutrefresh(screen->windows[i]->window);
 	}
-	wnoutrefresh(screen->windows[POPUP]->window);
 	
 	doupdate();
 }
 
 
+/**
+ * @brief The set_current_eScreen() function set the current window and cursor of the screen.
+ *
+ * @param type The type of the window (the type refers to the window)
+ */
 void set_current_window_eScreen(eScreen *screen, WINDOW_TYPE type)
 {
 	screen->current_window = screen->windows[type];
+	wmove(screen->current_window->window, screen->current_window->y_cursor, screen->current_window->x_cursor);
 }
 
-void insert_char_infile_eScreen(eScreen *screen, int input)
+
+/**
+ * @brief The print_content_eScreen() function print the content of the file in the window, do not change the cursor position
+ *
+ * @param screen eScreen pointer
+ * @param first_line First line to print
+ * @param number_length Number of digit of the higher line of the file
+ */
+void print_content_eScreen(eScreen *screen, eLine *first_line, unsigned int number_length)
 {
-	(void)screen;
-	(void)input;
+	eLine *current_line = first_line;
+	size_t screen_pos=0;
+	int line_number=first_line->pos;
+	
+	/* Print the right border of the lines number window */
+	wborder(screen->windows[FILE_LINESNUMBER]->window, ' ', 0, ' ', ' ', ' ', ACS_VLINE, ' ', ACS_VLINE);
+
+	while(screen_pos < screen->windows[FILE_CONTENT]->height)
+	{
+		/* If there is at least one line left */
+		if(current_line)
+		{
+			/* print line number */
+			mvwprintw(screen->windows[FILE_LINESNUMBER]->window, screen_pos, 0, "%*d", number_length, line_number);
+			for(size_t i_part_of_line=0 ; i_part_of_line < current_line->length ; i_part_of_line+=screen->windows[FILE_CONTENT]->width)
+			{
+				/* print each part of line (if the line width is higher than the scren width) */
+				mvwprintw(screen->windows[FILE_CONTENT]->window, screen_pos, 0, "%.*s", screen->windows[FILE_CONTENT]->width, current_line->string+i_part_of_line);
+				screen_pos++;
+			}
+			current_line = current_line->next;
+		}
+
+		/* If there are no lines left */
+		else
+		{
+			mvwprintw(screen->windows[FILE_LINESNUMBER]->window, screen_pos, 0, "%.*s%c", number_length, " ", '~');
+			screen_pos++;
+		}
+		line_number++;
+	}
+
+	/* Move the cursor to the current_window cursor position */
+	wmove(screen->current_window->window, screen->current_window->y_cursor, screen->current_window->x_cursor);
+}
+
+
+/**
+ * @brief The insert_char_eScreen() function insert a character in the current_window.
+ *
+ * @param screen eScreen pointer
+ * @param ch Character to insert in the screen
+ */
+void insert_char_eScreen(eScreen *screen, char ch)
+{
+	waddch(screen->current_window->window, ch);
+	getyx(screen->current_window->window, screen->current_window->y_cursor, screen->current_window->x_cursor);
+}
+
+
+/**
+ * @brief The get_input_eScreen() function request an input to the user.
+ *
+ * @param screen eScreen pointer
+ */
+int get_input_eScreen(eScreen *screen)
+{
+	return wgetch(screen->current_window->window);
 }

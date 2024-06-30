@@ -125,6 +125,9 @@ int insert_string_eLine(eLine *eline, const char *string, size_t length, unsigne
  */
 int insert_char_eLine(eLine *eline, const char ch, unsigned int pos)
 {
+	if(!eline)
+		return -1;
+
 	if(pos > eline->length + 1)
 	{
 		/* TODO: TRACE */

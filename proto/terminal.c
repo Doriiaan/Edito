@@ -39,6 +39,8 @@ int main(void)
 	
 	int ch;
 	bool run = true;
+	int x = 0;
+	int y = 0;
 
 	if((file = create_eFile("file.txt")) == NULL)
 	{
@@ -66,6 +68,7 @@ int main(void)
 	box(w_files, 0, 0);
 	box(w_code_box, 0, 0);
 
+
 	refresh();
 	wrefresh(w_menu);
 	wrefresh(w_files);
@@ -82,20 +85,31 @@ int main(void)
 				break;
 
 			case KEY_DOWN:
-				if(screen->end->next)
+				if(y+1 >= screen->n_lines && screen->end->next)
 				{
 					screen->first = screen->first->next;
 					screen->end = screen->end->next;
 					print_code(w_code_file, w_code_numbers, screen);
 				}
+				else
+				{
+					y++;
+					wmove(w_code_file, x, y);
+				}
 				break;
 
 			case KEY_UP:
-				if(screen->first->previous)
+				
+				if(y-1 < 0 && screen->first->previous)
 				{
 					screen->first = screen->first->previous;
 					screen->end = screen->end->previous;
 					print_code(w_code_file, w_code_numbers, screen);
+				}
+				else
+				{
+					y--;
+					wmove(w_code_file, x, y);
 				}
 				break;
 		}

@@ -22,7 +22,8 @@ typedef enum
 {
 	p_NOPERM,
 	p_READONLY,
-	p_READWRITE
+	p_READWRITE,
+	p_CREATE
 } PERM;
 
 
@@ -72,5 +73,14 @@ int write_eFile(eFile *efile);
  * @param efile eFile pointer pointer
  */
 void delete_eFile(eFile **efile);
+
+
+/**
+ * @brief the add_empty_line_eFile() add an empty line to the position pos in the file
+ *
+ * @param efile eFile pointer pointer
+ * @param pos  Position of the new line in the file
+ */
+void add_empty_line_eFile(eFile *efile, unsigned int pos);
 
 #endif

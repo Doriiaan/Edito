@@ -32,6 +32,7 @@ int main()
 	/* Terminal initialization */
 	init_terminal();	
 
+	/* TODO: eManager have to do the job */
 	/* Screen structure initialization */
 	if((screen = create_eScreen(LINES, COLS)) == NULL)
 	{
@@ -39,6 +40,7 @@ int main()
 		exit(EXIT_FAILURE);
 	}
 
+	/* TODO: eManager have to do the job */
 	/* File structure initialization */
 	if((file = create_eFile("text.txt")) == NULL)
 	{

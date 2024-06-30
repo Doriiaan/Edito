@@ -40,7 +40,7 @@ PERM file_permissions(const char *filename)
 	{
 		if(errno==ENOENT)
 		{
-			return p_READWRITE;
+			return p_CREATE;
 		}
 		else
 		{
@@ -92,8 +92,19 @@ eFile* create_eFile(const char *filename)
 		return NULL;	
 	}
 
+	if(efile->permissions == p_CREATE)
+	{
+		if((fp = fopen(filename, "w+")) == NULL)
+		{
+			/* TODO: TRACE */
+			free(efile);
+			return NULL;
+		}
+		add_empty_line_eFile(efile, 0);
+	}
+
 	/* open file to read it */
-	if((fp = fopen(filename, "r")) == NULL)
+	else if(efile->permissions != p_CREATE && (fp = fopen(filename, "r")) == NULL)
 	{
 		/* TODO: TRACE */
 		free(efile);
@@ -141,6 +152,9 @@ eFile* create_eFile(const char *filename)
 		previous = current;
 		current = NULL;
 	}
+
+	if(efile->n_elines == 0)
+		add_empty_line_eFile(efile, 0);
 
 	fclose(fp);
 	return efile;
@@ -194,7 +208,7 @@ int write_eFile(eFile *efile)
 
 
 /**
- * @brief the delete_Efile() delete and deallocate eFile and set the pointer to NULL.
+ * @brief the delete_eFile() delete and deallocate eFile and set the pointer to NULL.
  *
  * @param efile eFile pointer pointer
  */
@@ -202,7 +216,7 @@ void delete_eFile(eFile **efile)
 {
 	eLine *current = (*efile)->first, *temp=NULL;
 
-	while(current->next)
+	while(current)
 	{
 		temp = current->next;
 		delete_eLine(&current);
@@ -211,4 +225,40 @@ void delete_eFile(eFile **efile)
 
 	free(*efile);
 	*efile = NULL;
+}
+
+/**
+ * @brief the add_empty_line_eFile() add an empty line to the position pos in the file
+ *
+ * @param efile eFile pointer pointer
+ * @param pos  Position of the new line in the file
+ */
+void add_empty_line_eFile(eFile *efile, unsigned int pos)
+{
+	eLine *current = efile->first;
+	eLine *new = NULL;
+	unsigned int i = 0;
+
+	if(efile->first == NULL)
+	{
+		efile->first = create_eLine("", 0, 0, NULL, NULL);
+		return;
+	}
+
+	while(i < pos && current->next)
+	{
+		current=current->next;
+		i++;
+	}
+	
+	/* Current is previous*/
+	new = create_eLine("", 0, pos, current, current->next);
+
+	if(current->next)
+		current->next->previous = new;
+	current->next = new;
+
+	current = new->next;
+	while(current)
+		current->pos++;
 }
