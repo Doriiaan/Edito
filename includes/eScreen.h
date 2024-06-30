@@ -110,6 +110,15 @@ void print_content_eScreen(eScreen *screen, eLine *first_line, unsigned int numb
 void insert_char_eScreen(eScreen *screen, char ch);
 
 
+void move_cursor_eScreen(eScreen *screen, WINDOW_TYPE, unsigned int y, unsigned int x);
+
+
+unsigned int get_width_eScreen(eScreen *screen, WINDOW_TYPE type);
+
+
+unsigned int get_height_eScreen(eScreen *screen, WINDOW_TYPE type);
+
+
 /**
  * @brief The get_input_eScreen() function request an input to the user.
  *

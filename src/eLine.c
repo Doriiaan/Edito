@@ -57,6 +57,11 @@ eLine *create_eLine(char *string, size_t length, unsigned int pos, eLine *previo
 		return NULL;
 	}
 
+	if(string[strnlen(string, length)-1] == '\n')
+	{
+		length = strnlen(string, length)-1;
+	}
+
 	eline->length = strnlen(string, length);
 	memset(eline->string, 0, eline->alloc_size);
 	memcpy(eline->string, string, eline->length);
@@ -88,14 +93,21 @@ eLine *create_eLine(char *string, size_t length, unsigned int pos, eLine *previo
  */
 int insert_string_eLine(eLine *eline, const char *string, size_t length, unsigned int pos)
 {
+	/* del terminating \n character */
+	if(string[strnlen(string, length)-1] == '\n')
+	{
+		length = strnlen(string, length)-1;
+	}
+
 	size_t string_length = strnlen(string, length);
 	size_t new_length = eline->length + string_length;
-	
+
 	if(pos > eline->length + 1)
 	{
 		/* TODO: TRACE */
 		return -1;
 	}
+
 
 	if(new_length+1 > eline->alloc_size)
 	{
@@ -126,6 +138,9 @@ int insert_string_eLine(eLine *eline, const char *string, size_t length, unsigne
 int insert_char_eLine(eLine *eline, const char ch, unsigned int pos)
 {
 	if(!eline)
+		return -1;
+
+	if(ch == '\n')
 		return -1;
 
 	if(pos > eline->length + 1)

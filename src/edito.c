@@ -60,6 +60,9 @@ int main()
 	/* Print every Windows */
 	update_all_eScreen(screen);
 
+	set_current_window_eScreen(manager->screen, MENU);
+	move_cursor_eScreen(manager->screen, MENU, 1, 1);
+
 	/* Main loop */
 	while(run)
 	{
@@ -89,6 +92,7 @@ void init_terminal(void)
 	noecho(); /* deactivate echo from getch */
 	raw(); /* characters typed are immediately passed through to the user program and signal are uninterpreted */
 	keypad(stdscr, TRUE); /* activate KEY_UP, KEY_RIGHT, ... */
+	set_escdelay(50);
 	refresh();
 }
 

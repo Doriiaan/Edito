@@ -40,10 +40,6 @@ typedef struct {
 
 	unsigned int y;
 
-	unsigned int x_cursor;
-
-	unsigned int y_cursor;
-
 	WINDOW *window;
 
 } eWindow;

@@ -40,6 +40,8 @@ typedef struct {
 
 	eLine *current_line;
 
+	unsigned int current_pos;
+
 	eLine *first_screen_line;
 
 } eManager;
@@ -92,5 +94,11 @@ void set_eFile_eManager(eManager *manager, eFile *file);
  * @return returns true if the program continues and false otherwise.
  */
 bool run_eManager(eManager *manager);
+
+
+unsigned int gety_cursor_eManager(eManager *manager);
+
+
+unsigned int getx_cursor_eManager(eManager *manager);
 
 #endif

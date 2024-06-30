@@ -21,8 +21,19 @@ void test_create_eFile_empty(void)
 		CU_ASSERT_PTR_NOT_NULL(file->filename);
 		if(file->filename != NULL)
 			CU_ASSERT_STRING_EQUAL(file->filename, FILENAME1);
-		CU_ASSERT_PTR_NULL(file->first);
-		CU_ASSERT_EQUAL(file->n_elines, 0);
+		CU_ASSERT_PTR_NOT_NULL(file->first);
+		if(file->first)
+		{
+			CU_ASSERT_PTR_NOT_NULL(file->first->string);
+			if(file->first->string != NULL)
+				CU_ASSERT_STRING_EQUAL(file->first->string, "");
+			CU_ASSERT_EQUAL(file->first->length, 0);
+			CU_ASSERT_EQUAL(file->first->pos, 1);
+			CU_ASSERT_PTR_NULL(file->first->previous);
+			CU_ASSERT_PTR_NULL(file->first->next);
+
+		}
+		CU_ASSERT_EQUAL(file->n_elines, 1);
 		CU_ASSERT_EQUAL(file->permissions, p_READWRITE);
 	}
 }
@@ -53,8 +64,8 @@ void test_create_eFile_normal(void)
 					case 0:
 						CU_ASSERT_PTR_NOT_NULL(current->string);
 						if(current->string != NULL)
-							CU_ASSERT_STRING_EQUAL(current->string, "Hello world!\n");
-				   		CU_ASSERT_EQUAL(current->length, 13);
+							CU_ASSERT_STRING_EQUAL(current->string, "Hello world!");
+				   		CU_ASSERT_EQUAL(current->length, 12);
 						CU_ASSERT_EQUAL(current->pos, 1);
 						CU_ASSERT_PTR_NULL(current->previous);
 						CU_ASSERT_PTR_NOT_NULL(current->next);
@@ -62,8 +73,8 @@ void test_create_eFile_normal(void)
 					case 1:
 						CU_ASSERT_PTR_NOT_NULL(current->string);
 						if(current->string != NULL)
-							CU_ASSERT_STRING_EQUAL(current->string, "\n");
-					   	CU_ASSERT_EQUAL(current->length, 1);
+							CU_ASSERT_STRING_EQUAL(current->string, "");
+					   	CU_ASSERT_EQUAL(current->length, 0);
 						CU_ASSERT_EQUAL(current->pos, 2);
 						CU_ASSERT_PTR_NOT_NULL(current->previous);
 						CU_ASSERT_PTR_NOT_NULL(current->next);
@@ -71,8 +82,8 @@ void test_create_eFile_normal(void)
 					case 2:
 						CU_ASSERT_PTR_NOT_NULL(current->string);
 						if(current->string != NULL)
-							CU_ASSERT_STRING_EQUAL(current->string, "I'm fine!\n");
-					   	CU_ASSERT_EQUAL(current->length, 10);
+							CU_ASSERT_STRING_EQUAL(current->string, "I'm fine!");
+					   	CU_ASSERT_EQUAL(current->length, 9);
 						CU_ASSERT_EQUAL(current->pos, 3);
 						CU_ASSERT_PTR_NOT_NULL(current->previous);
 						CU_ASSERT_PTR_NULL(current->next);
@@ -102,14 +113,13 @@ void test_create_eFile_bigline(void)
 
 		if(file->first != NULL)
 		{
-			char expected_string[30002]; // 30000 'a' + '\n' + '\0'
+			char expected_string[30001]; // 30000 'a' + '\0'
     		memset(expected_string, 'a', 30000);
-    		expected_string[30000] = '\n';
-    		expected_string[30001] = '\0';
+    		expected_string[30000] = 0;
 
 			CU_ASSERT_PTR_NOT_NULL(file->first->string);
 			CU_ASSERT_STRING_EQUAL(file->first->string, expected_string);
-		  	CU_ASSERT_EQUAL(file->first->length, 30001);
+		  	CU_ASSERT_EQUAL(file->first->length, 30000);
 			CU_ASSERT_EQUAL(file->first->pos, 1);
 			CU_ASSERT_PTR_NULL(file->first->previous);
 			CU_ASSERT_PTR_NULL(file->first->next);
@@ -141,8 +151,8 @@ void test_create_eFile_readonly(void)
 					case 0:
 						CU_ASSERT_PTR_NOT_NULL(current->string);
 						if(current->string != NULL)
-							CU_ASSERT_STRING_EQUAL(current->string, "Hello world!\n");
-				   		CU_ASSERT_EQUAL(current->length, 13);
+							CU_ASSERT_STRING_EQUAL(current->string, "Hello world!");
+				   		CU_ASSERT_EQUAL(current->length, 12);
 						CU_ASSERT_EQUAL(current->pos, 1);
 						CU_ASSERT_PTR_NULL(current->previous);
 						CU_ASSERT_PTR_NOT_NULL(current->next);
@@ -150,8 +160,8 @@ void test_create_eFile_readonly(void)
 					case 1:
 						CU_ASSERT_PTR_NOT_NULL(current->string);
 						if(current->string != NULL)
-							CU_ASSERT_STRING_EQUAL(current->string, "\n");
-					   	CU_ASSERT_EQUAL(current->length, 1);
+							CU_ASSERT_STRING_EQUAL(current->string, "");
+					   	CU_ASSERT_EQUAL(current->length, 0);
 						CU_ASSERT_EQUAL(current->pos, 2);
 						CU_ASSERT_PTR_NOT_NULL(current->previous);
 						CU_ASSERT_PTR_NOT_NULL(current->next);
@@ -159,8 +169,8 @@ void test_create_eFile_readonly(void)
 					case 2:
 						CU_ASSERT_PTR_NOT_NULL(current->string);
 						if(current->string != NULL)
-							CU_ASSERT_STRING_EQUAL(current->string, "I'm fine!\n");
-					   	CU_ASSERT_EQUAL(current->length, 10);
+							CU_ASSERT_STRING_EQUAL(current->string, "I'm fine!");
+					   	CU_ASSERT_EQUAL(current->length, 9);
 						CU_ASSERT_EQUAL(current->pos, 3);
 						CU_ASSERT_PTR_NOT_NULL(current->previous);
 						CU_ASSERT_PTR_NULL(current->next);

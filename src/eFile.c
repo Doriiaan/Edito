@@ -84,6 +84,10 @@ eFile* create_eFile(const char *filename)
 		/* TODO:TRACE */
 		return NULL;
 	}
+	
+	efile->filename = filename;
+	
+	efile->n_elines = 0;
 
 	if((efile->permissions = file_permissions(filename)) == p_NOPERM)
 	{
@@ -100,7 +104,9 @@ eFile* create_eFile(const char *filename)
 			free(efile);
 			return NULL;
 		}
-		add_empty_line_eFile(efile, 0);
+		add_empty_line_eFile(efile, 1);
+		efile->n_elines = 1;
+		return efile;
 	}
 
 	/* open file to read it */
@@ -111,8 +117,6 @@ eFile* create_eFile(const char *filename)
 		return NULL;
 	}
 
-	efile->n_elines = 0;
-	efile->filename = filename;
 
 	/* Loop to read lines of the file*/
 	while(fgets(buffer, BUFFER_LENGTH, fp) != NULL)
@@ -154,7 +158,10 @@ eFile* create_eFile(const char *filename)
 	}
 
 	if(efile->n_elines == 0)
+	{
 		add_empty_line_eFile(efile, 0);
+		efile->n_elines = 1;
+	}
 
 	fclose(fp);
 	return efile;
@@ -241,7 +248,7 @@ void add_empty_line_eFile(eFile *efile, unsigned int pos)
 
 	if(efile->first == NULL)
 	{
-		efile->first = create_eLine("", 0, 0, NULL, NULL);
+		efile->first = create_eLine("", 0, 1, NULL, NULL);
 		return;
 	}
 

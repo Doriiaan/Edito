@@ -40,8 +40,8 @@ eWindow *create_eWindow(size_t height, size_t width, unsigned int y, unsigned in
 	window->height = height;
 	window->x = x;
 	window->y = y;
-	window->x_cursor = 0;
-	window->y_cursor = 0;
+	
+	keypad(window->window, TRUE); /* activate KEY_UP, KEY_RIGHT, ... */
 
 	return window;
 }

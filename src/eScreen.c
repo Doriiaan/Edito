@@ -169,7 +169,6 @@ void update_all_eScreen(eScreen *screen)
 void set_current_window_eScreen(eScreen *screen, WINDOW_TYPE type)
 {
 	screen->current_window = screen->windows[type];
-	wmove(screen->current_window->window, screen->current_window->y_cursor, screen->current_window->x_cursor);
 }
 
 
@@ -195,40 +194,51 @@ void print_content_eScreen(eScreen *screen, eLine *first_line, unsigned int numb
 		if(current_line)
 		{
 			/* print line number */
-			mvwprintw(screen->windows[FILE_LINESNUMBER]->window, screen_pos, 0, "%*d", number_length, line_number);
-			for(size_t i_part_of_line=0 ; i_part_of_line < current_line->length ; i_part_of_line+=screen->windows[FILE_CONTENT]->width)
+			size_t i_part_of_line=0;
+			
+			/* do while, because, do exact same thing when current_line->length == 0 */
+			do
 			{
-				/* print each part of line (if the line width is higher than the scren width) */
+				if(i_part_of_line == 0)
+					mvwprintw(screen->windows[FILE_LINESNUMBER]->window, screen_pos, 1, "%*d", number_length, line_number);
+				else
+					mvwprintw(screen->windows[FILE_LINESNUMBER]->window, screen_pos, 1, "%*c", number_length, ' ');
 				mvwprintw(screen->windows[FILE_CONTENT]->window, screen_pos, 0, "%.*s", screen->windows[FILE_CONTENT]->width, current_line->string+i_part_of_line);
+
+				i_part_of_line+=screen->windows[FILE_CONTENT]->width;
+				
 				screen_pos++;
-			}
+			}while(i_part_of_line < current_line->length);
+			
 			current_line = current_line->next;
 		}
 
 		/* If there are no lines left */
 		else
 		{
-			mvwprintw(screen->windows[FILE_LINESNUMBER]->window, screen_pos, 0, "%.*s%c", number_length, " ", '~');
+			mvwprintw(screen->windows[FILE_LINESNUMBER]->window, screen_pos, 1, "%*c", number_length, '~');
 			screen_pos++;
 		}
 		line_number++;
 	}
-
-	/* Move the cursor to the current_window cursor position */
-	wmove(screen->current_window->window, screen->current_window->y_cursor, screen->current_window->x_cursor);
 }
 
 
-/**
- * @brief The insert_char_eScreen() function insert a character in the current_window.
- *
- * @param screen eScreen pointer
- * @param ch Character to insert in the screen
- */
-void insert_char_eScreen(eScreen *screen, char ch)
+void move_cursor_eScreen(eScreen *screen, WINDOW_TYPE type, unsigned int y, unsigned int x)
 {
-	waddch(screen->current_window->window, ch);
-	getyx(screen->current_window->window, screen->current_window->y_cursor, screen->current_window->x_cursor);
+	wmove(screen->windows[type]->window, y, x);
+}
+
+
+unsigned int get_width_eScreen(eScreen *screen, WINDOW_TYPE type)
+{
+	return screen->windows[type]->width;
+}
+
+
+unsigned int get_height_eScreen(eScreen *screen, WINDOW_TYPE type)
+{
+	return screen->windows[type]->height;
 }
 
 
