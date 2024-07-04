@@ -19,11 +19,22 @@
 #include "eScreen.h"
 #include "eFile.h"
 
+/* Internal functions */
+static bool process_input_eManager(eManager *manager, int input);
 
-bool process_NORMAL_input_eManager(eManager *manager, int input);
-bool process_WRITE_input_eManager(eManager *manager, int input);
-bool process_WRITE_default_input_eManager(eManager *manager, int input);
-int digit_number(unsigned int n);
+static bool process_DEFAULT_eManager(eManager *manager, int input);
+static bool process_q_eManager(eManager *manager);
+static bool process_w_eManager(eManager *manager);
+static bool process_i_eManager(eManager *manager);
+static bool process_ENTER_eManager(eManager *manager);
+static bool process_ESCAPE_eManager(eManager *manager);
+static bool process_BACKSPACE_eManager(eManager *manager);
+static bool process_KEY_RIGHT_eManager(eManager *manager);
+static bool process_KEY_LEFT_eManager(eManager *manager);
+static bool process_KEY_DOWN_eManager(eManager *manager);
+static bool process_KEY_UP_eManager(eManager *manager);
+
+static int digit_number(unsigned int n);
 
 
 /**
@@ -117,71 +128,9 @@ bool run_eManager(eManager *manager)
 	/* Get User input */
 	input = get_input_eScreen(manager->screen);
 
-	if(manager->mode == NORMAL)
-		result = process_NORMAL_input_eManager(manager, input);
-
-	else if(manager->mode == WRITE)
-		result = process_WRITE_input_eManager(manager, input);
-
-	else
-		return false;
+	result = process_input_eManager(manager, input);
 
 	return result;
-}
-
-
-/*
- * @brief the process_NORMAL_input_eManager() function process an input if the program is in NORMAL mode.
- *
- * @param manager eManager pointer
- * @param input User input to process
- *
- * @return returns true if the program continues and false otherwise.
- */
-bool process_NORMAL_input_eManager(eManager *manager, int input)
-{
-	bool result=true;
-
-	switch(input)
-	{
-		/* Change mode to insertion mode */
-		case 'i':
-			if(manager->file)
-			{
-				manager->mode = WRITE;
-				set_current_window_eScreen(manager->screen, FILE_CONTENT);
-				move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
-				update_file_eScreen(manager->screen);
-			}
-			break;
-
-		/* Write the file on disk */
-		case 'w':
-			if(manager->file)
-			{
-				if(manager->file->permissions != p_READWRITE)
-				{
-					/* TODO: POPUP */
-					break;
-				}
-
-				if(write_eFile(manager->file) == -1)
-				{
-					/* TODO: TRACE */	
-				}
-			}
-			break;
-
-
-		/* Quit app */
-		case 'q':
-			result = false;
-
-
-		default:
-			break;
-	}
-	return result;	
 }
 
 
@@ -193,129 +142,290 @@ bool process_NORMAL_input_eManager(eManager *manager, int input)
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool process_WRITE_input_eManager(eManager *manager, int input)
+bool process_input_eManager(eManager *manager, int input)
 {
-	bool result = true;
-	char *buffer = NULL;
-	unsigned int buffer_length = 0;
-
 	switch(input)
 	{
-		
-		case KEY_UP:
-			if(manager->current_line->previous)
-			{
-				if(manager->current_pos > manager->current_line->previous->length)
-					manager->current_pos = manager->current_line->previous->length;
+		case 'q':
+			return process_q_eManager(manager);
 
-				if(manager->current_line == manager->first_screen_line)
-					manager->first_screen_line = manager->first_screen_line->previous;
-				
-				manager->current_line = manager->current_line->previous;
-				print_content_eScreen(manager->screen, manager->first_screen_line, digit_number(manager->file->n_elines));
-				move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
-				update_file_eScreen(manager->screen);
-			}
-			break;
 
+		case 'i':
+			return process_i_eManager(manager);
+
+
+		case 'w':
+			return process_w_eManager(manager);
+
+
+		/* ENTER */
 		case '\n':
-			buffer_length = sizeof(char)*(manager->current_line->length-manager->current_pos);
-			buffer = malloc(buffer_length+1);
-			memset(buffer, 0, buffer_length);
+			return process_ENTER_eManager(manager);
 
-			buffer_length = get_string_eLine(manager->current_line, buffer, buffer_length, manager->current_pos);
-		
-			add_empty_line_eFile(manager->file, manager->current_line->pos+1);
-			insert_string_eLine(manager->current_line->next, buffer, buffer_length, 0);
-			remove_string_eLine(manager->current_line, manager->current_pos, buffer_length);
+
+		case KEY_UP:
+			return process_KEY_UP_eManager(manager);
+
 			
-			free(buffer);	
-			buffer = NULL;
-			manager->current_pos = 0;
-			/* Continue to KEY_DOWN */
-			/* FALLTHRU */
-
-
 		case KEY_DOWN:
-			if(manager->current_line->next)
-			{
-				if(manager->current_pos > manager->current_line->next->length)
-					manager->current_pos = manager->current_line->next->length;
-				
-				manager->current_line = manager->current_line->next;
-
-				while(gety_cursor_eManager(manager) > get_height_eScreen(manager->screen, FILE_CONTENT)-1)
-					manager->first_screen_line = manager->first_screen_line->next;
-
-				print_content_eScreen(manager->screen, manager->first_screen_line, digit_number(manager->file->n_elines));
-				move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
-				update_file_eScreen(manager->screen);
-			}
-			break;
+			return process_KEY_DOWN_eManager(manager);
 
 
 		case KEY_LEFT:
-			if(manager->current_pos > 0)
-			{
-				manager->current_pos--;
-				move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
-			}
-			break;
+			return process_KEY_LEFT_eManager(manager);
 
 
-			case KEY_RIGHT:
-			if(manager->current_pos < manager->current_line->length)
-			{
-				manager->current_pos++;
-				move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
-			}
-			break;
+		case KEY_RIGHT:
+			return process_KEY_RIGHT_eManager(manager);
 
 		
 		case KEY_BACKSPACE:
-			if(manager->current_pos > 0 && manager->current_pos <= manager->current_line->length)
-			{
-				remove_char_eLine(manager->current_line, manager->current_pos-1);
-				print_content_eScreen(manager->screen, manager->first_screen_line, digit_number(manager->file->n_elines));
-				manager->current_pos--;
-				move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
-				update_file_eScreen(manager->screen);
-			}
-			break;
+			return process_BACKSPACE_eManager(manager);
 		
 		
-		/* escape */
+		/* ESCAPE */
 		case 27:
-			manager->mode = NORMAL;
+			return process_ESCAPE_eManager(manager);
 
-			set_current_window_eScreen(manager->screen, MENU);
-			move_cursor_eScreen(manager->screen, MENU, 1, 1);
-			update_menu_eScreen(manager->screen);
-			break;
 
 		default:
-			result = process_WRITE_default_input_eManager(manager, input);
-			break;
+			return process_DEFAULT_eManager(manager, input);
 	}
-	return result;
 }
 
 
 /*
- * @brief the process_WRITE_default_input_eManager() function process a default input (character, number, ...) if the program is in WRITE mode.
+ * @brief the process_DEFAULT_input_eManager() function process a default input (character, number, ...)
  *
  * @param manager eManager pointer
  * @param input Default user input to process
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool process_WRITE_default_input_eManager(eManager *manager, int input)
+bool process_DEFAULT_eManager(eManager *manager, int input)
 {
-	insert_char_eLine(manager->current_line, input, manager->current_pos);
-	print_content_eScreen(manager->screen, manager->first_screen_line, digit_number(manager->file->n_elines));
-	manager->current_pos++;
-	move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
-	update_file_eScreen(manager->screen);
+	if(manager->mode == WRITE)
+	{
+		insert_char_eLine(manager->current_line, input, manager->current_pos);
+		print_content_eScreen(manager->screen, manager->first_screen_line, digit_number(manager->file->n_elines));
+		process_KEY_RIGHT_eManager(manager);
+	}
+	return true;
+}
+
+
+bool process_q_eManager(eManager *manager)
+{
+	if(manager->mode == NORMAL)
+	{
+		return false;
+	}
+	return true;
+}
+
+
+bool process_w_eManager(eManager *manager)
+{
+	if(manager->mode == NORMAL)
+	{
+		if(manager->file)
+		{
+			if(manager->file->permissions != p_READWRITE)
+			{
+				/* TODO: POPUP */
+			}
+
+			if(write_eFile(manager->file) == -1)
+			{
+				/* TODO: TRACE */
+				/* tmp file */
+			}
+		}
+	}
+	return true;
+}
+
+
+bool process_i_eManager(eManager *manager)
+{
+	if(manager->mode == NORMAL)
+	{
+		if(manager->file)
+		{
+			manager->mode = WRITE;
+			set_current_window_eScreen(manager->screen, FILE_CONTENT);
+			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
+			update_file_eScreen(manager->screen);
+		}
+	}
+	return true;
+}
+
+
+bool process_ENTER_eManager(eManager *manager)
+{
+	char *buffer;
+	int buffer_length;
+
+	if(manager->mode == WRITE)
+	{
+		buffer_length = sizeof(char)*(manager->current_line->length-manager->current_pos);
+		buffer = malloc(buffer_length+1);
+		memset(buffer, 0, buffer_length);
+
+		buffer_length = get_string_eLine(manager->current_line, buffer, buffer_length, manager->current_pos);
+		add_empty_line_eFile(manager->file, manager->current_line->pos+1);
+		insert_string_eLine(manager->current_line->next, buffer, buffer_length, 0);	
+		remove_string_eLine(manager->current_line, manager->current_pos, buffer_length);
+	
+		free(buffer);	
+		buffer = NULL;
+		manager->current_pos = 0;
+		process_KEY_DOWN_eManager(manager);
+	}
+
+	return true;
+}
+
+
+bool process_ESCAPE_eManager(eManager *manager)
+{
+	if(manager->mode == WRITE)
+	{
+		manager->mode = NORMAL;
+
+		set_current_window_eScreen(manager->screen, MENU);
+		move_cursor_eScreen(manager->screen, MENU, 1, 1);
+		update_menu_eScreen(manager->screen);
+	}
+
+	return true;
+}
+
+
+bool process_BACKSPACE_eManager(eManager *manager)
+{
+	char *buffer;
+	int buffer_length;
+	unsigned int pos;
+
+	if(manager->mode == WRITE)
+	{
+		if(manager->current_pos > 0 && manager->current_pos <= manager->current_line->length)
+		{
+			remove_char_eLine(manager->current_line, manager->current_pos-1);
+			print_content_eScreen(manager->screen, manager->first_screen_line, digit_number(manager->file->n_elines));
+			process_KEY_LEFT_eManager(manager);
+		}
+		else if(manager->current_pos == 0 && manager->current_line->previous != NULL)
+		{
+			buffer_length = sizeof(char)*(manager->current_line->length-manager->current_pos);
+			buffer = malloc(buffer_length+1);
+			memset(buffer, 0, buffer_length);
+
+			buffer_length = get_string_eLine(manager->current_line, buffer, buffer_length, manager->current_pos);
+			manager->current_pos = manager->current_line->previous->length;
+			insert_string_eLine(manager->current_line->previous, buffer, buffer_length, manager->current_line->previous->length);
+
+			pos = manager->current_line->pos;
+			process_KEY_UP_eManager(manager);
+			delete_line_eFile(manager->file, pos);
+
+			print_content_eScreen(manager->screen, manager->first_screen_line, digit_number(manager->file->n_elines));
+			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
+			update_file_eScreen(manager->screen);
+		}
+	}
+	return true;
+}
+
+
+bool process_KEY_RIGHT_eManager(eManager *manager)
+{
+	if(manager->mode == WRITE)
+	{
+		if(manager->current_pos < manager->current_line->length)
+		{
+			manager->current_pos++;
+			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
+			update_file_eScreen(manager->screen);
+		}
+		else if(manager->current_pos >= manager->current_line->length && manager->current_line->next != NULL)
+		{
+			manager->current_pos = 0;
+			process_KEY_DOWN_eManager(manager);
+		}
+	}
+	return true;
+}
+
+
+bool process_KEY_LEFT_eManager(eManager *manager)
+{
+	if(manager->mode == WRITE)
+	{
+		if(manager->current_pos > 0)
+		{
+			manager->current_pos--;
+			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
+			update_file_eScreen(manager->screen);
+		}
+		else if(manager->current_pos == 0 && manager->current_line->previous != NULL)
+		{
+			manager->current_pos = manager->current_line->previous->length;
+			process_KEY_UP_eManager(manager);
+		}
+	}
+	return true;
+}
+
+
+bool process_KEY_DOWN_eManager(eManager *manager)
+{
+	if(manager->mode == WRITE)
+	{
+		if(manager->current_line->next)
+		{
+			/* Do not get out of line with cursor  */
+			if(manager->current_pos > manager->current_line->next->length)
+				manager->current_pos = manager->current_line->next->length;				
+			
+			manager->current_line = manager->current_line->next;
+
+			/* While cursor is out of screen (line to big), pull down the screen */
+			while(gety_cursor_eManager(manager) > get_height_eScreen(manager->screen, FILE_CONTENT)-1)
+				manager->first_screen_line = manager->first_screen_line->next;
+
+			print_content_eScreen(manager->screen, manager->first_screen_line, digit_number(manager->file->n_elines));
+			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
+			update_file_eScreen(manager->screen);
+		}
+	}
+	return true;
+}
+
+
+bool process_KEY_UP_eManager(eManager *manager)
+{
+	if(manager->mode == WRITE)
+	{
+		if(manager->current_line->previous)
+		{
+			/* Do not get out of line with cursor  */
+			if(manager->current_pos > manager->current_line->previous->length)
+				manager->current_pos = manager->current_line->previous->length;
+
+			/* If current == first_line, pull up the screen */
+			if(manager->current_line == manager->first_screen_line)
+				manager->first_screen_line = manager->first_screen_line->previous;
+				
+			manager->current_line = manager->current_line->previous;
+			print_content_eScreen(manager->screen, manager->first_screen_line, digit_number(manager->file->n_elines));
+			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
+			update_file_eScreen(manager->screen);
+		}
+	}
+
 	return true;
 }
 

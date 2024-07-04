@@ -83,4 +83,13 @@ void delete_eFile(eFile **efile);
  */
 void add_empty_line_eFile(eFile *efile, unsigned int pos);
 
+
+/**
+ * @brief the delete_line_eFile() delete a line to the position pos in the file
+ *
+ * @param efile eFile pointer pointer
+ * @param pos Position of the line that will be deleted
+ */
+void delete_line_eFile(eFile *efile, unsigned int pos);
+
 #endif

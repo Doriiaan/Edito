@@ -275,3 +275,41 @@ void add_empty_line_eFile(eFile *efile, unsigned int pos)
 		current = current->next;
 	}
 }
+			
+
+/**
+ * @brief the delete_line_eFile() delete a line to the position pos in the file
+ *
+ * @param efile eFile pointer pointer
+ * @param pos Position of the line that will be deleted
+ */
+void delete_line_eFile(eFile *efile, unsigned int pos)
+{
+	eLine *current = efile->first;
+	eLine *tmp = NULL;
+	unsigned int i = 1;
+
+	while(current && i < pos)
+	{
+		current = current->next;
+		i++;
+	}
+
+	if(current == NULL)
+		return;
+
+	if(current->next != NULL)
+		current->next->previous = current->previous;
+
+	if(current->previous != NULL)
+		current->previous->next = current->next;
+
+	tmp=current->next;
+	delete_eLine(&current);
+	current = tmp;
+	while(current)
+	{
+		current->pos--;
+		current = current->next;
+	}
+}
