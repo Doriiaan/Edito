@@ -13,6 +13,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "eManager.h"
 #include "eScreen.h"
@@ -34,7 +35,7 @@ int digit_number(unsigned int n);
  */
 eManager *create_eManager()
 {
-	eManager *manager;
+	eManager *manager = NULL;
 
 	manager = (eManager *) malloc(sizeof(eManager));
 	if(manager == NULL)
@@ -46,6 +47,8 @@ eManager *create_eManager()
 	manager->mode = NORMAL;	
 	manager->screen = NULL;
 	manager->file = NULL;
+
+	/* file cursor : TODO deplace it in eFile structure ?*/
 	manager->current_line = NULL;
 	manager->current_pos = 0;
 	manager->first_screen_line = NULL;
@@ -77,8 +80,8 @@ void set_eScreen_eManager(eManager *manager, eScreen *screen)
 }
 
 
-//void set_menu_eManager(eManager *manager, eMenu *menu);
-//void set_bar_eManager(eManager *manager, eBar *menu);
+// TODO: void set_menu_eManager(eManager *manager, eMenu *menu);
+// TODO: void set_bar_eManager(eManager *manager, eBar *menu);
 
 
 /**
@@ -111,7 +114,9 @@ bool run_eManager(eManager *manager)
 	int input;
 	bool result;
 
+	/* Get User input */
 	input = get_input_eScreen(manager->screen);
+
 	if(manager->mode == NORMAL)
 		result = process_NORMAL_input_eManager(manager, input);
 
@@ -150,6 +155,24 @@ bool process_NORMAL_input_eManager(eManager *manager, int input)
 			}
 			break;
 
+		/* Write the file on disk */
+		case 'w':
+			if(manager->file)
+			{
+				if(manager->file->permissions != p_READWRITE)
+				{
+					/* TODO: POPUP */
+					break;
+				}
+
+				if(write_eFile(manager->file) == -1)
+				{
+					/* TODO: TRACE */	
+				}
+			}
+			break;
+
+
 		/* Quit app */
 		case 'q':
 			result = false;
@@ -172,17 +195,64 @@ bool process_NORMAL_input_eManager(eManager *manager, int input)
  */
 bool process_WRITE_input_eManager(eManager *manager, int input)
 {
-	bool result=true;
-
+	bool result = true;
+	char *buffer = NULL;
+	unsigned int buffer_length = 0;
 
 	switch(input)
 	{
 		
 		case KEY_UP:
+			if(manager->current_line->previous)
+			{
+				if(manager->current_pos > manager->current_line->previous->length)
+					manager->current_pos = manager->current_line->previous->length;
+
+				if(manager->current_line == manager->first_screen_line)
+					manager->first_screen_line = manager->first_screen_line->previous;
+				
+				manager->current_line = manager->current_line->previous;
+				print_content_eScreen(manager->screen, manager->first_screen_line, digit_number(manager->file->n_elines));
+				move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
+				update_file_eScreen(manager->screen);
+			}
 			break;
 
+		case '\n':
+			buffer_length = sizeof(char)*(manager->current_line->length-manager->current_pos);
+			buffer = malloc(buffer_length+1);
+			memset(buffer, 0, buffer_length);
+
+			buffer_length = get_string_eLine(manager->current_line, buffer, buffer_length, manager->current_pos);
+		
+			add_empty_line_eFile(manager->file, manager->current_line->pos+1);
+			insert_string_eLine(manager->current_line->next, buffer, buffer_length, 0);
+			remove_string_eLine(manager->current_line, manager->current_pos, buffer_length);
+			
+			free(buffer);	
+			buffer = NULL;
+			manager->current_pos = 0;
+			/* Continue to KEY_DOWN */
+			/* FALLTHRU */
+
+
 		case KEY_DOWN:
+			if(manager->current_line->next)
+			{
+				if(manager->current_pos > manager->current_line->next->length)
+					manager->current_pos = manager->current_line->next->length;
+				
+				manager->current_line = manager->current_line->next;
+
+				while(gety_cursor_eManager(manager) > get_height_eScreen(manager->screen, FILE_CONTENT)-1)
+					manager->first_screen_line = manager->first_screen_line->next;
+
+				print_content_eScreen(manager->screen, manager->first_screen_line, digit_number(manager->file->n_elines));
+				move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
+				update_file_eScreen(manager->screen);
+			}
 			break;
+
 
 		case KEY_LEFT:
 			if(manager->current_pos > 0)
@@ -192,7 +262,8 @@ bool process_WRITE_input_eManager(eManager *manager, int input)
 			}
 			break;
 
-		case KEY_RIGHT:
+
+			case KEY_RIGHT:
 			if(manager->current_pos < manager->current_line->length)
 			{
 				manager->current_pos++;
@@ -200,8 +271,18 @@ bool process_WRITE_input_eManager(eManager *manager, int input)
 			}
 			break;
 
+		
 		case KEY_BACKSPACE:
+			if(manager->current_pos > 0 && manager->current_pos <= manager->current_line->length)
+			{
+				remove_char_eLine(manager->current_line, manager->current_pos-1);
+				print_content_eScreen(manager->screen, manager->first_screen_line, digit_number(manager->file->n_elines));
+				manager->current_pos--;
+				move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
+				update_file_eScreen(manager->screen);
+			}
 			break;
+		
 		
 		/* escape */
 		case 27:
@@ -214,6 +295,7 @@ bool process_WRITE_input_eManager(eManager *manager, int input)
 
 		default:
 			result = process_WRITE_default_input_eManager(manager, input);
+			break;
 	}
 	return result;
 }
@@ -266,6 +348,12 @@ int digit_number(unsigned int n)
 }
 
 
+unsigned int getx_cursor_eManager(eManager *manager)
+{
+	return manager->current_pos%get_width_eScreen(manager->screen, FILE_CONTENT);
+}
+
+
 unsigned int gety_cursor_eManager(eManager *manager)
 {
 	size_t width;
@@ -276,7 +364,7 @@ unsigned int gety_cursor_eManager(eManager *manager)
 	
 	y=0;
 	current = manager->first_screen_line;
-	while(current != manager->current_line)
+	while(current && current != manager->current_line)
 	{
 		if(current->length == 0)
 			y++;
@@ -285,16 +373,8 @@ unsigned int gety_cursor_eManager(eManager *manager)
 			y += current->length/width;
 			y += (current->length%width != 0) ? 1 : 0;
 		}
+		current = current->next;
 	}
-	y += manager->current_line->length/width;
-
+	y += manager->current_pos/width;
 	return y;
-}
-
-unsigned int getx_cursor_eManager(eManager *manager)
-{
-	size_t width;
-   
-	width = get_width_eScreen(manager->screen, FILE_CONTENT);
-	return manager->current_pos%width;
 }

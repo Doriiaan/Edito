@@ -16,6 +16,7 @@
 
 #include <stdlib.h>
 #include <ncurses.h>
+#include <string.h>
 
 #include "eScreen.h"
 #include "eLine.h"
@@ -182,11 +183,18 @@ void set_current_window_eScreen(eScreen *screen, WINDOW_TYPE type)
 void print_content_eScreen(eScreen *screen, eLine *first_line, unsigned int number_length)
 {
 	eLine *current_line = first_line;
-	size_t screen_pos=0;
-	int line_number=first_line->pos;
-	
+	size_t screen_pos = 0;
+	int line_number = first_line->pos;
+	char *refresh_line = NULL;
+	bool refresh_last_line = true;
+
+	refresh_line = (char *) malloc((screen->windows[FILE_CONTENT]->width+1)*sizeof(char));
+	memset(refresh_line, ' ', screen->windows[FILE_CONTENT]->width);
+	refresh_line[screen->windows[FILE_CONTENT]->width] = 0;
+
 	/* Print the right border of the lines number window */
 	wborder(screen->windows[FILE_LINESNUMBER]->window, ' ', 0, ' ', ' ', ' ', ACS_VLINE, ' ', ACS_VLINE);
+
 
 	while(screen_pos < screen->windows[FILE_CONTENT]->height)
 	{
@@ -203,6 +211,11 @@ void print_content_eScreen(eScreen *screen, eLine *first_line, unsigned int numb
 					mvwprintw(screen->windows[FILE_LINESNUMBER]->window, screen_pos, 1, "%*d", number_length, line_number);
 				else
 					mvwprintw(screen->windows[FILE_LINESNUMBER]->window, screen_pos, 1, "%*c", number_length, ' ');
+				
+				/* refresh line */
+				mvwprintw(screen->windows[FILE_CONTENT]->window, screen_pos, 0, "%s", refresh_line);
+
+				/* print line */
 				mvwprintw(screen->windows[FILE_CONTENT]->window, screen_pos, 0, "%.*s", screen->windows[FILE_CONTENT]->width, current_line->string+i_part_of_line);
 
 				i_part_of_line+=screen->windows[FILE_CONTENT]->width;
@@ -216,6 +229,13 @@ void print_content_eScreen(eScreen *screen, eLine *first_line, unsigned int numb
 		/* If there are no lines left */
 		else
 		{
+			/* refresh last line */
+			if(refresh_last_line)
+			{
+				mvwprintw(screen->windows[FILE_CONTENT]->window, screen_pos, 0, "%s", refresh_line);
+				refresh_last_line = false;
+			}
+
 			mvwprintw(screen->windows[FILE_LINESNUMBER]->window, screen_pos, 1, "%*c", number_length, '~');
 			screen_pos++;
 		}

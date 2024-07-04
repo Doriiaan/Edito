@@ -40,13 +40,19 @@ unsigned int get_next_power_of_two(unsigned int n);
  */
 eLine *create_eLine(char *string, size_t length, unsigned int pos, eLine *previous, eLine *next)
 {
-	struct eLine *eline = (struct eLine *) malloc(sizeof(struct eLine));
+	eLine *eline = (eLine *) malloc(sizeof(eLine));
 	if(eline == NULL)
 	{
 		/* TODO: TRACE */
 		return NULL;
 	}
-
+	
+	/* Remove '\n' */
+	if(string[strnlen(string, length)-1] == '\n')
+	{
+		length = strnlen(string, length)-1;
+	}
+	
 	eline->alloc_size = get_next_power_of_two(strnlen(string, length))*sizeof(char);
 	
 	eline->string = (char *) malloc(eline->alloc_size);
@@ -56,13 +62,9 @@ eLine *create_eLine(char *string, size_t length, unsigned int pos, eLine *previo
 		free(eline);
 		return NULL;
 	}
-
-	if(string[strnlen(string, length)-1] == '\n')
-	{
-		length = strnlen(string, length)-1;
-	}
-
+	
 	eline->length = strnlen(string, length);
+	
 	memset(eline->string, 0, eline->alloc_size);
 	memcpy(eline->string, string, eline->length);
 
@@ -93,6 +95,9 @@ eLine *create_eLine(char *string, size_t length, unsigned int pos, eLine *previo
  */
 int insert_string_eLine(eLine *eline, const char *string, size_t length, unsigned int pos)
 {
+	if(eline == NULL)
+		return -1;
+
 	/* del terminating \n character */
 	if(string[strnlen(string, length)-1] == '\n')
 	{
@@ -102,7 +107,7 @@ int insert_string_eLine(eLine *eline, const char *string, size_t length, unsigne
 	size_t string_length = strnlen(string, length);
 	size_t new_length = eline->length + string_length;
 
-	if(pos > eline->length + 1)
+	if(pos > eline->length)
 	{
 		/* TODO: TRACE */
 		return -1;
@@ -130,20 +135,20 @@ int insert_string_eLine(eLine *eline, const char *string, size_t length, unsigne
  *
  * @param eline: eLine
  * @param ch: The character to insert
- * @param pos: Position where to insert the string
+ * @param pos: Position where to insert the character
  *
  * @return 0 on success, -1 on error, see logs
  *
  */
 int insert_char_eLine(eLine *eline, const char ch, unsigned int pos)
 {
-	if(!eline)
+	if(eline == NULL)
 		return -1;
 
 	if(ch == '\n')
 		return -1;
 
-	if(pos > eline->length + 1)
+	if(pos > eline->length)
 	{
 		/* TODO: TRACE */
 		return -1;
@@ -160,6 +165,93 @@ int insert_char_eLine(eLine *eline, const char ch, unsigned int pos)
 	memmove(eline->string + pos + 1, eline->string + pos, eline->length - pos);
 	eline->string[pos] = ch;
 	return 0;
+}
+
+
+/**
+ * @brief The remove_string_eLine() function remove length character of the line at position pos.
+ *
+ * @param eline: eLine 
+ * @param length: Number of character to remove from the eLine
+ * @param pos: Position where to delete the string
+ *
+ * @return 0 on success, -1 on error, see logs
+ *
+ */
+int remove_string_eLine(eLine *eline, unsigned int pos, size_t length)
+{
+	int real_length = 0;
+
+	if(eline ==NULL)
+		return -1;
+
+	if(pos > eline->length)
+		return -1;
+
+	/* If pos + length > eline->length*/
+	real_length = strnlen(eline->string+pos, length);
+
+	/* This move final 0 */
+	memmove(eline->string+pos, eline->string + pos + real_length, eline->length-real_length-pos+1);
+	eline->length -= real_length;
+	return 0;
+}
+
+
+/**
+ * @brief The remove_char_eLine() function remove a character in the line at position pos.
+ *
+ * @param eline: eLine
+ * @param pos: Position where to remove the character
+ *
+ * @return 0 on success, -1 on error, see logs
+ *
+ */
+int remove_char_eLine(eLine *eline, unsigned int pos)
+{
+	if(eline == NULL)
+		return -1;
+
+	if(pos > eline->length)
+	{
+		/* TODO: TRACE */
+		return -1;
+	}
+
+	if(eline->length == 0)
+		return 0;
+
+	/* This move final 0 */
+	memmove(eline->string+pos, eline->string + pos + 1, eline->length - pos);
+	eline->length--;
+	return 0;
+}
+
+
+/**
+ * @brief The get_char_eLine() function get a string in the line at position pos and return how many character actually got.
+ *
+ * @param eline : eLine
+ * @param string : buffer where string of line is copied
+ * @param length : length of buffer
+ * @param pos : Position where to remove the character
+ *
+ * @return 0 on success, -1 on error, see logs
+ *
+ * @note : This function has security and get the max between strnlen(string, length) and eline->length character.
+ */
+int get_string_eLine(eLine *eline, char *string, size_t length, unsigned int pos)
+{
+	size_t min;
+	
+	if(eline == NULL)
+		return -1;
+
+	min = (length < eline->length-pos) ? length : eline->length-pos;
+	memcpy(string, eline->string+pos, min);
+	string[min] = 0;
+	
+	return min;
 }
 
 

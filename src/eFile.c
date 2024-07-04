@@ -139,15 +139,6 @@ eFile* create_eFile(const char *filename)
 			}
 		}
 
-		/* If the last line does not have a \n */
-		if(current->string[current->length-1] != '\n')
-			if(insert_string_eLine(current, "\n", 1, current->length))
-			{
-				/* TODO: TRACE */
-				delete_eFile(&efile);
-				return NULL;
-			}
-
 	   	if(efile->n_elines==0)
 			efile->first = current;
 
@@ -178,6 +169,8 @@ int write_eFile(eFile *efile)
 {
 	FILE *fp = NULL;
 	eLine *current = NULL;
+	char *buffer = NULL;
+	size_t buffer_length = 0;
 
 	if(efile == NULL)
 	{
@@ -185,7 +178,7 @@ int write_eFile(eFile *efile)
 		return -1;
 	}
 
-	if(efile->permissions == p_NOPERM)
+	if(efile->permissions != p_READWRITE)
 	{
 		/* TODO: TRACE */
 		return -1;
@@ -198,9 +191,20 @@ int write_eFile(eFile *efile)
 	}
 
 	current = efile->first;
+	
 	while(current)
 	{
-		if(fputs(current->string, fp) == EOF)
+		if(buffer_length < current->length+2)
+		{
+			buffer_length = sizeof(char)*(current->length+2);
+			buffer = (char *) realloc(buffer, buffer_length);
+		}
+		
+		memset(buffer, 0, buffer_length);
+		memcpy(buffer, current->string, current->length);
+		buffer[current->length] = '\n';
+
+		if(fputs(buffer, fp) == EOF)
 		{
 			/* TODO: TRACE + call a function to write in a temporary file */
 			fclose(fp);
@@ -208,8 +212,10 @@ int write_eFile(eFile *efile)
 		}
 		current=current->next;
 	}
-	
+
+	free(buffer);
 	fclose(fp);
+	
 	return 0;
 }
 
@@ -244,7 +250,7 @@ void add_empty_line_eFile(eFile *efile, unsigned int pos)
 {
 	eLine *current = efile->first;
 	eLine *new = NULL;
-	unsigned int i = 0;
+	unsigned int i = 1;
 
 	if(efile->first == NULL)
 	{
@@ -252,7 +258,7 @@ void add_empty_line_eFile(eFile *efile, unsigned int pos)
 		return;
 	}
 
-	while(i < pos && current->next)
+	while(i < pos-1 && current->next)
 	{
 		current=current->next;
 		i++;
@@ -261,11 +267,11 @@ void add_empty_line_eFile(eFile *efile, unsigned int pos)
 	/* Current is previous*/
 	new = create_eLine("", 0, pos, current, current->next);
 
-	if(current->next)
-		current->next->previous = new;
-	current->next = new;
 
 	current = new->next;
 	while(current)
+	{
 		current->pos++;
+		current = current->next;
+	}
 }

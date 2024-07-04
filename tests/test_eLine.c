@@ -335,6 +335,31 @@ void test_insert_char_eLine_limit4(void)
 	}
 }
 
+void test_insert_char_eLine_limit5(void)
+{
+	eLine *eline = create_eLine("aaaaaaaaaaaaaaa", 15, 0, NULL, NULL);
+	int result = insert_char_eLine(eline, '$', eline->length+1);
+
+	CU_ASSERT_EQUAL(result, -1);
+
+	CU_ASSERT_PTR_NOT_NULL(eline);
+	if(eline != NULL)
+	{
+		CU_ASSERT_PTR_NOT_NULL(eline->string);
+		if(eline->string != NULL)
+			CU_ASSERT_STRING_EQUAL(eline->string, "aaaaaaaaaaaaaaa");
+		
+		CU_ASSERT_EQUAL(eline->length, 15);
+		CU_ASSERT_EQUAL(eline->alloc_size, 16);
+		CU_ASSERT_EQUAL(eline->pos, 0);
+		CU_ASSERT_PTR_NULL(eline->previous);
+		CU_ASSERT_PTR_NULL(eline->next);
+
+		if(eline->string != NULL)
+			free(eline->string);
+		free(eline);
+	}
+}
 
 void add_tests_eLine(CU_pSuite pSuite)
 {
@@ -351,4 +376,5 @@ void add_tests_eLine(CU_pSuite pSuite)
 	CU_add_test(pSuite, "insert_char_eLine() with limit test2", test_insert_char_eLine_limit2);
 	CU_add_test(pSuite, "insert_char_eLine() with limit test3", test_insert_char_eLine_limit3);
 	CU_add_test(pSuite, "insert_char_eLine() with limit test4", test_insert_char_eLine_limit4);
+	CU_add_test(pSuite, "insert_char_eLine() with limit test5", test_insert_char_eLine_limit5);
 }
