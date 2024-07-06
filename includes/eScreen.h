@@ -44,6 +44,16 @@ eScreen * create_eScreen(int n_lines, int n_cols);
 
 
 /**
+ * @brief The create_file_window_eScreen() function allocate and initialize file windows.
+ *
+ * @param screen eScreen pointer
+ * @param number_length number of digit in the lines number
+ *
+ */
+void create_file_window_eScreen(eScreen *screen, unsigned int number_length);
+
+
+/**
  * @brief The delete_eScreen() function deallocate the eScreen structure and set the pointer to the structure to NULL.
  *
  * @param manager eManager pointer pointer
@@ -98,7 +108,7 @@ void set_current_window_eScreen(eScreen *screen, WINDOW_TYPE type);
  * @param first_line First line to print
  * @param number_length Number of digit of the higher line of the file
  */
-void print_content_eScreen(eScreen *screen, eLine *first_line, unsigned int number_length);
+void print_content_eScreen(eScreen *screen, eLine *first_line);
 
 
 /**

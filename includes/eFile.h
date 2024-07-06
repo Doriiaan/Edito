@@ -81,7 +81,7 @@ void delete_eFile(eFile **efile);
  * @param efile eFile pointer pointer
  * @param pos  Position of the new line in the file
  */
-void add_empty_line_eFile(eFile *efile, unsigned int pos);
+int add_empty_line_eFile(eFile *efile, unsigned int pos);
 
 
 /**

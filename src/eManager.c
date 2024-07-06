@@ -19,6 +19,7 @@
 #include "eScreen.h"
 #include "eFile.h"
 
+
 /* Internal functions */
 static bool process_input_eManager(eManager *manager, int input);
 
@@ -29,12 +30,14 @@ static bool process_i_eManager(eManager *manager);
 static bool process_ENTER_eManager(eManager *manager);
 static bool process_ESCAPE_eManager(eManager *manager);
 static bool process_BACKSPACE_eManager(eManager *manager);
+static bool process_DELETE_eManager(eManager *manager);
 static bool process_KEY_RIGHT_eManager(eManager *manager);
 static bool process_KEY_LEFT_eManager(eManager *manager);
 static bool process_KEY_DOWN_eManager(eManager *manager);
 static bool process_KEY_UP_eManager(eManager *manager);
 
 static int digit_number(unsigned int n);
+unsigned int screen_width_of_string(const char *s, size_t length);
 
 
 /**
@@ -51,7 +54,6 @@ eManager *create_eManager()
 	manager = (eManager *) malloc(sizeof(eManager));
 	if(manager == NULL)
 	{
-		/* TODO: TRACE */
 		return NULL;
 	}
 
@@ -63,6 +65,7 @@ eManager *create_eManager()
 	manager->current_line = NULL;
 	manager->current_pos = 0;
 	manager->first_screen_line = NULL;
+
 	return manager;
 }
 
@@ -75,7 +78,7 @@ eManager *create_eManager()
 void delete_eManager(eManager **manager)
 {
 	free(*manager);
-	manager = NULL;
+	*manager = NULL;
 }
 
 
@@ -109,7 +112,8 @@ void set_eFile_eManager(eManager *manager, eFile *file)
 	manager->current_line = file->first;
 	manager->current_pos = 0;
 	manager->first_screen_line = file->first;
-	print_content_eScreen(manager->screen, file->first, digit_number(file->n_elines));
+	create_file_window_eScreen(manager->screen, digit_number(file->n_elines));
+	print_content_eScreen(manager->screen, file->first);
 }
 
 
@@ -122,20 +126,19 @@ void set_eFile_eManager(eManager *manager, eFile *file)
  */
 bool run_eManager(eManager *manager)
 {
-	int input;
-	bool result;
+	int input = 0;
+	bool result = false;
 
 	/* Get User input */
 	input = get_input_eScreen(manager->screen);
-
-	result = process_input_eManager(manager, input);
+	result =  process_input_eManager(manager, input);
 
 	return result;
 }
 
 
 /*
- * @brief the process_WRITE_input_eManager() function process an input if the program is in WRITE mode.
+ * @brief the process_input_eManager() function process an input if the program is in WRITE mode.
  *
  * @param manager eManager pointer
  * @param input User input to process
@@ -183,6 +186,10 @@ bool process_input_eManager(eManager *manager, int input)
 			return process_BACKSPACE_eManager(manager);
 		
 		
+		case KEY_DC:
+			return process_DELETE_eManager(manager);
+		
+
 		/* ESCAPE */
 		case 27:
 			return process_ESCAPE_eManager(manager);
@@ -207,13 +214,20 @@ bool process_DEFAULT_eManager(eManager *manager, int input)
 	if(manager->mode == WRITE)
 	{
 		insert_char_eLine(manager->current_line, input, manager->current_pos);
-		print_content_eScreen(manager->screen, manager->first_screen_line, digit_number(manager->file->n_elines));
+		print_content_eScreen(manager->screen, manager->first_screen_line);
 		process_KEY_RIGHT_eManager(manager);
 	}
 	return true;
 }
 
 
+/*
+ * @brief the process_q_input_eManager() function process a 'q' input 
+ *
+ * @param manager eManager pointer
+ *
+ * @return returns true if the program continues and false otherwise.
+ */
 bool process_q_eManager(eManager *manager)
 {
 	if(manager->mode == NORMAL)
@@ -224,6 +238,13 @@ bool process_q_eManager(eManager *manager)
 }
 
 
+/*
+ * @brief the process_w_input_eManager() function process a 'w' input 
+ *
+ * @param manager eManager pointer
+ *
+ * @return returns true if the program continues and false otherwise.
+ */
 bool process_w_eManager(eManager *manager)
 {
 	if(manager->mode == NORMAL)
@@ -237,7 +258,6 @@ bool process_w_eManager(eManager *manager)
 
 			if(write_eFile(manager->file) == -1)
 			{
-				/* TODO: TRACE */
 				/* tmp file */
 			}
 		}
@@ -246,6 +266,13 @@ bool process_w_eManager(eManager *manager)
 }
 
 
+/*
+ * @brief the process_i_input_eManager() function process a 'i' input 
+ *
+ * @param manager eManager pointer
+ *
+ * @return returns true if the program continues and false otherwise.
+ */
 bool process_i_eManager(eManager *manager)
 {
 	if(manager->mode == NORMAL)
@@ -262,21 +289,36 @@ bool process_i_eManager(eManager *manager)
 }
 
 
+/*
+ * @brief the process_ENTER_input_eManager() function process a ENTER input 
+ *
+ * @param manager eManager pointer
+ *
+ * @return returns true if the program continues and false otherwise.
+ */
 bool process_ENTER_eManager(eManager *manager)
 {
-	char *buffer;
-	int buffer_length;
+	char *buffer = NULL;
+	int buffer_length = 0;
 
+	/*
+	 * 1. Allocate buffer
+	 * 2. Put into buffer, the string of current line after current pos
+	 * 3. Add an empty line
+	 * 4. Insert buffer into new empty line
+	 * 5. Remove string of current line after current pos 
+	 * 6. Set current pos to 0 and process KEY_DOWN
+	 */
 	if(manager->mode == WRITE)
 	{
 		buffer_length = sizeof(char)*(manager->current_line->length-manager->current_pos);
 		buffer = malloc(buffer_length+1);
-		memset(buffer, 0, buffer_length);
+		memset(buffer, 0, buffer_length+1);
 
 		buffer_length = get_string_eLine(manager->current_line, buffer, buffer_length, manager->current_pos);
 		add_empty_line_eFile(manager->file, manager->current_line->pos+1);
 		insert_string_eLine(manager->current_line->next, buffer, buffer_length, 0);	
-		remove_string_eLine(manager->current_line, manager->current_pos, buffer_length);
+		remove_string_eLine(manager->current_line, buffer_length, manager->current_pos);
 	
 		free(buffer);	
 		buffer = NULL;
@@ -287,6 +329,14 @@ bool process_ENTER_eManager(eManager *manager)
 	return true;
 }
 
+
+/*
+ * @brief the process_ESCAPE_input_eManager() function process an ESCAPE input 
+ *
+ * @param manager eManager pointer
+ *
+ * @return returns true if the program continues and false otherwise.
+ */
 
 bool process_ESCAPE_eManager(eManager *manager)
 {
@@ -303,35 +353,60 @@ bool process_ESCAPE_eManager(eManager *manager)
 }
 
 
+/*
+ * @brief the process_BACKSPACE_input_eManager() function process a BACKSPACE input 
+ *
+ * @param manager eManager pointer
+ *
+ * @return returns true if the program continues and false otherwise.
+ */
+
 bool process_BACKSPACE_eManager(eManager *manager)
 {
-	char *buffer;
-	int buffer_length;
-	unsigned int pos;
+	char *buffer = NULL;
+	int buffer_length = 0;
+	unsigned int pos = 0;
 
 	if(manager->mode == WRITE)
 	{
-		if(manager->current_pos > 0 && manager->current_pos <= manager->current_line->length)
+		/* If current_pos > 0
+		 * 1. Remove char before current_pos
+		 * 2. Print content
+		 * 3. Process KEY_LEFT 
+		 */
+		if(manager->current_pos > 0)
 		{
+			/* If current_pos > current_line->length (error), remove_char_eLine return -1, process just KEY_LEFT */
 			remove_char_eLine(manager->current_line, manager->current_pos-1);
-			print_content_eScreen(manager->screen, manager->first_screen_line, digit_number(manager->file->n_elines));
+			print_content_eScreen(manager->screen, manager->first_screen_line);
 			process_KEY_LEFT_eManager(manager);
 		}
+		/* If current_pos == 0 and current_line->previous exist
+		 * 1. Allocate buffer
+		 * 2. Put into buffer the current line
+		 * 3. Insert buffer into the previous line at the end of line
+		 * 4. Save line pos
+		 * 5. Process KEY_UP
+		 * 6. Delete line at pos
+		 * 7. Refresh screen
+		 */
 		else if(manager->current_pos == 0 && manager->current_line->previous != NULL)
 		{
 			buffer_length = sizeof(char)*(manager->current_line->length-manager->current_pos);
 			buffer = malloc(buffer_length+1);
-			memset(buffer, 0, buffer_length);
+			memset(buffer, 0, buffer_length+1);
 
 			buffer_length = get_string_eLine(manager->current_line, buffer, buffer_length, manager->current_pos);
 			manager->current_pos = manager->current_line->previous->length;
 			insert_string_eLine(manager->current_line->previous, buffer, buffer_length, manager->current_line->previous->length);
+			free(buffer);
+			buffer = NULL;
 
 			pos = manager->current_line->pos;
 			process_KEY_UP_eManager(manager);
 			delete_line_eFile(manager->file, pos);
 
-			print_content_eScreen(manager->screen, manager->first_screen_line, digit_number(manager->file->n_elines));
+			print_content_eScreen(manager->screen, manager->first_screen_line);
 			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
 			update_file_eScreen(manager->screen);
 		}
@@ -339,6 +414,50 @@ bool process_BACKSPACE_eManager(eManager *manager)
 	return true;
 }
 
+
+bool process_DELETE_eManager(eManager *manager)
+{
+	char *buffer = NULL;
+	int buffer_length = 0;
+
+	if(manager->mode == WRITE)
+	{
+		if(manager->current_pos < manager->current_line->length)
+		{
+			remove_char_eLine(manager->current_line, manager->current_pos);
+			print_content_eScreen(manager->screen, manager->first_screen_line);
+			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
+			update_file_eScreen(manager->screen);
+		}
+		else if( manager->current_pos >= manager->current_line->length && manager->current_line->next)
+		{
+			buffer_length = sizeof(char)*(manager->current_line->next->length);
+			buffer = malloc(buffer_length+1);
+			memset(buffer, 0, buffer_length+1);
+			
+			buffer_length = get_string_eLine(manager->current_line->next, buffer, buffer_length, 0);
+			insert_string_eLine(manager->current_line, buffer, buffer_length, manager->current_line->length);
+			free(buffer);
+			buffer = NULL;
+			
+			delete_line_eFile(manager->file, manager->current_line->next->pos);
+			
+			print_content_eScreen(manager->screen, manager->first_screen_line);
+			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
+			update_file_eScreen(manager->screen);
+		}
+
+	}
+	return true;
+}
+
+/*
+ * @brief the process_KEY_RIGHT_input_eManager() function process a KEY_RIGHT input 
+ *
+ * @param manager eManager pointer
+ *
+ * @return returns true if the program continues and false otherwise.
+ */
 
 bool process_KEY_RIGHT_eManager(eManager *manager)
 {
@@ -360,6 +479,14 @@ bool process_KEY_RIGHT_eManager(eManager *manager)
 }
 
 
+/*
+ * @brief the process_KEY_LEFT_input_eManager() function process a KEY_LEFT input 
+ *
+ * @param manager eManager pointer
+ *
+ * @return returns true if the program continues and false otherwise.
+ */
+
 bool process_KEY_LEFT_eManager(eManager *manager)
 {
 	if(manager->mode == WRITE)
@@ -380,6 +507,14 @@ bool process_KEY_LEFT_eManager(eManager *manager)
 }
 
 
+/*
+ * @brief the process_KEY_DOWN_input_eManager() function process a KEY_DOWN input 
+ *
+ * @param manager eManager pointer
+ *
+ * @return returns true if the program continues and false otherwise.
+ */
+
 bool process_KEY_DOWN_eManager(eManager *manager)
 {
 	if(manager->mode == WRITE)
@@ -396,7 +531,7 @@ bool process_KEY_DOWN_eManager(eManager *manager)
 			while(gety_cursor_eManager(manager) > get_height_eScreen(manager->screen, FILE_CONTENT)-1)
 				manager->first_screen_line = manager->first_screen_line->next;
 
-			print_content_eScreen(manager->screen, manager->first_screen_line, digit_number(manager->file->n_elines));
+			print_content_eScreen(manager->screen, manager->first_screen_line);
 			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
 			update_file_eScreen(manager->screen);
 		}
@@ -405,6 +540,13 @@ bool process_KEY_DOWN_eManager(eManager *manager)
 }
 
 
+/*
+ * @brief the process_KEY_UP_input_eManager() function process a KEY_UP input 
+ *
+ * @param manager eManager pointer
+ *
+ * @return returns true if the program continues and false otherwise.
+ */
 bool process_KEY_UP_eManager(eManager *manager)
 {
 	if(manager->mode == WRITE)
@@ -420,7 +562,7 @@ bool process_KEY_UP_eManager(eManager *manager)
 				manager->first_screen_line = manager->first_screen_line->previous;
 				
 			manager->current_line = manager->current_line->previous;
-			print_content_eScreen(manager->screen, manager->first_screen_line, digit_number(manager->file->n_elines));
+			print_content_eScreen(manager->screen, manager->first_screen_line);
 			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
 			update_file_eScreen(manager->screen);
 		}
@@ -447,6 +589,8 @@ int digit_number(unsigned int n)
 		return 5;
     if (n < 1000000) 
 		return 6;
+    if (n < 1000000) 
+		return 6;
     if (n < 10000000) 
 		return 7;
     if (n < 100000000) 
@@ -458,16 +602,34 @@ int digit_number(unsigned int n)
 }
 
 
+/*
+ * @brief The getx_cursor_eManager() return the window file x position of cursor in fuction of file.
+ *
+ * @param manager eManager pointer
+ *
+ * @return returns x position.
+ */
 unsigned int getx_cursor_eManager(eManager *manager)
 {
-	return manager->current_pos%get_width_eScreen(manager->screen, FILE_CONTENT);
+	unsigned int pos = 0;
+	size_t width = get_width_eScreen(manager->screen, FILE_CONTENT); 
+	
+	pos = screen_width_of_string(manager->current_line->string, manager->current_pos)%width;
+	
+	return pos; 
 }
 
-
+/*
+ * @brief The gety_cursor_eManager() return the window file y position of cursor in fuction of file.
+ *
+ * @param manager eManager pointer
+ *
+ * @return returns y position.
+ */
 unsigned int gety_cursor_eManager(eManager *manager)
 {
-	size_t width;
-	unsigned int y;
+	size_t width = 0;
+	unsigned int y = 0;
 	eLine *current = NULL;
 
 	width = get_width_eScreen(manager->screen, FILE_CONTENT);
@@ -480,11 +642,31 @@ unsigned int gety_cursor_eManager(eManager *manager)
 			y++;
 		else
 		{
-			y += current->length/width;
-			y += (current->length%width != 0) ? 1 : 0;
+			y += screen_width_of_string(current->string, current->length)/width;
+			y += (screen_width_of_string(current->string, current->length) % width != 0) ? 1 : 0;
 		}
 		current = current->next;
 	}
-	y += manager->current_pos/width;
+	
+	y += screen_width_of_string(manager->current_line->string, manager->current_pos)/width;
+
 	return y;
+}
+
+
+unsigned int screen_width_of_string(const char *s, size_t length)
+{
+	size_t real_length = strnlen(s, length);
+	unsigned int i = 0;
+	size_t width = 0;
+
+	while(i < real_length)
+	{
+		if(s[i] == '\t')
+			width += TABSIZE - width%TABSIZE;
+		else
+			width += 1;
+		i++;
+	}
+	return width;
 }

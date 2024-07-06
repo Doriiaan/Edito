@@ -96,9 +96,23 @@ void set_eFile_eManager(eManager *manager, eFile *file);
 bool run_eManager(eManager *manager);
 
 
-unsigned int gety_cursor_eManager(eManager *manager);
-
-
+/*
+ * @brief The getx_cursor_eManager() return the window file x position of cursor in fuction of file.
+ *
+ * @param manager eManager pointer
+ *
+ * @return returns x position.
+ */
 unsigned int getx_cursor_eManager(eManager *manager);
+
+
+/*
+ * @brief The gety_cursor_eManager() return the window file y position of cursor in fuction of file.
+ *
+ * @param manager eManager pointer
+ *
+ * @return returns y position.
+ */
+unsigned int gety_cursor_eManager(eManager *manager);
 
 #endif

@@ -54,6 +54,7 @@ int main()
 		reset_terminal();
 		exit(EXIT_FAILURE);
 	}
+
 	set_eScreen_eManager(manager, screen);
 	set_eFile_eManager(manager, file);
 

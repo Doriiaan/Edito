@@ -94,7 +94,7 @@ int insert_char_eLine(eLine *eline, const char ch, unsigned int pos);
  * @return 0 on success, -1 on error, see logs
  *
  */
-int remove_string_eLine(eLine *eline, unsigned int pos, size_t length);
+int remove_string_eLine(eLine *eline, size_t length, unsigned int pos);
 
 
 /**

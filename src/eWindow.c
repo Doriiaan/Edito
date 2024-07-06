@@ -27,7 +27,7 @@
  */
 eWindow *create_eWindow(size_t height, size_t width, unsigned int y, unsigned int x)
 {
-	eWindow *window;
+	eWindow *window = 0;
 
 	window = (eWindow *) malloc(sizeof(eWindow));
 	if(window == NULL)

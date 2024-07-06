@@ -75,13 +75,13 @@ eFile* create_eFile(const char *filename)
 	eFile *efile=NULL;
 	eLine *current=NULL, *previous=NULL;
 	char buffer[BUFFER_LENGTH];
+	memset(buffer, 0, BUFFER_LENGTH);
 
 
 	/* Allocate and fill the data structure */
 	efile = (eFile *) malloc(sizeof(eFile));
 	if(efile == NULL)
 	{
-		/* TODO:TRACE */
 		return NULL;
 	}
 	
@@ -91,7 +91,6 @@ eFile* create_eFile(const char *filename)
 
 	if((efile->permissions = file_permissions(filename)) == p_NOPERM)
 	{
-		/* TODO:TRACE */
 		free(efile);
 		return NULL;	
 	}
@@ -100,7 +99,6 @@ eFile* create_eFile(const char *filename)
 	{
 		if((fp = fopen(filename, "w+")) == NULL)
 		{
-			/* TODO: TRACE */
 			free(efile);
 			return NULL;
 		}
@@ -112,7 +110,6 @@ eFile* create_eFile(const char *filename)
 	/* open file to read it */
 	else if(efile->permissions != p_CREATE && (fp = fopen(filename, "r")) == NULL)
 	{
-		/* TODO: TRACE */
 		free(efile);
 		return NULL;
 	}
@@ -123,7 +120,6 @@ eFile* create_eFile(const char *filename)
 	{
 		if((current = create_eLine(buffer, BUFFER_LENGTH, efile->n_elines+1, previous, NULL)) == NULL)
 		{
-			/* TODO: TRACE */
 			delete_eFile(&efile);	
 			return NULL;
 		}
@@ -133,7 +129,6 @@ eFile* create_eFile(const char *filename)
 		{
 			if(insert_string_eLine(current, buffer, BUFFER_LENGTH, current->length))
 			{
-				/* TODO: TRACE */
 				delete_eFile(&efile);
 				return NULL;
 			}
@@ -174,19 +169,16 @@ int write_eFile(eFile *efile)
 
 	if(efile == NULL)
 	{
-		/* TODO: TRACE */
 		return -1;
 	}
 
 	if(efile->permissions != p_READWRITE)
 	{
-		/* TODO: TRACE */
 		return -1;
 	}
 
 	if((fp = fopen(efile->filename, "w")) == NULL)
 	{
-		/* TODO: TRACE */
 		return -1;
 	}
 
@@ -194,6 +186,7 @@ int write_eFile(eFile *efile)
 	
 	while(current)
 	{
+		/* Realloc buffer if necessary, first time realloc is equal to malloc */
 		if(buffer_length < current->length+2)
 		{
 			buffer_length = sizeof(char)*(current->length+2);
@@ -206,7 +199,6 @@ int write_eFile(eFile *efile)
 
 		if(fputs(buffer, fp) == EOF)
 		{
-			/* TODO: TRACE + call a function to write in a temporary file */
 			fclose(fp);
 			return -1;
 		}
@@ -246,7 +238,7 @@ void delete_eFile(eFile **efile)
  * @param efile eFile pointer pointer
  * @param pos  Position of the new line in the file
  */
-void add_empty_line_eFile(eFile *efile, unsigned int pos)
+int add_empty_line_eFile(eFile *efile, unsigned int pos)
 {
 	eLine *current = efile->first;
 	eLine *new = NULL;
@@ -254,8 +246,12 @@ void add_empty_line_eFile(eFile *efile, unsigned int pos)
 
 	if(efile->first == NULL)
 	{
-		efile->first = create_eLine("", 0, 1, NULL, NULL);
-		return;
+		if((efile->first = create_eLine("", 0, 1, NULL, NULL)) == NULL)
+		{
+			return -1;
+		}
+		return 0;
+		
 	}
 
 	while(i < pos-1 && current->next)
@@ -265,15 +261,19 @@ void add_empty_line_eFile(eFile *efile, unsigned int pos)
 	}
 	
 	/* Current is previous*/
-	new = create_eLine("", 0, pos, current, current->next);
+	if((new = create_eLine("", 0, pos, current, current->next)) == NULL)
+	{
+		return -1;
+	}
 
-
+	/* Increment line pos */
 	current = new->next;
 	while(current)
 	{
 		current->pos++;
 		current = current->next;
 	}
+	return 0;
 }
 			
 
@@ -304,6 +304,7 @@ void delete_line_eFile(eFile *efile, unsigned int pos)
 	if(current->previous != NULL)
 		current->previous->next = current->next;
 
+	/* Delete line and decrement line pos */
 	tmp=current->next;
 	delete_eLine(&current);
 	current = tmp;

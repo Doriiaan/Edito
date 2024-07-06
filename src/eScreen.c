@@ -31,12 +31,10 @@
  */
 eScreen *create_eScreen(int lines, int columns)
 {
-	eScreen *screen;
-	int width_menu, height_menu;
-	int width_bar, height_bar;
-	int width_file_box, height_file_box;
-	int width_file_linesnumber, height_file_linesnumber;
-	int width_file_content, height_file_content;
+	eScreen *screen = NULL;
+	int width_menu = 0, height_menu = 0;
+	int width_bar = 0, height_bar = 0;
+	int width_file_box = 0, height_file_box = 0;
 
 	screen = (eScreen *) malloc(sizeof(eScreen));
 	if(screen == NULL)
@@ -58,11 +56,6 @@ eScreen *create_eScreen(int lines, int columns)
 	width_file_box = width_bar;
 	height_file_box = lines - height_bar;
 	
-	width_file_linesnumber = 5; /* Default value, resize for each file */
-	height_file_linesnumber=height_file_box - 2;
-	
-	width_file_content=columns - width_menu - width_file_linesnumber-2; 
-	height_file_content=height_file_box - 2;
 
 	/* Create WINDOWs */
 	screen->windows[MENU] = create_eWindow(height_menu, width_menu, 0, 0);
@@ -71,9 +64,9 @@ eScreen *create_eScreen(int lines, int columns)
 
 	screen->windows[FILE_BOX] = create_eWindow(height_file_box, width_file_box, height_bar, width_menu);
 
-	screen->windows[FILE_LINESNUMBER] = create_eWindow(height_file_linesnumber, width_file_linesnumber, height_bar+1,width_menu+1);
+	screen->windows[FILE_LINESNUMBER] = NULL; 
 
-	screen->windows[FILE_CONTENT] = create_eWindow(height_file_content, width_file_content, height_bar+1, width_menu+1+width_file_linesnumber);
+	screen->windows[FILE_CONTENT] = NULL;
 
 	screen->windows[POPUP] = NULL;
 
@@ -81,6 +74,38 @@ eScreen *create_eScreen(int lines, int columns)
 
 	return screen;
 }
+
+
+/**
+ * @brief The create_file_window_eScreen() function allocate and initialize file windows.
+ *
+ * @param screen eScreen pointer
+ * @param number_length number of digit in the lines number
+ *
+ */
+void create_file_window_eScreen(eScreen *screen, unsigned int number_length)
+{
+
+	int width_file_linesnumber = 0, height_file_linesnumber = 0;
+	int width_file_content = 0, height_file_content = 0;
+	int x_file_linesnumber = 0, y_file_linesnumber = 0;
+	int x_file_content = 0, y_file_content = 0;
+
+	width_file_linesnumber = number_length + 2;
+	height_file_linesnumber= screen->windows[FILE_BOX]->height - 2;
+	
+	width_file_content = screen->windows[FILE_BOX]->width - width_file_linesnumber - 2; 
+	height_file_content = screen->windows[FILE_BOX]->height - 2;
+
+	x_file_linesnumber = screen->windows[FILE_BOX]->x + 1;
+	y_file_linesnumber = screen->windows[FILE_BOX]->y + 1;
+
+	x_file_content = x_file_linesnumber + width_file_linesnumber;
+	y_file_content = screen->windows[FILE_BOX]->y + 1;
+
+	screen->windows[FILE_LINESNUMBER] = create_eWindow(height_file_linesnumber, width_file_linesnumber, y_file_linesnumber, x_file_linesnumber);
+	screen->windows[FILE_CONTENT] = create_eWindow(height_file_content, width_file_content, y_file_content, x_file_content);
+}	
 
 
 /**
@@ -180,13 +205,15 @@ void set_current_window_eScreen(eScreen *screen, WINDOW_TYPE type)
  * @param first_line First line to print
  * @param number_length Number of digit of the higher line of the file
  */
-void print_content_eScreen(eScreen *screen, eLine *first_line, unsigned int number_length)
+void print_content_eScreen(eScreen *screen, eLine *first_line)
 {
 	eLine *current_line = first_line;
-	size_t screen_pos = 0;
+	size_t screen_pos = 0; /* y pos */
 	int line_number = first_line->pos;
 	char *refresh_line = NULL;
 	bool refresh_last_line = true;
+	size_t i_part_of_line=0;
+	int number_length = screen->windows[FILE_LINESNUMBER]->width - 2;
 
 	refresh_line = (char *) malloc((screen->windows[FILE_CONTENT]->width+1)*sizeof(char));
 	memset(refresh_line, ' ', screen->windows[FILE_CONTENT]->width);
@@ -202,7 +229,7 @@ void print_content_eScreen(eScreen *screen, eLine *first_line, unsigned int numb
 		if(current_line)
 		{
 			/* print line number */
-			size_t i_part_of_line=0;
+			i_part_of_line=0;
 			
 			/* do while, because, do exact same thing when current_line->length == 0 */
 			do
