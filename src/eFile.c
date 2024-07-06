@@ -103,7 +103,6 @@ eFile* create_eFile(const char *filename)
 			return NULL;
 		}
 		add_empty_line_eFile(efile, 1);
-		efile->n_elines = 1;
 		return efile;
 	}
 
@@ -250,6 +249,7 @@ int add_empty_line_eFile(eFile *efile, unsigned int pos)
 		{
 			return -1;
 		}
+		efile->n_elines = 1;
 		return 0;
 		
 	}
@@ -265,6 +265,7 @@ int add_empty_line_eFile(eFile *efile, unsigned int pos)
 	{
 		return -1;
 	}
+	efile->n_elines++;
 
 	/* Increment line pos */
 	current = new->next;
@@ -307,6 +308,7 @@ void delete_line_eFile(eFile *efile, unsigned int pos)
 	/* Delete line and decrement line pos */
 	tmp=current->next;
 	delete_eLine(&current);
+	efile->n_elines--;
 	current = tmp;
 	while(current)
 	{

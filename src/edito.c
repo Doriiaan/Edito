@@ -58,6 +58,7 @@ int main()
 	set_eScreen_eManager(manager, screen);
 	set_eFile_eManager(manager, file);
 
+
 	/* Print every Windows */
 	update_all_eScreen(screen);
 

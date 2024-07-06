@@ -91,7 +91,7 @@ void create_file_window_eScreen(eScreen *screen, unsigned int number_length)
 	int x_file_linesnumber = 0, y_file_linesnumber = 0;
 	int x_file_content = 0, y_file_content = 0;
 
-	width_file_linesnumber = number_length + 2;
+	width_file_linesnumber = number_length + 3;
 	height_file_linesnumber= screen->windows[FILE_BOX]->height - 2;
 	
 	width_file_content = screen->windows[FILE_BOX]->width - width_file_linesnumber - 2; 
@@ -107,6 +107,38 @@ void create_file_window_eScreen(eScreen *screen, unsigned int number_length)
 	screen->windows[FILE_CONTENT] = create_eWindow(height_file_content, width_file_content, y_file_content, x_file_content);
 }	
 
+
+/**
+ * @brief The resize_file_window_eScreen() function resize file windows.
+ *
+ * @param screen eScreen pointer
+ * @param number_length number of digit in the lines number
+ *
+ */
+void resize_file_eScreen(eScreen *screen, unsigned int number_length)
+{
+	if(number_length+3 != screen->windows[FILE_LINESNUMBER]->width)
+	{	
+		int width_file_linesnumber = 0;
+		int width_file_content = 0;
+		int x_file_content = 0;
+
+		width_file_linesnumber = number_length + 3;
+		
+		width_file_content = screen->windows[FILE_BOX]->width - width_file_linesnumber - 2; 
+
+		x_file_content = screen->windows[FILE_LINESNUMBER]->x + width_file_linesnumber;
+
+		
+		screen->windows[FILE_LINESNUMBER]->width = width_file_linesnumber;
+		screen->windows[FILE_CONTENT]->width = width_file_content;
+		screen->windows[FILE_CONTENT]->x = x_file_content;
+
+		wresize(screen->windows[FILE_LINESNUMBER]->window, screen->windows[FILE_LINESNUMBER]->height, width_file_linesnumber);
+		mvwin(screen->windows[FILE_CONTENT]->window, screen->windows[FILE_CONTENT]->y, x_file_content);
+		wresize(screen->windows[FILE_CONTENT]->window, screen->windows[FILE_CONTENT]->height, width_file_content);
+	}
+}
 
 /**
  * @brief The delete_eScreen() function deallocate the eScreen structure and set the pointer to the structure to NULL.
@@ -210,19 +242,15 @@ void print_content_eScreen(eScreen *screen, eLine *first_line)
 	eLine *current_line = first_line;
 	size_t screen_pos = 0; /* y pos */
 	int line_number = first_line->pos;
-	char *refresh_line = NULL;
-	bool refresh_last_line = true;
 	size_t i_part_of_line=0;
-	int number_length = screen->windows[FILE_LINESNUMBER]->width - 2;
+	int number_length = screen->windows[FILE_LINESNUMBER]->width - 3;
 
-	refresh_line = (char *) malloc((screen->windows[FILE_CONTENT]->width+1)*sizeof(char));
-	memset(refresh_line, ' ', screen->windows[FILE_CONTENT]->width);
-	refresh_line[screen->windows[FILE_CONTENT]->width] = 0;
 
-	/* Print the right border of the lines number window */
+	werase(screen->windows[FILE_CONTENT]->window);
+	werase(screen->windows[FILE_LINESNUMBER]->window);
+
 	wborder(screen->windows[FILE_LINESNUMBER]->window, ' ', 0, ' ', ' ', ' ', ACS_VLINE, ' ', ACS_VLINE);
-
-
+	
 	while(screen_pos < screen->windows[FILE_CONTENT]->height)
 	{
 		/* If there is at least one line left */
@@ -235,12 +263,7 @@ void print_content_eScreen(eScreen *screen, eLine *first_line)
 			do
 			{
 				if(i_part_of_line == 0)
-					mvwprintw(screen->windows[FILE_LINESNUMBER]->window, screen_pos, 1, "%*d", number_length, line_number);
-				else
-					mvwprintw(screen->windows[FILE_LINESNUMBER]->window, screen_pos, 1, "%*c", number_length, ' ');
-				
-				/* refresh line */
-				mvwprintw(screen->windows[FILE_CONTENT]->window, screen_pos, 0, "%s", refresh_line);
+					mvwprintw(screen->windows[FILE_LINESNUMBER]->window, screen_pos, 1, "%*d ", number_length, line_number);
 
 				/* print line */
 				mvwprintw(screen->windows[FILE_CONTENT]->window, screen_pos, 0, "%.*s", screen->windows[FILE_CONTENT]->width, current_line->string+i_part_of_line);
@@ -256,14 +279,7 @@ void print_content_eScreen(eScreen *screen, eLine *first_line)
 		/* If there are no lines left */
 		else
 		{
-			/* refresh last line */
-			if(refresh_last_line)
-			{
-				mvwprintw(screen->windows[FILE_CONTENT]->window, screen_pos, 0, "%s", refresh_line);
-				refresh_last_line = false;
-			}
-
-			mvwprintw(screen->windows[FILE_LINESNUMBER]->window, screen_pos, 1, "%*c", number_length, '~');
+			mvwprintw(screen->windows[FILE_LINESNUMBER]->window, screen_pos, 1, "%*c ", number_length, '~');
 			screen_pos++;
 		}
 		line_number++;

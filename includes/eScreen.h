@@ -54,6 +54,16 @@ void create_file_window_eScreen(eScreen *screen, unsigned int number_length);
 
 
 /**
+ * @brief The resize_file_window_eScreen() function resize file windows.
+ *
+ * @param screen eScreen pointer
+ * @param number_length number of digit in the lines number
+ *
+ */
+void resize_file_eScreen(eScreen *screen, unsigned int number_length);
+
+
+/**
  * @brief The delete_eScreen() function deallocate the eScreen structure and set the pointer to the structure to NULL.
  *
  * @param manager eManager pointer pointer

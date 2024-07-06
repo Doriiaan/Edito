@@ -323,6 +323,7 @@ bool process_ENTER_eManager(eManager *manager)
 		free(buffer);	
 		buffer = NULL;
 		manager->current_pos = 0;
+		resize_file_eScreen(manager->screen, digit_number(manager->file->n_elines));
 		process_KEY_DOWN_eManager(manager);
 	}
 
@@ -405,6 +406,7 @@ bool process_BACKSPACE_eManager(eManager *manager)
 			pos = manager->current_line->pos;
 			process_KEY_UP_eManager(manager);
 			delete_line_eFile(manager->file, pos);
+			resize_file_eScreen(manager->screen, digit_number(manager->file->n_elines));
 
 			print_content_eScreen(manager->screen, manager->first_screen_line);
 			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
@@ -441,6 +443,7 @@ bool process_DELETE_eManager(eManager *manager)
 			buffer = NULL;
 			
 			delete_line_eFile(manager->file, manager->current_line->next->pos);
+			resize_file_eScreen(manager->screen, digit_number(manager->file->n_elines));
 			
 			print_content_eScreen(manager->screen, manager->first_screen_line);
 			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
