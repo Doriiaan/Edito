@@ -242,9 +242,8 @@ void print_content_eScreen(eScreen *screen, eLine *first_line)
 	eLine *current_line = first_line;
 	size_t screen_pos = 0; /* y pos */
 	int line_number = first_line->pos;
-	size_t i_part_of_line=0;
 	int number_length = screen->windows[FILE_LINESNUMBER]->width - 3;
-
+	size_t width = screen->windows[FILE_CONTENT]->width;
 
 	werase(screen->windows[FILE_CONTENT]->window);
 	werase(screen->windows[FILE_LINESNUMBER]->window);
@@ -257,22 +256,13 @@ void print_content_eScreen(eScreen *screen, eLine *first_line)
 		if(current_line)
 		{
 			/* print line number */
-			i_part_of_line=0;
-			
-			/* do while, because, do exact same thing when current_line->length == 0 */
-			do
-			{
-				if(i_part_of_line == 0)
-					mvwprintw(screen->windows[FILE_LINESNUMBER]->window, screen_pos, 1, "%*d ", number_length, line_number);
+			mvwprintw(screen->windows[FILE_LINESNUMBER]->window, screen_pos, 1, "%*d ", number_length, line_number);
 
-				/* print line */
-				mvwprintw(screen->windows[FILE_CONTENT]->window, screen_pos, 0, "%.*s", screen->windows[FILE_CONTENT]->width, current_line->string+i_part_of_line);
+			/* print line */
+			mvwaddstr(screen->windows[FILE_CONTENT]->window, screen_pos, 0, current_line->string);
 
-				i_part_of_line+=screen->windows[FILE_CONTENT]->width;
-				
-				screen_pos++;
-			}while(i_part_of_line < current_line->length);
-			
+			/* +1 because when end of line, put next file line two screen line after to let cursor go on next screen line*/
+			screen_pos += current_line->length/width + 1;
 			current_line = current_line->next;
 		}
 

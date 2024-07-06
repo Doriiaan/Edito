@@ -129,9 +129,22 @@ bool run_eManager(eManager *manager)
 	int input = 0;
 	bool result = false;
 
-	/* Get User input */
+	curs_set(1);
 	input = get_input_eScreen(manager->screen);
+	curs_set(0);
 	result =  process_input_eManager(manager, input);
+	
+	if(manager->mode == WRITE)
+	{
+		print_content_eScreen(manager->screen, manager->first_screen_line);
+		move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
+		update_file_eScreen(manager->screen);
+	}
+	else if(manager->mode == NORMAL)
+	{
+		move_cursor_eScreen(manager->screen, MENU, 1, 1);
+		update_menu_eScreen(manager->screen);
+	}
 
 	return result;
 }
@@ -214,7 +227,6 @@ bool process_DEFAULT_eManager(eManager *manager, int input)
 	if(manager->mode == WRITE)
 	{
 		insert_char_eLine(manager->current_line, input, manager->current_pos);
-		print_content_eScreen(manager->screen, manager->first_screen_line);
 		process_KEY_RIGHT_eManager(manager);
 	}
 	return true;
@@ -231,9 +243,10 @@ bool process_DEFAULT_eManager(eManager *manager, int input)
 bool process_q_eManager(eManager *manager)
 {
 	if(manager->mode == NORMAL)
-	{
 		return false;
-	}
+	else if(manager->mode == WRITE)
+		process_DEFAULT_eManager(manager, 'q');
+
 	return true;
 }
 
@@ -262,6 +275,9 @@ bool process_w_eManager(eManager *manager)
 			}
 		}
 	}
+	else if(manager->mode == WRITE)
+		process_DEFAULT_eManager(manager, 'w');
+
 	return true;
 }
 
@@ -281,10 +297,12 @@ bool process_i_eManager(eManager *manager)
 		{
 			manager->mode = WRITE;
 			set_current_window_eScreen(manager->screen, FILE_CONTENT);
-			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
-			update_file_eScreen(manager->screen);
 		}
 	}
+	
+	else if(manager->mode == WRITE)
+		process_DEFAULT_eManager(manager, 'i');
+
 	return true;
 }
 
@@ -344,10 +362,7 @@ bool process_ESCAPE_eManager(eManager *manager)
 	if(manager->mode == WRITE)
 	{
 		manager->mode = NORMAL;
-
 		set_current_window_eScreen(manager->screen, MENU);
-		move_cursor_eScreen(manager->screen, MENU, 1, 1);
-		update_menu_eScreen(manager->screen);
 	}
 
 	return true;
@@ -379,7 +394,6 @@ bool process_BACKSPACE_eManager(eManager *manager)
 		{
 			/* If current_pos > current_line->length (error), remove_char_eLine return -1, process just KEY_LEFT */
 			remove_char_eLine(manager->current_line, manager->current_pos-1);
-			print_content_eScreen(manager->screen, manager->first_screen_line);
 			process_KEY_LEFT_eManager(manager);
 		}
 		/* If current_pos == 0 and current_line->previous exist
@@ -407,10 +421,6 @@ bool process_BACKSPACE_eManager(eManager *manager)
 			process_KEY_UP_eManager(manager);
 			delete_line_eFile(manager->file, pos);
 			resize_file_eScreen(manager->screen, digit_number(manager->file->n_elines));
-
-			print_content_eScreen(manager->screen, manager->first_screen_line);
-			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
-			update_file_eScreen(manager->screen);
 		}
 	}
 	return true;
@@ -427,9 +437,6 @@ bool process_DELETE_eManager(eManager *manager)
 		if(manager->current_pos < manager->current_line->length)
 		{
 			remove_char_eLine(manager->current_line, manager->current_pos);
-			print_content_eScreen(manager->screen, manager->first_screen_line);
-			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
-			update_file_eScreen(manager->screen);
 		}
 		else if( manager->current_pos >= manager->current_line->length && manager->current_line->next)
 		{
@@ -444,10 +451,6 @@ bool process_DELETE_eManager(eManager *manager)
 			
 			delete_line_eFile(manager->file, manager->current_line->next->pos);
 			resize_file_eScreen(manager->screen, digit_number(manager->file->n_elines));
-			
-			print_content_eScreen(manager->screen, manager->first_screen_line);
-			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
-			update_file_eScreen(manager->screen);
 		}
 
 	}
@@ -469,8 +472,6 @@ bool process_KEY_RIGHT_eManager(eManager *manager)
 		if(manager->current_pos < manager->current_line->length)
 		{
 			manager->current_pos++;
-			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
-			update_file_eScreen(manager->screen);
 		}
 		else if(manager->current_pos >= manager->current_line->length && manager->current_line->next != NULL)
 		{
@@ -497,8 +498,6 @@ bool process_KEY_LEFT_eManager(eManager *manager)
 		if(manager->current_pos > 0)
 		{
 			manager->current_pos--;
-			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
-			update_file_eScreen(manager->screen);
 		}
 		else if(manager->current_pos == 0 && manager->current_line->previous != NULL)
 		{
@@ -531,12 +530,8 @@ bool process_KEY_DOWN_eManager(eManager *manager)
 			manager->current_line = manager->current_line->next;
 
 			/* While cursor is out of screen (line to big), pull down the screen */
-			while(gety_cursor_eManager(manager) > get_height_eScreen(manager->screen, FILE_CONTENT)-1)
+			while(gety_cursor_eManager(manager)+5 > get_height_eScreen(manager->screen, FILE_CONTENT)-1)
 				manager->first_screen_line = manager->first_screen_line->next;
-
-			print_content_eScreen(manager->screen, manager->first_screen_line);
-			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
-			update_file_eScreen(manager->screen);
 		}
 	}
 	return true;
@@ -561,13 +556,10 @@ bool process_KEY_UP_eManager(eManager *manager)
 				manager->current_pos = manager->current_line->previous->length;
 
 			/* If current == first_line, pull up the screen */
-			if(manager->current_line == manager->first_screen_line)
+			if(manager->first_screen_line->previous && manager->current_line->pos-5 < manager->first_screen_line->pos)
 				manager->first_screen_line = manager->first_screen_line->previous;
 				
 			manager->current_line = manager->current_line->previous;
-			print_content_eScreen(manager->screen, manager->first_screen_line);
-			move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
-			update_file_eScreen(manager->screen);
 		}
 	}
 
