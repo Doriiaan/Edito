@@ -9,14 +9,14 @@
  * ===================================================
  */
 
-#include <stddef.h>
-#include <stdlib.h> 
-#include <locale.h>
-#include <stdbool.h>
-
 #include "eScreen.h"
 #include "eFile.h"
 #include "eManager.h"
+
+#include <stdlib.h> 
+#include <stdbool.h>
+#include <locale.h>
+
 
 void init_terminal(void);
 void reset_terminal(void);

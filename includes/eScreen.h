@@ -11,10 +11,8 @@
 #ifndef __ESCREEN_H__
 #define __ESCREEN_H__
 
-#include <ncurses.h>
-
 #include "eLine.h"
-#include "eWindow.h"
+#include "eWindow.h" /* include ncurses */
 
 typedef struct {
 

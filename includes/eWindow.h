@@ -13,6 +13,8 @@
 
 #define WINDOWS_NUMBER 6 
 
+#include <ncurses.h>
+
 /**
  * @enum Window type enumeration
  */

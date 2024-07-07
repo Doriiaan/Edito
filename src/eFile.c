@@ -15,14 +15,15 @@
  * ===================================================
  */
 
+#include "eFile.h"
+#include "eLine.h"
+
 #include <stdio.h> /* printf, FILE */
 #include <stdlib.h> /* malloc */
 #include <string.h> /* strlen, strncpy, strncat */
 #include <errno.h> /* errno code */
 #include <unistd.h> /* access */
 
-#include "eFile.h"
-#include "eLine.h"
 
 #define BUFFER_LENGTH 256 /* Buffer length of the buffer used to read lines */
 

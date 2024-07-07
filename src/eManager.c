@@ -12,12 +12,14 @@
  * ===================================================
  */
 
-#include <stdlib.h>
-#include <string.h>
-
 #include "eManager.h"
 #include "eScreen.h"
 #include "eFile.h"
+
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
 
 
 /* Internal functions */
@@ -132,6 +134,7 @@ bool run_eManager(eManager *manager)
 	curs_set(1);
 	input = get_input_eScreen(manager->screen);
 	curs_set(0);
+
 	result =  process_input_eManager(manager, input);
 	
 	if(manager->mode == WRITE)
@@ -226,8 +229,11 @@ bool process_DEFAULT_eManager(eManager *manager, int input)
 {
 	if(manager->mode == WRITE)
 	{
-		insert_char_eLine(manager->current_line, input, manager->current_pos);
-		process_KEY_RIGHT_eManager(manager);
+		if(isprint(input))
+		{
+			insert_char_eLine(manager->current_line, input, manager->current_pos);
+			process_KEY_RIGHT_eManager(manager);
+		}
 	}
 	return true;
 }

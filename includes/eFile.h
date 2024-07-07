@@ -11,7 +11,6 @@
 #ifndef __EFILE_H__
 #define __EFILE_H__
 
-#include <stdio.h> /* FILE */
 #include "eLine.h"
 
 

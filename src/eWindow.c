@@ -12,10 +12,9 @@
  * ===================================================
  */
 
-#include <stdlib.h>
-#include <ncurses.h>
-
 #include "eWindow.h"
+#include <stdlib.h>
+
 
 
 /**

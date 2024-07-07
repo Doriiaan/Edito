@@ -14,12 +14,12 @@
  * ===================================================
  */
 
-#include <stdlib.h>
-#include <ncurses.h>
-#include <string.h>
-
 #include "eScreen.h"
 #include "eLine.h"
+
+#include <stdlib.h>
+#include <string.h>
+
 
 
 /**
