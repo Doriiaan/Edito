@@ -26,8 +26,8 @@ typedef struct eLine
 	/** Allocated size */
 	size_t alloc_size;	
 	
-	/** Position of the line in the file */
-	unsigned int pos;
+	/** Line number */
+	unsigned int line_number;
 	
 	/** Previous line of NULL */
 	struct eLine *previous; 
@@ -44,17 +44,17 @@ typedef struct eLine
 /**
  * @brief The create_eLine() function allocate and initialize an eLine.
  *
- * @param string: 	String of line.
- * @param length: 	Length of the string (excluding null terminator)
- * @param pos: 		Position of the line in the file.
- * @param next: 	Next line in file.
+ * @param string: String of line.
+ * @param length: Length of the string (excluding null terminator)
+ * @param line_number : Line number	
+ * @param next: Next line in file.
  * @param previous: Previous line in file.
  *
  * @return Pointer on the line structure or NULL if allocation failed.
  *
  * @note delete_eLine() must be called before exiting.
  */
-eLine *create_eLine(char *string, size_t length, unsigned int pos, eLine *previous, eLine *next);
+eLine *create_eLine(char *string, size_t length, unsigned int line_number, eLine *previous, eLine *next);
 
 
 /**

@@ -13,7 +13,8 @@
 
 #include "eFile.h"
 #include "eScreen.h"
-#include "eLine.h"
+#include "eBar.h"
+#include "eRepository.h"
 
 
 /**
@@ -83,9 +84,10 @@ void set_eScreen_eManager(eManager *manager, eScreen *screen);
  * @param manager eManager pointer
  * @param file eFile pointer
  *
+ * return 0 on success, -1 on error
  * @note This function also print the content of the file in the screen.
  */
-void set_eFile_eManager(eManager *manager, eFile *file);
+int set_eFile_eManager(eManager *manager, eFile *file);
 
 
 /**
@@ -95,7 +97,7 @@ void set_eFile_eManager(eManager *manager, eFile *file);
  * @param file eFile pointer
  *
  */
-void set_eBar_eManager(eManager *manager, eBar *bar);
+int set_eBar_eManager(eManager *manager, eBar *bar);
 
 
 /**
@@ -106,7 +108,7 @@ void set_eBar_eManager(eManager *manager, eBar *bar);
  *
  * @note This function also print the content of the repository in the screen.
  */
-void set_eBar_eManager(eManager *manager, eRepository *repo);
+int set_eRepository_eManager(eManager *manager, eRepository *repo);
 
 
 /**

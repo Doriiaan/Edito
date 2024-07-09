@@ -1,9 +1,0 @@
-
-
-
-typedef struct {
-	
-	MENU *eMenu;	
-
-
-}

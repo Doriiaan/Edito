@@ -23,6 +23,7 @@
 #include <string.h> /* strlen, strncpy, strncat */
 #include <errno.h> /* errno code */
 #include <unistd.h> /* access */
+#include <stdbool.h>
 
 
 #define BUFFER_LENGTH 256 /* Buffer length of the buffer used to read lines */
@@ -70,7 +71,7 @@ PERM file_permissions(const char *filename)
  *
  * @note delete_eFile() must be called before exiting.
  */
-eFile* create_eFile(const char *filename)
+eFile* create_eFile(char *filename)
 {
 	eFile *efile=NULL;
 
@@ -107,10 +108,10 @@ eFile* create_eFile(const char *filename)
  */
 int open_eFile(eFile *efile)
 {
-	char *buffer = NULL;
 	eLine *current = NULL, *previous = NULL;
 	FILE *fp = NULL;
-	
+	char buffer[BUFFER_LENGTH];
+	memset(buffer, 0, BUFFER_LENGTH);	
 
 	/* If the file did not exist when callinf create_eFile() */
 	if(efile->permissions == p_CREATE)
@@ -137,6 +138,7 @@ int open_eFile(eFile *efile)
 		if((current = create_eLine(buffer, BUFFER_LENGTH, efile->n_elines+1, previous, NULL)) == NULL)
 		{
 			close_eFile(efile);	
+			fclose(fp);
 			return -1;
 		}
 
@@ -145,7 +147,8 @@ int open_eFile(eFile *efile)
 		{
 			if(insert_string_eLine(current, buffer, BUFFER_LENGTH, current->length))
 			{
-				close(efile);
+				close_eFile(efile);
+				fclose(fp);
 				return -1;
 			}
 		}
@@ -175,7 +178,11 @@ int open_eFile(eFile *efile)
 }
 
 
-void close_eFile(eFile *efile);
+/**
+ * @brief The close_eFile() function close the file and delete lines.
+ *
+ */
+void close_eFile(eFile *efile)
 {
 	efile->current_line = NULL;
 	efile->current_pos = 0;
@@ -303,11 +310,11 @@ int add_empty_line_eFile(eFile *efile, unsigned int pos)
 	}
 	efile->n_elines++;
 
-	/* Increment line pos */
+	/* Increment line number */
 	current = new->next;
 	while(current)
 	{
-		current->pos++;
+		current->line_number++;
 		current = current->next;
 	}
 	
@@ -320,15 +327,45 @@ int add_empty_line_eFile(eFile *efile, unsigned int pos)
  * @brief the delete_line_eFile() delete a line to the position pos in the file
  *
  * @param efile eFile pointer pointer
- * @param pos Position of the line that will be deleted
+ * @param line_number Position of the line that will be deleted
  */
-void delete_line_eFile(eFile *efile, unsigned int pos)
+void delete_line_eFile(eFile *efile, unsigned int line_number)
 {
 	eLine *current = efile->first_file_line;
 	eLine *tmp = NULL;
 	unsigned int i = 1;
+	bool last_line=false;
 
-	while(current && i < pos)
+	if(line_number == efile->current_line->line_number)
+	{
+		if(efile->current_line->next)
+			efile->current_line = efile->current_line->next;
+
+		else if(efile->current_line->previous)
+			efile->current_line = efile->current_line->previous;
+		else
+			last_line = true;
+	}
+	
+	if(line_number == efile->first_screen_line->line_number)
+	{
+		if(efile->first_screen_line->next)
+			efile->first_screen_line = efile->first_screen_line->next;
+
+		else if(efile->first_screen_line->previous)
+			efile->first_screen_line = efile->first_screen_line->previous;
+		else
+			last_line = true;
+	}
+	
+	if(last_line)
+		add_empty_line_eFile(efile, line_number+1);
+
+	
+	if(line_number == efile->first_file_line->line_number)
+		efile->first_file_line = efile->first_file_line->next;
+
+	while(current && i < line_number)
 	{
 		current = current->next;
 		i++;
@@ -343,14 +380,14 @@ void delete_line_eFile(eFile *efile, unsigned int pos)
 	if(current->previous != NULL)
 		current->previous->next = current->next;
 
-	/* Delete line and decrement line pos */
+	/* Delete line and decrement line number */
 	tmp=current->next;
 	delete_eLine(&current);
 	efile->n_elines--;
 	current = tmp;
 	while(current)
 	{
-		current->pos--;
+		current->line_number--;
 		current = current->next;
 	}
 
@@ -364,7 +401,7 @@ void delete_line_eFile(eFile *efile, unsigned int pos)
  * @param efile eFile pointer
  * @param ch character to insert
  */
-void insert_char_eFile(eFile *efile, const char *ch)
+void insert_char_eFile(eFile *efile, const char ch)
 {
 	if(!insert_char_eLine(efile->current_line, ch, efile->current_pos))
 		efile->is_saved = false;	
@@ -379,5 +416,32 @@ void insert_char_eFile(eFile *efile, const char *ch)
 void remove_char_eFile(eFile *efile)
 {
 	if(!remove_char_eLine(efile->current_line, efile->current_pos))
+		efile->is_saved = false;	
+}
+
+
+/**
+ * @brief the insert_string_eFile() insert the string at current_pos in the current line 
+ *
+ * @param efile eFile pointer
+ * @param string string to insert
+ * @param length lenght of string
+ */
+void insert_string_eFile(eFile *efile, const char *string, size_t length)
+{
+	if(!insert_string_eLine(efile->current_line, string, length, efile->current_pos))
+		efile->is_saved = false;
+}
+
+
+/**
+ * @brief the remove_string_eFile() remove the string that start at current_pos and end to current_pos+length in the current line 
+ *
+ * @param efile eFile pointer
+ * @param length of string to remove
+ */
+void remove_string_eFile(eFile *efile, size_t length)
+{
+	if(!remove_string_eLine(efile->current_line, length, efile->current_pos))
 		efile->is_saved = false;	
 }

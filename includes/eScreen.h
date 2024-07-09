@@ -13,6 +13,7 @@
 
 #include "eLine.h"
 #include "eWindow.h" /* include ncurses */
+#include <menu.h>
 
 typedef struct {
 
@@ -32,7 +33,7 @@ typedef struct {
 	MENU *repo;
 
 	/* Repository items */
-	ITEMS **repo_items;
+	ITEM **repo_items;
 
 	// MENU *settings (for the future)
 
@@ -78,11 +79,11 @@ void delete_eScreen(eScreen **screen);
 
 
 /**
- * @brief The update_menu_eScreen() function refresh the menu window.
+ * @brief The update_repository_eScreen() function refresh the menu window.
  *
  * @param screen eScreen pointer
  */
-void update_menu_eScreen(eScreen *screen);
+void update_repository_eScreen(eScreen *screen);
 
 
 /*

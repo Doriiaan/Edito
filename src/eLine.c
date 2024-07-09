@@ -30,14 +30,14 @@ unsigned int get_next_power_of_two(unsigned int n);
  *
  * @param string: String of line.
  * @param length: Length of the string (excluding null terminator)
- * @param pos: Position of the line in the file.
+ * @param line_number: Line number.
  * @param next: Next line in file.
  * @param previous: Previous line in file.
  * @return Pointer on the line structure or NULL if allocation failed.
  *
  * @note delete_eLine() must be called before exiting.
  */
-eLine *create_eLine(char *string, size_t length, unsigned int pos, eLine *previous, eLine *next)
+eLine *create_eLine(char *string, size_t length, unsigned int line_number, eLine *previous, eLine *next)
 {
 	eLine *eline = (eLine *) malloc(sizeof(eLine));
 	if(eline == NULL)
@@ -65,7 +65,7 @@ eLine *create_eLine(char *string, size_t length, unsigned int pos, eLine *previo
 	memset(eline->string, 0, eline->alloc_size);
 	memcpy(eline->string, string, eline->length);
 
-	eline->pos = pos;
+	eline->line_number = line_number;
 
 	eline->next = next;
 	if(eline->next)
@@ -126,6 +126,23 @@ int insert_string_eLine(eLine *eline, const char *string, size_t length, unsigne
 	eline->length = new_length;
 
 	return 0;
+}
+
+
+/**
+ * @brief The delete_eLine() function delete and deallocate eLine and set pointer to NULL
+ *
+ * @param: eline pointer pointer
+ */
+void delete_eLine(eLine **eline)
+{
+	if(*eline != NULL)
+	{
+		if((*eline)->string != NULL)
+			free((*eline)->string);
+		free(*eline);
+		*eline = NULL;
+	}
 }
 
 
@@ -237,7 +254,7 @@ int remove_char_eLine(eLine *eline, unsigned int pos)
  *
  * @note : This function has security and get the max between strnlen(string, length) and eline->length character.
  */
-int get_string_eLine(eLine *eline, char *string, size_t length, unsigned int pos)
+int get_string_eLine(eLine *eline, char *buffer, size_t length, unsigned int pos)
 {
 	size_t min = 0;
 	
@@ -245,27 +262,10 @@ int get_string_eLine(eLine *eline, char *string, size_t length, unsigned int pos
 		return -1;
 
 	min = (length < eline->length-pos) ? length : eline->length-pos;
-	memcpy(string, eline->string+pos, min);
-	string[min] = 0;
+	memcpy(buffer, eline->string+pos, min);
+	buffer[min] = 0;
 	
 	return min;
-}
-
-
-/**
- * @brief The delete_eLine() function delete and deallocate eLine and set pointer to NULL
- *
- * @param: eline pointer pointer
- */
-void delete_eLine(eLine **eline)
-{
-	if(*eline != NULL)
-	{
-		if((*eline)->string != NULL)
-			free((*eline)->string);
-		free(*eline);
-		*eline = NULL;
-	}
 }
 
 

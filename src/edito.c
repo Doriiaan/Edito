@@ -62,8 +62,8 @@ int main()
 	/* Print every Windows */
 	update_all_eScreen(screen);
 
-	set_current_window_eScreen(manager->screen, MENU);
-	move_cursor_eScreen(manager->screen, MENU, 1, 1);
+	set_current_window_eScreen(manager->screen, REPOSITORY);
+	move_cursor_eScreen(manager->screen, REPOSITORY, 1, 1);
 
 	/* Main loop */
 	while(run)

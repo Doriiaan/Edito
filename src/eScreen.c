@@ -32,7 +32,7 @@
 eScreen *create_eScreen(int lines, int columns)
 {
 	eScreen *screen = NULL;
-	int width_menu = 0, height_menu = 0;
+	int width_repository = 0, height_repository = 0;
 	int width_bar = 0, height_bar = 0;
 	int width_file_box = 0, height_file_box = 0;
 
@@ -47,10 +47,10 @@ eScreen *create_eScreen(int lines, int columns)
 	screen->height = lines;
 	
 	/* Set WINDOWs dimension */
-	width_menu = columns/5;
-	height_menu = lines;
+	width_repository = columns/5;
+	height_repository = lines;
 
-	width_bar = columns - width_menu;
+	width_bar = columns - width_repository;
 	height_bar = lines/10;
 
 	width_file_box = width_bar;
@@ -58,11 +58,11 @@ eScreen *create_eScreen(int lines, int columns)
 	
 
 	/* Create WINDOWs */
-	screen->windows[MENU] = create_eWindow(height_menu, width_menu, 0, 0);
+	screen->windows[REPOSITORY] = create_eWindow(height_repository, width_repository, 0, 0);
 
-	screen->windows[BAR] = create_eWindow(height_bar, width_bar,0 , width_menu);
+	screen->windows[BAR] = create_eWindow(height_bar, width_bar,0 , width_repository);
 
-	screen->windows[FILE_BOX] = create_eWindow(height_file_box, width_file_box, height_bar, width_menu);
+	screen->windows[FILE_BOX] = create_eWindow(height_file_box, width_file_box, height_bar, width_repository);
 
 	screen->windows[FILE_LINESNUMBER] = NULL; 
 
@@ -70,7 +70,7 @@ eScreen *create_eScreen(int lines, int columns)
 
 	screen->windows[POPUP] = NULL;
 
-	screen->current_window = screen->windows[MENU];
+	screen->current_window = screen->windows[REPOSITORY];
 
 	return screen;
 }
@@ -147,7 +147,7 @@ void resize_file_eScreen(eScreen *screen, unsigned int number_length)
  */
 void delete_eScreen(eScreen **screen)
 {
-	delete_eWindow(&(*screen)->windows[MENU]);
+	delete_eWindow(&(*screen)->windows[REPOSITORY]);
 	delete_eWindow(&(*screen)->windows[BAR]);
 	delete_eWindow(&(*screen)->windows[FILE_BOX]);
 	delete_eWindow(&(*screen)->windows[FILE_LINESNUMBER]);
@@ -160,14 +160,14 @@ void delete_eScreen(eScreen **screen)
 
 
 /**
- * @brief The update_menu_eScreen() function refresh the menu window.
+ * @brief The update_repository_eScreen() function refresh the repository window.
  *
  * @param screen eScreen pointer
  */
-void update_menu_eScreen(eScreen *screen)
+void update_repository_eScreen(eScreen *screen)
 {
-	box(screen->windows[MENU]->window, 0, 0);
-	wnoutrefresh(screen->windows[MENU]->window);
+	box(screen->windows[REPOSITORY]->window, 0, 0);
+	wnoutrefresh(screen->windows[REPOSITORY]->window);
 	doupdate();
 }
 
@@ -205,7 +205,7 @@ void update_file_eScreen(eScreen *screen)
  */
 void update_all_eScreen(eScreen *screen)
 {
-	box(screen->windows[MENU]->window, 0, 0);
+	box(screen->windows[REPOSITORY]->window, 0, 0);
 	box(screen->windows[BAR]->window, 0, 0);
 	box(screen->windows[FILE_BOX]->window, 0, 0);
 
@@ -241,7 +241,7 @@ void print_content_eScreen(eScreen *screen, eLine *first_line)
 {
 	eLine *current_line = first_line;
 	size_t screen_pos = 0; /* y pos */
-	int line_number = first_line->pos;
+	int line_number = first_line->line_number;
 	int number_length = screen->windows[FILE_LINESNUMBER]->width - 3;
 	size_t width = screen->windows[FILE_CONTENT]->width;
 

@@ -20,7 +20,7 @@
  */
 typedef enum {
 
-	MENU=0,
+	REPOSITORY=0,
 	BAR=1,
 	FILE_BOX=2,
 	FILE_LINESNUMBER=3,

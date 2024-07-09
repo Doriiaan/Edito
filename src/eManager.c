@@ -21,7 +21,6 @@
 #include <ctype.h>
 
 
-
 /* Internal functions */
 static bool process_input_eManager(eManager *manager, int input);
 
@@ -62,7 +61,7 @@ eManager *create_eManager()
 	manager->mode = NORMAL;	
 	manager->screen = NULL;
 	manager->file = NULL;
-	manager->repo = NULL;
+	manager->project_repo = NULL;
 	manager->bar = NULL;
 
 	return manager;
@@ -93,8 +92,25 @@ void set_eScreen_eManager(eManager *manager, eScreen *screen)
 }
 
 
-void set_eRepository_eManager(eManager *manager, eRepository *repo);
-void set_eBar_eManager(eManager *manager, eBar *bar);
+/**
+ * @brief The set_eBar_eManager() function set an eBar to eManager.
+ *
+ * @param manager eManager pointer
+ * @param file eFile pointer
+ *
+ */
+int set_eBar_eManager(eManager *manager, eBar *bar);
+
+
+/**
+ * @brief The set_eRepository_eManager() function set an eRepository to eManager.
+ *
+ * @param manager eManager pointer
+ * @param file eFile pointer
+ *
+ * @note This function also print the content of the repository in the screen.
+ */
+int set_eRepository_eManager(eManager *manager, eRepository *repo);
 
 
 /**
@@ -105,11 +121,17 @@ void set_eBar_eManager(eManager *manager, eBar *bar);
  *
  * @note This function also print the content of the file in the screen.
  */
-void set_eFile_eManager(eManager *manager, eFile *file)
+int set_eFile_eManager(eManager *manager, eFile *file)
 {
+	// TODO: in the future, do not open in this function but in open_file_eBar
+	if(open_eFile(file) == -1)
+		return -1;
+
 	manager->file = file;
 	create_file_window_eScreen(manager->screen, digit_number(file->n_elines));
 	print_content_eScreen(manager->screen, file->first_screen_line);
+	
+	return 0;
 }
 
 
@@ -133,14 +155,15 @@ bool run_eManager(eManager *manager)
 	
 	if(manager->mode == WRITE)
 	{
+		resize_file_eScreen(manager->screen, digit_number(manager->file->n_elines));
 		print_content_eScreen(manager->screen, manager->file->first_screen_line);
 		move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
 		update_file_eScreen(manager->screen);
 	}
 	else if(manager->mode == NORMAL)
 	{
-		move_cursor_eScreen(manager->screen, MENU, 1, 1);
-		update_menu_eScreen(manager->screen);
+		move_cursor_eScreen(manager->screen, REPOSITORY, 1, 1);
+		update_repository_eScreen(manager->screen);
 	}
 
 	return result;
@@ -321,11 +344,12 @@ bool process_ENTER_eManager(eManager *manager)
 
 	/*
 	 * 1. Allocate buffer
-	 * 2. Put into buffer, the string of current line after current pos
-	 * 3. Add an empty line
-	 * 4. Insert buffer into new empty line
-	 * 5. Remove string of current line after current pos 
-	 * 6. Set current pos to 0 and process KEY_DOWN
+	 * 2. Remove string of current line after current pos 
+	 * 3. Put the string of current line after current pos into buffer
+	 * 4. Add an empty line
+	 * 5. Set current pos in line to 0
+	 * 6. Process KEY_DOWN
+	 * 7. Insert buffer into new empty line
 	 */
 	if(manager->mode == WRITE)
 	{
@@ -333,16 +357,16 @@ bool process_ENTER_eManager(eManager *manager)
 		buffer = malloc(buffer_length+1);
 		memset(buffer, 0, buffer_length+1);
 
-		//TODO: buffer_length = get_string_eLine(manager->file->current_line, buffer, buffer_length, manager->file->current_pos);
-		add_empty_line_eFile(manager->file, manager->file->current_line->pos+1);
-		//TODO: insert_string_eLine(manager->file->current_line->next, buffer, buffer_length, 0);	
-		//TODO: remove_string_eLine(manager->file->current_line, buffer_length, manager->file->current_pos);
+		buffer_length = get_string_eLine(manager->file->current_line, buffer, buffer_length, manager->file->current_pos);
+		remove_string_eFile(manager->file, buffer_length);
+		add_empty_line_eFile(manager->file, manager->file->current_line->line_number+1);
+		manager->file->current_pos = 0;
+		process_KEY_DOWN_eManager(manager);
+		insert_string_eFile(manager->file, buffer, buffer_length);	
 	
 		free(buffer);	
 		buffer = NULL;
-		manager->file->current_pos = 0;
-		resize_file_eScreen(manager->screen, digit_number(manager->file->n_elines));
-		process_KEY_DOWN_eManager(manager);
+
 	}
 
 	return true;
@@ -362,7 +386,7 @@ bool process_ESCAPE_eManager(eManager *manager)
 	if(manager->mode == WRITE)
 	{
 		manager->mode = NORMAL;
-		set_current_window_eScreen(manager->screen, MENU);
+		set_current_window_eScreen(manager->screen, REPOSITORY);
 	}
 
 	return true;
@@ -381,14 +405,13 @@ bool process_BACKSPACE_eManager(eManager *manager)
 {
 	char *buffer = NULL;
 	int buffer_length = 0;
-	unsigned int pos = 0;
+	unsigned int line_number = 0;
 
 	if(manager->mode == WRITE)
 	{
 		/* If current_pos > 0
-		 * 1. Remove char before current_pos
-		 * 2. Print content
-		 * 3. Process KEY_LEFT 
+		 * 1. Process KEY_LEFT 
+		 * 2. Remove char before current_pos
 		 */
 		if(manager->file->current_pos > 0)
 		{
@@ -398,28 +421,26 @@ bool process_BACKSPACE_eManager(eManager *manager)
 		/* If current_pos == 0 and current_line->previous exist
 		 * 1. Allocate buffer
 		 * 2. Put into buffer the current line
-		 * 3. Insert buffer into the previous line at the end of line
-		 * 4. Save line pos
-		 * 5. Process KEY_UP
-		 * 6. Delete line at pos
-		 * 7. Refresh screen
+		 * 3. Save current line line_number 
+		 * 4. Process KEY_LEFT to go to end of previous line
+		 * 5. Insert buffer into the new current line
+		 * 6. Delete 
 		 */
 		else if(manager->file->current_pos == 0 && manager->file->current_line->previous != NULL)
 		{
 			buffer_length = sizeof(char)*(manager->file->current_line->length-manager->file->current_pos);
 			buffer = malloc(buffer_length+1);
 			memset(buffer, 0, buffer_length+1);
+			
+			buffer_length = get_string_eLine(manager->file->current_line, buffer, buffer_length, manager->file->current_pos);
+			line_number = manager->file->current_line->line_number;
+			process_KEY_LEFT_eManager(manager);
+			insert_string_eFile(manager->file, buffer, buffer_length);
+			delete_line_eFile(manager->file, line_number);
 
-			//TODO: buffer_length = get_string_eLine(manager->file->current_line, buffer, buffer_length, manager->file->current_pos);
-			manager->file->current_pos = manager->file->current_line->previous->length;
-			//TODO: insert_string_eLine(manager->file->current_line->previous, buffer, buffer_length, manager->file->current_line->previous->length);
 			free(buffer);
 			buffer = NULL;
 
-			pos = manager->file->current_line->pos;
-			process_KEY_UP_eManager(manager);
-			delete_line_eFile(manager->file, pos);
-			resize_file_eScreen(manager->screen, digit_number(manager->file->n_elines));
 		}
 	}
 	return true;
@@ -443,13 +464,12 @@ bool process_DELETE_eManager(eManager *manager)
 			buffer = malloc(buffer_length+1);
 			memset(buffer, 0, buffer_length+1);
 			
-			//TODO: buffer_length = get_string_eLine(manager->file->current_line->next, buffer, buffer_length, 0);
-			//TODO: insert_string_eLine(manager->file->current_line, buffer, buffer_length, manager->file->current_line->length);
+			buffer_length = get_string_eLine(manager->file->current_line->next, buffer, buffer_length, 0);
+			insert_string_eFile(manager->file, buffer, buffer_length);
+			delete_line_eFile(manager->file, manager->file->current_line->next->line_number);
+			
 			free(buffer);
 			buffer = NULL;
-			
-			delete_line_eFile(manager->file, manager->file->current_line->next->pos);
-			resize_file_eScreen(manager->screen, digit_number(manager->file->n_elines));
 		}
 
 	}
@@ -555,7 +575,7 @@ bool process_KEY_UP_eManager(eManager *manager)
 				manager->file->current_pos = manager->file->current_line->previous->length;
 
 			/* If current == first_line, pull up the screen */
-			if(manager->file->first_screen_line->previous && manager->file->current_line->pos-5 < manager->file->first_screen_line->pos)
+			if(manager->file->current_line->line_number-5 < manager->file->first_screen_line->line_number && manager->file->first_screen_line->previous)
 				manager->file->first_screen_line = manager->file->first_screen_line->previous;
 				
 			manager->file->current_line = manager->file->current_line->previous;
