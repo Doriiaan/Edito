@@ -1,0 +1,9 @@
+
+
+
+typedef struct {
+	
+	MENU *eMenu;	
+
+
+}

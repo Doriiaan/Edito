@@ -30,7 +30,7 @@ typedef enum {
 } WINDOW_TYPE;
 
 /**
- * @struct Window structure to reprensent keep all information about a window 
+ * @struct Window structure to keep all information about a window 
  */
 typedef struct {
 

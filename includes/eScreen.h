@@ -28,6 +28,14 @@ typedef struct {
 	/* Array of every window */
 	eWindow *current_window;
 
+	/* Repository menu */
+	MENU *repo;
+
+	/* Repository items */
+	ITEMS **repo_items;
+
+	// MENU *settings (for the future)
+
 } eScreen;
 
 
@@ -119,21 +127,8 @@ void set_current_window_eScreen(eScreen *screen, WINDOW_TYPE type);
 void print_content_eScreen(eScreen *screen, eLine *first_line);
 
 
-/**
- * @brief The insert_char_eScreen() function insert a character in the current_window.
- *
- * @param screen eScreen pointer
- * @param ch Character to insert in the screen
- */
-void insert_char_eScreen(eScreen *screen, char ch);
-
-
 void move_cursor_eScreen(eScreen *screen, WINDOW_TYPE, unsigned int y, unsigned int x);
-
-
 unsigned int get_width_eScreen(eScreen *screen, WINDOW_TYPE type);
-
-
 unsigned int get_height_eScreen(eScreen *screen, WINDOW_TYPE type);
 
 

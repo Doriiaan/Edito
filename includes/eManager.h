@@ -34,15 +34,17 @@ typedef struct {
 	/* Editor mode */
 	MODE mode;
 
+	/* Screen */
 	eScreen *screen;
 
+	/* Current opened file */
 	eFile *file;
 
-	eLine *current_line;
+	/* File bar */
+	eBar *bar;
 
-	unsigned int current_pos;
-
-	eLine *first_screen_line;
+	/* Repository */
+	eRepository *project_repo;
 
 } eManager;
 
@@ -84,6 +86,27 @@ void set_eScreen_eManager(eManager *manager, eScreen *screen);
  * @note This function also print the content of the file in the screen.
  */
 void set_eFile_eManager(eManager *manager, eFile *file);
+
+
+/**
+ * @brief The set_eBar_eManager() function set an eBar to eManager.
+ *
+ * @param manager eManager pointer
+ * @param file eFile pointer
+ *
+ */
+void set_eBar_eManager(eManager *manager, eBar *bar);
+
+
+/**
+ * @brief The set_eRepository_eManager() function set an eRepository to eManager.
+ *
+ * @param manager eManager pointer
+ * @param file eFile pointer
+ *
+ * @note This function also print the content of the repository in the screen.
+ */
+void set_eBar_eManager(eManager *manager, eRepository *repo);
 
 
 /**

@@ -38,10 +38,19 @@ typedef struct efile_s
 	unsigned int n_elines;
 	
 	/** First line of eLine linked list */
-	eLine *first;
+	eLine *first_file_line;
+
+	/** First line of screen */
+	eLine *first_screen_line;
+
+	/** Current line */
+	eLine current_line;
+
+	/** Current pos in current line */
+	unsigned int current_pos;
 
 	/** Filename */
-	const char *filename;
+	char *filename;
 
 } eFile;
 

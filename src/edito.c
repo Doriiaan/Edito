@@ -91,9 +91,9 @@ void init_terminal(void)
 
     initscr(); /* Init window structure */
 
-	noecho(); /* deactivate echo from getch */
-	raw(); /* characters typed are immediately passed through to the user program and signal are uninterpreted */
-	keypad(stdscr, TRUE); /* activate KEY_UP, KEY_RIGHT, ... */
+	noecho(); /* Deactivate echo from getch */
+	cbreak(); /* Deactivate buffering but allow Ctrl+C */
+	keypad(stdscr, TRUE); /* Activate KEY_UP, KEY_RIGHT, ... */
 	set_escdelay(50);
 	refresh();
 }
