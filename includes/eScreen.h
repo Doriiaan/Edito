@@ -12,8 +12,9 @@
 #define __ESCREEN_H__
 
 #include "eLine.h"
-#include "eWindow.h" /* include ncurses */
-#include <menu.h>
+#include "eWindow.h" 
+#include "eMenu.h"
+
 
 typedef struct {
 
@@ -26,22 +27,11 @@ typedef struct {
 	/* Array of every window */
 	eWindow *windows[WINDOWS_NUMBER]; 
 	
-	/* Array of every window */
+	/* Pointer on the current window */
 	eWindow *current_window;
 
-	/* Repository menu */
-	MENU *repo;
-
-	/* Repository items */
-	ITEM **repo_items;
-
-	// MENU *settings (for the future)
-	
-	/* Bar files menu */
-	MENU *bar;
-
-	/* Bar files items */
-	ITEM **bar_items;
+	/* Array of every menu */
+	eMenu *menus[MENU_NUMBER];
 
 } eScreen;
 
@@ -54,26 +44,6 @@ typedef struct {
  * @note delete_eScreen() must be called before exiting.
  */
 eScreen * create_eScreen(int n_lines, int n_cols);
-
-
-/**
- * @brief The create_file_window_eScreen() function allocate and initialize file windows.
- *
- * @param screen eScreen pointer
- * @param number_length number of digit in the lines number
- *
- */
-void create_file_window_eScreen(eScreen *screen, unsigned int number_length);
-
-
-/**
- * @brief The resize_file_window_eScreen() function resize file windows.
- *
- * @param screen eScreen pointer
- * @param number_length number of digit in the lines number
- *
- */
-void resize_file_eScreen(eScreen *screen, unsigned int number_length);
 
 
 /**
@@ -124,16 +94,7 @@ void update_all_eScreen(eScreen *screen);
 void set_current_window_eScreen(eScreen *screen, WINDOW_TYPE type);
 
 
-/**
- * @brief The print_content_eScreen() function print the content of the file in the window, do not change the cursor position
- *
- * @param screen eScreen pointer
- * @param first_line First line to print
- * @param number_length Number of digit of the higher line of the file
- */
-void print_content_eScreen(eScreen *screen, eLine *first_line);
-
-
+// TODO: comment
 void move_cursor_eScreen(eScreen *screen, WINDOW_TYPE, unsigned int y, unsigned int x);
 unsigned int get_width_eScreen(eScreen *screen, WINDOW_TYPE type);
 unsigned int get_height_eScreen(eScreen *screen, WINDOW_TYPE type);
@@ -145,5 +106,51 @@ unsigned int get_height_eScreen(eScreen *screen, WINDOW_TYPE type);
  * @param screen eScreen pointer
  */
 int get_input_eScreen(eScreen *screen);
+
+
+ 
+/* ==========================================================
+ * eWindow functions
+ * ========================================================== */
+
+/**
+ * @brief The create_file_window_eScreen() function allocate and initialize file windows.
+ *
+ * @param screen eScreen pointer
+ * @param number_length number of digit in the lines number
+ *
+ */
+void create_file_window_eScreen(eScreen *screen, unsigned int number_length);
+
+
+// TODO: a faire sauter -> remplacer par resize_eWindow
+/**
+ * @brief The resize_file_window_eScreen() function resize file windows.
+ *
+ * @param screen eScreen pointer
+ * @param number_length number of digit in the lines number
+ */
+void resize_file_eScreen(eScreen *screen, unsigned int number_length);
+
+
+// TODO: A faire sauter -> remplacer par print_line_eWindow(eWindow *window, unsigned int x, unsigned int y, const char fmt, ...); 
+/**
+ * @brief The print_content_eScreen() function print the content of the file in the window, do not change the cursor position
+ *
+ * @param screen eScreen pointer
+ * @param first_line First line to print
+ * @param number_length Number of digit of the higher line of the file
+ */
+void print_content_eScreen(eScreen *screen, eLine *first_line);
+
+
+
+/* ==========================================================
+ * eMenu functions
+ * ========================================================== */
+
+int add_item_menu_eScreen(eScree *screen, MENU_TYPE type, const char *item);
+int next_item_menu_eScreen(eScree *screen, MENU_TYPE type);
+int previous_item_menu_eScreen(eScree *screen, MENU_TYPE type);
 
 #endif

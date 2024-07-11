@@ -76,84 +76,13 @@ eScreen *create_eScreen(int lines, int columns)
 	screen->current_window = screen->windows[REPOSITORY];
 
 	/* Create MENUs */
-	screen->bar_items = (ITEM **) malloc(sizeof(ITEM)*2);
-	screen->bar_items[0] = new_item("Hello world!", "");
-	screen->bar_items[1] = (ITEM*) NULL;
+	screen->menus[BAR] = create_eMenu(screen->windows[BAR_BOX], screen->windows[BAR_ITEMS]);
 
-	screen->bar = new_menu(screen->bar_items);
-
-	set_menu_win(screen->bar, screen->windows[BAR_BOX]->window);
-	set_menu_sub(screen->bar, screen->windows[BAR_ITEMS]->window);
-
-	set_menu_mark(screen->bar, "");
+	// screen->menus[REPOSITORY] = create_eMenu(screen->windows[REPOSITORY], screen->windows[REPOSITORY_ITEMS]);
 
 	return screen;
 }
 
-
-/**
- * @brief The create_file_window_eScreen() function allocate and initialize file windows.
- *
- * @param screen eScreen pointer
- * @param number_length number of digit in the lines number
- *
- */
-void create_file_window_eScreen(eScreen *screen, unsigned int number_length)
-{
-
-	int width_file_linesnumber = 0, height_file_linesnumber = 0;
-	int width_file_content = 0, height_file_content = 0;
-	int x_file_linesnumber = 0, y_file_linesnumber = 0;
-	int x_file_content = 0, y_file_content = 0;
-
-	width_file_linesnumber = number_length + 3;
-	height_file_linesnumber= screen->windows[FILE_BOX]->height - 2;
-	
-	width_file_content = screen->windows[FILE_BOX]->width - width_file_linesnumber - 2; 
-	height_file_content = screen->windows[FILE_BOX]->height - 2;
-
-	x_file_linesnumber = screen->windows[FILE_BOX]->x + 1;
-	y_file_linesnumber = screen->windows[FILE_BOX]->y + 1;
-
-	x_file_content = x_file_linesnumber + width_file_linesnumber;
-	y_file_content = screen->windows[FILE_BOX]->y + 1;
-
-	screen->windows[FILE_LINESNUMBER] = create_eWindow(height_file_linesnumber, width_file_linesnumber, y_file_linesnumber, x_file_linesnumber);
-	screen->windows[FILE_CONTENT] = create_eWindow(height_file_content, width_file_content, y_file_content, x_file_content);
-}	
-
-
-/**
- * @brief The resize_file_window_eScreen() function resize file windows.
- *
- * @param screen eScreen pointer
- * @param number_length number of digit in the lines number
- *
- */
-void resize_file_eScreen(eScreen *screen, unsigned int number_length)
-{
-	if(number_length+3 != screen->windows[FILE_LINESNUMBER]->width)
-	{	
-		int width_file_linesnumber = 0;
-		int width_file_content = 0;
-		int x_file_content = 0;
-
-		width_file_linesnumber = number_length + 3;
-		
-		width_file_content = screen->windows[FILE_BOX]->width - width_file_linesnumber - 2; 
-
-		x_file_content = screen->windows[FILE_LINESNUMBER]->x + width_file_linesnumber;
-
-		
-		screen->windows[FILE_LINESNUMBER]->width = width_file_linesnumber;
-		screen->windows[FILE_CONTENT]->width = width_file_content;
-		screen->windows[FILE_CONTENT]->x = x_file_content;
-
-		wresize(screen->windows[FILE_LINESNUMBER]->window, screen->windows[FILE_LINESNUMBER]->height, width_file_linesnumber);
-		mvwin(screen->windows[FILE_CONTENT]->window, screen->windows[FILE_CONTENT]->y, x_file_content);
-		wresize(screen->windows[FILE_CONTENT]->window, screen->windows[FILE_CONTENT]->height, width_file_content);
-	}
-}
 
 /**
  * @brief The delete_eScreen() function deallocate the eScreen structure and set the pointer to the structure to NULL.
@@ -260,38 +189,31 @@ int get_input_eScreen(eScreen *screen)
 }
 
 
-/* =======================================================================*/
-/* Bar                                                                   */
-/* =======================================================================*/
+void move_cursor_eScreen(eScreen *screen, WINDOW_TYPE type, unsigned int y, unsigned int x)
+{
+	wmove(screen->windows[type]->window, y, x);
+}
 
-// Add
-// Remove
-// Get current
-// Next
-// Previous
 
-/* =============================================================================*/
-/* Repository                                                                   */
-/* =============================================================================*/
+unsigned int get_width_eScreen(eScreen *screen, WINDOW_TYPE type)
+{
+	return screen->windows[type]->width;
+}
 
-// Add
-// Remove
-// Get current
-// Next
-// Previous
 
-/* =======================================================================*/
-/* File                                                                   */
-/* =======================================================================*/
+unsigned int get_height_eScreen(eScreen *screen, WINDOW_TYPE type)
+{
+	return screen->windows[type]->height;
+}
 
-// Move cursor
-// Get height
-// Get width
-// Print content
 
+
+/* ==========================================================
+ * eWindow functions
+ * ========================================================== */
 
 /**
-  * @brief The print_content_eScreen() function print the content of the file in the window, do not change the cursor position
+ * @brief The print_content_eScreen() function print the content of the file in the window, do not change the cursor position
  *
  * @param screen eScreen pointer
  * @param first_line First line to print
@@ -337,19 +259,88 @@ void print_content_eScreen(eScreen *screen, eLine *first_line)
 }
 
 
-void move_cursor_eScreen(eScreen *screen, WINDOW_TYPE type, unsigned int y, unsigned int x)
+/**
+ * @brief The create_file_window_eScreen() function allocate and initialize file windows.
+ *
+ * @param screen eScreen pointer
+ * @param number_length number of digit in the lines number
+ *
+ */
+void create_file_window_eScreen(eScreen *screen, unsigned int number_length)
 {
-	wmove(screen->windows[type]->window, y, x);
+
+	int width_file_linesnumber = 0, height_file_linesnumber = 0;
+	int width_file_content = 0, height_file_content = 0;
+	int x_file_linesnumber = 0, y_file_linesnumber = 0;
+	int x_file_content = 0, y_file_content = 0;
+
+	width_file_linesnumber = number_length + 3;
+	height_file_linesnumber= screen->windows[FILE_BOX]->height - 2;
+	
+	width_file_content = screen->windows[FILE_BOX]->width - width_file_linesnumber - 2; 
+	height_file_content = screen->windows[FILE_BOX]->height - 2;
+
+	x_file_linesnumber = screen->windows[FILE_BOX]->x + 1;
+	y_file_linesnumber = screen->windows[FILE_BOX]->y + 1;
+
+	x_file_content = x_file_linesnumber + width_file_linesnumber;
+	y_file_content = screen->windows[FILE_BOX]->y + 1;
+
+	screen->windows[FILE_LINESNUMBER] = create_eWindow(height_file_linesnumber, width_file_linesnumber, y_file_linesnumber, x_file_linesnumber);
+	screen->windows[FILE_CONTENT] = create_eWindow(height_file_content, width_file_content, y_file_content, x_file_content);
+}	
+
+
+/**
+ * @brief The resize_file_window_eScreen() function resize file windows.
+ *
+ * @param screen eScreen pointer
+ * @param number_length number of digit in the lines number
+ *
+ */
+void resize_file_eScreen(eScreen *screen, unsigned int number_length)
+{
+	if(number_length+3 != screen->windows[FILE_LINESNUMBER]->width)
+	{	
+		int width_file_linesnumber = 0;
+		int width_file_content = 0;
+		int x_file_content = 0;
+
+		width_file_linesnumber = number_length + 3;
+		
+		width_file_content = screen->windows[FILE_BOX]->width - width_file_linesnumber - 2; 
+
+		x_file_content = screen->windows[FILE_LINESNUMBER]->x + width_file_linesnumber;
+
+		
+		screen->windows[FILE_LINESNUMBER]->width = width_file_linesnumber;
+		screen->windows[FILE_CONTENT]->width = width_file_content;
+		screen->windows[FILE_CONTENT]->x = x_file_content;
+
+		wresize(screen->windows[FILE_LINESNUMBER]->window, screen->windows[FILE_LINESNUMBER]->height, width_file_linesnumber);
+		mvwin(screen->windows[FILE_CONTENT]->window, screen->windows[FILE_CONTENT]->y, x_file_content);
+		wresize(screen->windows[FILE_CONTENT]->window, screen->windows[FILE_CONTENT]->height, width_file_content);
+	}
 }
 
 
-unsigned int get_width_eScreen(eScreen *screen, WINDOW_TYPE type)
+/* ==========================================================
+ * eMenu functions
+ * ========================================================== */
+
+int add_item_menu_eScreen(eScree *screen, MENU_TYPE type, const char *item)
 {
-	return screen->windows[type]->width;
+	return add_item_eMenu(screen->menus[type], item);
 }
 
 
-unsigned int get_height_eScreen(eScreen *screen, WINDOW_TYPE type)
+void next_item_menu_eScreen(eScree *screen, MENU_TYPE type)
 {
-	return screen->windows[type]->height;
+	next_item_eMenu(screen->menus[type]);
+}
+
+
+void previous_item_menu_eScreen(eScree *screen, MENU_TYPE type)
+{
+	previous_item_eMenu(screen->menus[type]);
 }

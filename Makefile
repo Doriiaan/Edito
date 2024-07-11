@@ -26,18 +26,9 @@ project:
 	$(MAKE) -C src project 
 
 
-# Call compilation of project and "make tests" in ./tests
-tests: project 
-	$(MAKE) -C tests tests
-
-proto: project 
-	$(MAKE) -C proto proto
-
 # Clean all
 clean:
 	@$(MAKE) -C src clean_project
-	@$(MAKE) -C tests clean_tests
-	@$(MAKE) -C proto clean_proto
 
 
-.PHONY: all project tests proto clean clean_project clean_tests clean_proto
+.PHONY: all project clean clean_project
