@@ -40,14 +40,6 @@ int main()
 		exit(EXIT_FAILURE);
 	}
 
-	/* TODO: eManager have to do the job */
-	/* File structure initialization */
-	if((file = create_eFile("text.txt")) == NULL)
-	{
-		reset_terminal();
-		exit(EXIT_FAILURE);
-	}
-
 	/* Manager structure initialization */
 	if((manager = create_eManager()) == NULL)
 	{
@@ -56,8 +48,6 @@ int main()
 	}
 
 	set_eScreen_eManager(manager, screen);
-	set_eFile_eManager(manager, file);
-
 
 	/* Print every Windows */
 	update_all_eScreen(screen);
@@ -93,9 +83,7 @@ void init_terminal(void)
 
 	noecho(); /* Deactivate echo from getch */
 	cbreak(); /* Deactivate buffering but allow Ctrl+C */
-	keypad(stdscr, TRUE); /* Activate KEY_UP, KEY_RIGHT, ... */
 	set_escdelay(50);
-	refresh();
 }
 
 

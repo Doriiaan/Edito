@@ -16,6 +16,7 @@
 
 #include "eScreen.h"
 #include "eLine.h"
+#include "util.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -60,7 +61,9 @@ eScreen *create_eScreen(int lines, int columns)
 	/* Create WINDOWs */
 	screen->windows[REPOSITORY] = create_eWindow(height_repository, width_repository, 0, 0);
 
-	screen->windows[BAR] = create_eWindow(height_bar, width_bar,0 , width_repository);
+	screen->windows[BAR_BOX] = create_eWindow(height_bar, width_bar,0 , width_repository);
+	
+	screen->windows[BAR_ITEMS] = create_der_eWindow(screen->windows[BAR_BOX], height_bar-2, width_bar-2 , 1 , 1);
 
 	screen->windows[FILE_BOX] = create_eWindow(height_file_box, width_file_box, height_bar, width_repository);
 
@@ -71,6 +74,18 @@ eScreen *create_eScreen(int lines, int columns)
 	screen->windows[POPUP] = NULL;
 
 	screen->current_window = screen->windows[REPOSITORY];
+
+	/* Create MENUs */
+	screen->bar_items = (ITEM **) malloc(sizeof(ITEM)*2);
+	screen->bar_items[0] = new_item("Hello world!", "");
+	screen->bar_items[1] = (ITEM*) NULL;
+
+	screen->bar = new_menu(screen->bar_items);
+
+	set_menu_win(screen->bar, screen->windows[BAR_BOX]->window);
+	set_menu_sub(screen->bar, screen->windows[BAR_ITEMS]->window);
+
+	set_menu_mark(screen->bar, "");
 
 	return screen;
 }
@@ -147,13 +162,14 @@ void resize_file_eScreen(eScreen *screen, unsigned int number_length)
  */
 void delete_eScreen(eScreen **screen)
 {
-	delete_eWindow(&(*screen)->windows[REPOSITORY]);
-	delete_eWindow(&(*screen)->windows[BAR]);
-	delete_eWindow(&(*screen)->windows[FILE_BOX]);
-	delete_eWindow(&(*screen)->windows[FILE_LINESNUMBER]);
-	delete_eWindow(&(*screen)->windows[FILE_CONTENT]);
-	if((*screen)->windows[POPUP])
-		delete_eWindow(&(*screen)->windows[POPUP]);
+	if(*screen == NULL)
+		return;
+
+	for(int i=0; i<WINDOWS_NUMBER; i++)
+	{
+		if((*screen)->windows[i] != NULL)
+			delete_eWindow(&(*screen)->windows[i]);
+	}
 	free(*screen);
 	*screen = NULL;
 }
@@ -179,8 +195,9 @@ void update_repository_eScreen(eScreen *screen)
  */
 void update_bar_eScreen(eScreen *screen)
 {
-	box(screen->windows[BAR]->window, 0, 0);
-	wnoutrefresh(screen->windows[BAR]->window);
+	box(screen->windows[BAR_BOX]->window, 0, 0);
+	post_menu(screen->bar);
+	wnoutrefresh(screen->windows[BAR_BOX]->window);
 	doupdate();
 }
 
@@ -206,9 +223,11 @@ void update_file_eScreen(eScreen *screen)
 void update_all_eScreen(eScreen *screen)
 {
 	box(screen->windows[REPOSITORY]->window, 0, 0);
-	box(screen->windows[BAR]->window, 0, 0);
+	box(screen->windows[BAR_BOX]->window, 0, 0);
 	box(screen->windows[FILE_BOX]->window, 0, 0);
 
+	post_menu(screen->bar);
+	
 	for(int i=0 ; i<WINDOWS_NUMBER ; i++)
 	{
 		if(screen->windows[i])
@@ -231,7 +250,48 @@ void set_current_window_eScreen(eScreen *screen, WINDOW_TYPE type)
 
 
 /**
- * @brief The print_content_eScreen() function print the content of the file in the window, do not change the cursor position
+ * @brief The get_input_eScreen() function request an input to the user.
+ *
+ * @param screen eScreen pointer
+ */
+int get_input_eScreen(eScreen *screen)
+{
+	return wgetch(screen->current_window->window);
+}
+
+
+/* =======================================================================*/
+/* Bar                                                                   */
+/* =======================================================================*/
+
+// Add
+// Remove
+// Get current
+// Next
+// Previous
+
+/* =============================================================================*/
+/* Repository                                                                   */
+/* =============================================================================*/
+
+// Add
+// Remove
+// Get current
+// Next
+// Previous
+
+/* =======================================================================*/
+/* File                                                                   */
+/* =======================================================================*/
+
+// Move cursor
+// Get height
+// Get width
+// Print content
+
+
+/**
+  * @brief The print_content_eScreen() function print the content of the file in the window, do not change the cursor position
  *
  * @param screen eScreen pointer
  * @param first_line First line to print
@@ -292,15 +352,4 @@ unsigned int get_width_eScreen(eScreen *screen, WINDOW_TYPE type)
 unsigned int get_height_eScreen(eScreen *screen, WINDOW_TYPE type)
 {
 	return screen->windows[type]->height;
-}
-
-
-/**
- * @brief The get_input_eScreen() function request an input to the user.
- *
- * @param screen eScreen pointer
- */
-int get_input_eScreen(eScreen *screen)
-{
-	return wgetch(screen->current_window->window);
 }

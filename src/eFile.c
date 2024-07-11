@@ -214,19 +214,13 @@ int write_eFile(eFile *efile)
 	size_t buffer_length = 0;
 
 	if(efile == NULL)
-	{
 		return -1;
-	}
 
 	if(efile->permissions != p_READWRITE)
-	{
 		return -1;
-	}
 
 	if((fp = fopen(efile->filename, "w")) == NULL)
-	{
 		return -1;
-	}
 
 	current = efile->first_file_line;
 	
@@ -267,6 +261,9 @@ int write_eFile(eFile *efile)
  */
 void delete_eFile(eFile **efile)
 {
+	if(*efile == NULL)
+		return;
+
 	close_eFile(*efile);
 	free(*efile);
 	*efile = NULL;

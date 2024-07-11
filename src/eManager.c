@@ -75,6 +75,9 @@ eManager *create_eManager()
  */
 void delete_eManager(eManager **manager)
 {
+	if(*manager == NULL)
+		return;
+
 	free(*manager);
 	*manager = NULL;
 }
@@ -152,7 +155,10 @@ bool run_eManager(eManager *manager)
 	curs_set(0);
 
 	result =  process_input_eManager(manager, input);
-	
+
+	if(result == false)
+		return false;
+
 	if(manager->mode == WRITE)
 	{
 		resize_file_eScreen(manager->screen, digit_number(manager->file->n_elines));
@@ -267,6 +273,7 @@ bool process_q_eManager(eManager *manager)
 {
 	if(manager->mode == NORMAL)
 		return false;
+
 	else if(manager->mode == WRITE)
 		process_DEFAULT_eManager(manager, 'q');
 
@@ -285,7 +292,7 @@ bool process_w_eManager(eManager *manager)
 {
 	if(manager->mode == NORMAL)
 	{
-		if(manager->file)
+		if(manager->file != NULL)
 		{
 			if(manager->file->permissions != p_READWRITE)
 			{
@@ -316,7 +323,7 @@ bool process_i_eManager(eManager *manager)
 {
 	if(manager->mode == NORMAL)
 	{
-		if(manager->file)
+		if(manager->file != NULL)
 		{
 			manager->mode = WRITE;
 			set_current_window_eScreen(manager->screen, FILE_CONTENT);

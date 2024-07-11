@@ -24,7 +24,7 @@ typedef struct {
 	size_t height;
 	
 	/* Array of every window */
-	eWindow *windows[6]; 
+	eWindow *windows[WINDOWS_NUMBER]; 
 	
 	/* Array of every window */
 	eWindow *current_window;
@@ -36,6 +36,12 @@ typedef struct {
 	ITEM **repo_items;
 
 	// MENU *settings (for the future)
+	
+	/* Bar files menu */
+	MENU *bar;
+
+	/* Bar files items */
+	ITEM **bar_items;
 
 } eScreen;
 

@@ -16,13 +16,11 @@
  */
 
 #include "eLine.h"
+#include "util.h"
 
 #include <string.h> /* strnlen */
 #include <stdlib.h> /* malloc */
 #include <stdio.h> /* EOF */
-
-
-unsigned int get_next_power_of_two(unsigned int n);
 
 	
 /**
@@ -136,13 +134,14 @@ int insert_string_eLine(eLine *eline, const char *string, size_t length, unsigne
  */
 void delete_eLine(eLine **eline)
 {
-	if(*eline != NULL)
-	{
-		if((*eline)->string != NULL)
-			free((*eline)->string);
-		free(*eline);
-		*eline = NULL;
-	}
+	if(*eline == NULL)
+		return;	
+		
+	if((*eline)->string != NULL)
+		free((*eline)->string);
+	
+	free(*eline);
+	*eline = NULL;
 }
 
 
@@ -269,14 +268,4 @@ int get_string_eLine(eLine *eline, char *buffer, size_t length, unsigned int pos
 }
 
 
-/*
- * @brief The get_next_power_of_two() function is an intern function to calculate the next power of two after a number n.
- *
- * @example get_next_power_of_two(7) -> 8
- * @example get_next_power_of_two(16) -> 32
- * @example get_next_power_of_two(0) -> 1
- */
-unsigned int get_next_power_of_two(unsigned int n)
-{
-	return (1 << (sizeof(unsigned int)*8 - __builtin_clz(n)));
-}
+
