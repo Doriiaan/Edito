@@ -17,6 +17,7 @@
 
 #include "eFile.h"
 #include "eLine.h"
+#include "util.h"
 
 #include <stdio.h> /* printf, FILE */
 #include <stdlib.h> /* malloc */
@@ -24,21 +25,22 @@
 #include <errno.h> /* errno code */
 #include <unistd.h> /* access */
 #include <stdbool.h>
+#include <libgen.h> /* basename, dirname */
 
 
 #define BUFFER_LENGTH 256 /* Buffer length of the buffer used to read lines */
 
 
 /**
- * @brief The file_permissions() function return the permission of the file designed by filename.
+ * @brief The file_permissions() function return the permission of the file designed by realpath.
  *
- * @param filename: Name of the file
+ * @param realpath: Name of the file
  * @return PERM value defining the permission of the file.
  */
-PERM file_permissions(const char *filename)
+PERM file_permissions(const char *realpath)
 {
 	errno=0;
-	if(access(filename, R_OK) == -1)
+	if(access(realpath, R_OK) == -1)
 	{
 		if(errno==ENOENT)
 		{
@@ -51,7 +53,7 @@ PERM file_permissions(const char *filename)
 	}
 	else
 	{
-		if(access(filename, W_OK) == -1)
+		if(access(realpath, W_OK) == -1)
 		{
 			return p_READONLY;
 		}
@@ -66,12 +68,12 @@ PERM file_permissions(const char *filename)
 /**
  * @brief The create_eFile() function allocate an eFile structure but do not open or allocate lines.
  *
- * @param filename:	Name of the file
+ * @param realpath:	Name of the file
  * @return eFile pointer or NULL if it was an error, see logs.
  *
  * @note delete_eFile() must be called before exiting.
  */
-eFile* create_eFile(char *filename)
+eFile* create_eFile(char *realpath)
 {
 	eFile *efile=NULL;
 
@@ -82,13 +84,15 @@ eFile* create_eFile(char *filename)
 		return NULL;
 	}
 	
-	if((efile->permissions = file_permissions(filename)) == p_NOPERM)
+	if((efile->permissions = file_permissions(realpath)) == p_NOPERM)
 	{
 		free(efile);
 		return NULL;	
 	}
 
-	efile->filename = filename;
+	efile->filename = basename(realpath);
+	efile->path = dirname(realpath);
+	efile->realpath = realpath;
 	efile->n_elines = 0;
 	efile->first_file_line = NULL;
 	efile->first_screen_line = NULL;
@@ -113,10 +117,10 @@ int open_eFile(eFile *efile)
 	char buffer[BUFFER_LENGTH];
 	memset(buffer, 0, BUFFER_LENGTH);	
 
-	/* If the file did not exist when callinf create_eFile() */
+	/* If the file did not exist when calling create_eFile() */
 	if(efile->permissions == p_CREATE)
 	{
-		if((fp = fopen(efile->filename, "w+")) == NULL)
+		if((fp = fopen(efile->realpath, "w+")) == NULL)
 		{
 			return -1;
 		}
@@ -126,7 +130,7 @@ int open_eFile(eFile *efile)
 	}
 
 	/* Open file to read it */
-	else if(efile->permissions != p_CREATE && (fp = fopen(efile->filename, "r")) == NULL)
+	else if(efile->permissions != p_CREATE && (fp = fopen(efile->realpath, "r")) == NULL)
 	{
 		return -1;
 	}
@@ -184,6 +188,9 @@ int open_eFile(eFile *efile)
  */
 void close_eFile(eFile *efile)
 {
+	if(efile == NULL)
+		return;
+
 	efile->current_line = NULL;
 	efile->current_pos = 0;
 	efile->first_screen_line = NULL;
@@ -201,7 +208,7 @@ void close_eFile(eFile *efile)
 
 
 /**
- * @brief The write_eFile() function write the content of eFile on the file designed by filename stored in the filename attribute.
+ * @brief The write_eFile() function write the content of eFile on the file designed by realpath stored in the realpath attribute.
  *
  * @param efile eFile pointer
  * @return 0 on sucess or -1 in failure, see logs.
@@ -219,7 +226,7 @@ int write_eFile(eFile *efile)
 	if(efile->permissions != p_READWRITE)
 		return -1;
 
-	if((fp = fopen(efile->filename, "w")) == NULL)
+	if((fp = fopen(efile->realpath, "w")) == NULL)
 		return -1;
 
 	current = efile->first_file_line;

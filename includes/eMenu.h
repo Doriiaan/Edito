@@ -12,6 +12,7 @@
 #define __EMENU_H__
 
 #include <ncurses.h>
+#include <menu.h>
 
 #define MENU_NUMBER 2
 
@@ -21,8 +22,8 @@
  */
 typedef enum {
 
-	REPOSITORY=0,
-	BAR=1
+	MDIR=0,
+	MBAR
 
 } MENU_TYPE;
 
@@ -65,7 +66,7 @@ eMenu *create_eMenu(WINDOW *win, WINDOW *sub, int rows, int columns);
  *
  * @param menu eMenu pointer pointer
  */
-void delete_eMenu(eMenu *menu);
+void delete_eMenu(eMenu **menu);
 
 
 /**

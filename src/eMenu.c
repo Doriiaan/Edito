@@ -13,7 +13,9 @@
  */
 
 #include "eMenu.h"
+#include "util.h"
 #include <stdlib.h>
+#include <string.h>
 
 
 /**
@@ -36,16 +38,18 @@ eMenu *create_eMenu(WINDOW *win, WINDOW *sub, int rows, int columns)
 
 	menu->items = (ITEM **) malloc(sizeof(ITEM*));
 	menu->items[0] = (ITEM *)NULL;
-	manu->n_items = 0;
+	menu->n_items = 0;
 	menu->alloc_size = 1;
 	menu->rows = rows;
 	menu->columns = columns;
 
 	menu->menu = new_menu(menu->items);
 	set_menu_format(menu->menu, rows, columns);
+	set_menu_mark(menu->menu, "");
+	set_menu_pad(menu->menu, 0);
 
-	set_menu_win(screen->bar, win);
-	set_menu_sub(screen->bar, sub);
+	set_menu_win(menu->menu, win);
+	set_menu_sub(menu->menu, sub);
 
 	return menu;
 }
@@ -57,12 +61,12 @@ eMenu *create_eMenu(WINDOW *win, WINDOW *sub, int rows, int columns)
  *
  * @param menu eMenu pointer pointer
  */
-void delete_eMenu(eMenu *menu)
+void delete_eMenu(eMenu **menu)
 {
 	if(*menu != NULL)
 		return;
 
-	for(int i=0; i<(*menu)->n_items; i++)
+	for(unsigned int i=0; i<(*menu)->n_items; i++)
 	{
 		free_item((*menu)->items[i]);	
 	}
@@ -85,21 +89,25 @@ int add_item_eMenu(eMenu *menu, const char *item)
 		return -1;
 
 	/* Alloc_size must be equal to n_items+1. Last item must be set to NULL */
-	if(menu->n_items >= menu->alloc_sizel-1)
+	if(menu->n_items+1 >= menu->alloc_size)
 	{
-		menu->items = (ITEM **) realloc(menu->items, next_power_of_two(menu->n_item+1)*sizeof(ITEM *));
+		menu->items = (ITEM **) realloc(menu->items, get_next_power_of_two(menu->n_items+2)*sizeof(ITEM *));
 		if(menu->items == NULL)
 			return -1;
 
-		menu->alloc_size = next_power_of_two(menu->n_item+1);
-		memset(menu->items+menu->n_items, NULL, menu->alloc_size-menu->n_items);
+		menu->alloc_size = get_next_power_of_two(menu->n_items+1);
 	}
 
-	menu->items[menu->n_items] = new_item(item, NULL);
+	menu->items[menu->n_items] = new_item(item, "");
+	item_opts_off(menu->items[menu->n_items], O_NONCYCLIC | O_SHOWDESC);
+	menu->items[menu->n_items+1] = (ITEM*)NULL;
 	if(menu->items[menu->n_items] == NULL)
 		return -1;
 
 	menu->n_items++;
+	menu->columns++;
+	set_menu_format(menu->menu, menu->rows, menu->columns); 
+	set_menu_items(menu->menu, menu->items);
 	return 0;
 }
 

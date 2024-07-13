@@ -33,6 +33,8 @@ typedef struct {
 	/* Array of every menu */
 	eMenu *menus[MENU_NUMBER];
 
+	eMenu *current_menu;
+
 } eScreen;
 
 
@@ -85,30 +87,8 @@ void update_file_eScreen(eScreen *screen);
  */
 void update_all_eScreen(eScreen *screen);
 
-
-/**
- * @brief The set_current_eScreen() function set the current window and cursor of the screen.
- *
- * @param type The type of the window (the type refers to the window)
- */
-void set_current_window_eScreen(eScreen *screen, WINDOW_TYPE type);
-
-
-// TODO: comment
-void move_cursor_eScreen(eScreen *screen, WINDOW_TYPE, unsigned int y, unsigned int x);
-unsigned int get_width_eScreen(eScreen *screen, WINDOW_TYPE type);
-unsigned int get_height_eScreen(eScreen *screen, WINDOW_TYPE type);
-
-
-/**
- * @brief The get_input_eScreen() function request an input to the user.
- *
- * @param screen eScreen pointer
- */
-int get_input_eScreen(eScreen *screen);
-
-
  
+
 /* ==========================================================
  * eWindow functions
  * ========================================================== */
@@ -144,13 +124,67 @@ void resize_file_eScreen(eScreen *screen, unsigned int number_length);
 void print_content_eScreen(eScreen *screen, eLine *first_line);
 
 
+/**
+ * @brief The set_current_eScreen() function set the current window and cursor of the screen.
+ *
+ * @param type The type of the window (the type refers to the window)
+ */
+void set_current_window_eScreen(eScreen *screen, WINDOW_TYPE type);
+
+
+/**
+ * @brief the move_cursor_eScreen() function move the cursor of the current_window.
+ *
+ * @param y y position
+ * @param x x position
+ */
+void move_cursor_eScreen(eScreen *screen, unsigned int y, unsigned int x);
+
+
+/**
+ * @brief the get_width_eSreen() return the width of the window pointed by type.
+ *
+ * @param type Window type.
+ */
+unsigned int get_width_eScreen(eScreen *screen, WINDOW_TYPE type);
+
+
+/**
+ * @brief the get_height_eSreen() return the height of the window pointed by type.
+ *
+ * @param type Window type.
+ */
+unsigned int get_height_eScreen(eScreen *screen, WINDOW_TYPE type);
+
+
+/**
+ * @brief The get_input_eScreen() function request an input to the user.
+ *
+ * @param screen eScreen pointer
+ */
+int get_input_eScreen(eScreen *screen);
+
+
 
 /* ==========================================================
  * eMenu functions
  * ========================================================== */
 
-int add_item_menu_eScreen(eScree *screen, MENU_TYPE type, const char *item);
-int next_item_menu_eScreen(eScree *screen, MENU_TYPE type);
-int previous_item_menu_eScreen(eScree *screen, MENU_TYPE type);
+
+/**
+ * @brief The set_current_eScreen() function set the current window and cursor of the screen.
+ *
+ * @param type The type of the window (the type refers to the window)
+ */
+void set_current_menu_eScreen(eScreen *screen, MENU_TYPE type);
+
+
+int add_item_menu_eScreen(eScreen *screen, MENU_TYPE type, const char *item);
+
+
+void next_item_menu_eScreen(eScreen *screen);
+
+
+void previous_item_menu_eScreen(eScreen *screen);
 
 #endif

@@ -28,6 +28,8 @@ static bool process_DEFAULT_eManager(eManager *manager, int input);
 static bool process_q_eManager(eManager *manager);
 static bool process_w_eManager(eManager *manager);
 static bool process_i_eManager(eManager *manager);
+static bool process_r_eManager(eManager *manager);
+static bool process_b_eManager(eManager *manager);
 static bool process_ENTER_eManager(eManager *manager);
 static bool process_ESCAPE_eManager(eManager *manager);
 static bool process_BACKSPACE_eManager(eManager *manager);
@@ -58,10 +60,10 @@ eManager *create_eManager()
 		return NULL;
 	}
 
-	manager->mode = NORMAL;	
+	manager->mode = DIR;	
 	manager->screen = NULL;
 	manager->file = NULL;
-	manager->project_repo = NULL;
+	manager->directory = NULL;
 	manager->bar = NULL;
 
 	return manager;
@@ -99,21 +101,27 @@ void set_eScreen_eManager(eManager *manager, eScreen *screen)
  * @brief The set_eBar_eManager() function set an eBar to eManager.
  *
  * @param manager eManager pointer
- * @param file eFile pointer
+ * @param bar eBar pointer
  *
  */
-int set_eBar_eManager(eManager *manager, eBar *bar);
+void set_eBar_eManager(eManager *manager, eBar *bar)
+{
+	manager->bar = bar;
+}
 
 
 /**
- * @brief The set_eRepository_eManager() function set an eRepository to eManager.
+ * @brief The set_eDirectory_eManager() function set an eDirectory to eManager.
  *
  * @param manager eManager pointer
- * @param file eFile pointer
+ * @param directory eDirectory pointer
  *
  * @note This function also print the content of the repository in the screen.
  */
-int set_eRepository_eManager(eManager *manager, eRepository *repo);
+void set_eDirectory_eManager(eManager *manager, eDirectory *directory)
+{
+	manager->directory = directory;
+}
 
 
 /**
@@ -163,13 +171,12 @@ bool run_eManager(eManager *manager)
 	{
 		resize_file_eScreen(manager->screen, digit_number(manager->file->n_elines));
 		print_content_eScreen(manager->screen, manager->file->first_screen_line);
-		move_cursor_eScreen(manager->screen, FILE_CONTENT, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
+		move_cursor_eScreen(manager->screen, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
 		update_file_eScreen(manager->screen);
 	}
-	else if(manager->mode == NORMAL)
+	else if(manager->mode == BAR)
 	{
-		move_cursor_eScreen(manager->screen, REPOSITORY, 1, 1);
-		update_repository_eScreen(manager->screen);
+		update_bar_eScreen(manager->screen);
 	}
 
 	return result;
@@ -194,6 +201,14 @@ bool process_input_eManager(eManager *manager, int input)
 
 		case 'i':
 			return process_i_eManager(manager);
+
+
+		case 'b':
+			return process_b_eManager(manager);
+
+
+		case 'r':
+			return process_r_eManager(manager);
 
 
 		case 'w':
@@ -240,6 +255,7 @@ bool process_input_eManager(eManager *manager, int input)
 }
 
 
+
 /*
  * @brief the process_DEFAULT_input_eManager() function process a default input (character, number, ...)
  *
@@ -261,7 +277,6 @@ bool process_DEFAULT_eManager(eManager *manager, int input)
 	return true;
 }
 
-
 /*
  * @brief the process_q_input_eManager() function process a 'q' input 
  *
@@ -271,7 +286,7 @@ bool process_DEFAULT_eManager(eManager *manager, int input)
  */
 bool process_q_eManager(eManager *manager)
 {
-	if(manager->mode == NORMAL)
+	if(manager->mode == DIR || manager->mode == BAR)
 		return false;
 
 	else if(manager->mode == WRITE)
@@ -290,13 +305,13 @@ bool process_q_eManager(eManager *manager)
  */
 bool process_w_eManager(eManager *manager)
 {
-	if(manager->mode == NORMAL)
+	if(manager->mode == DIR || manager->mode == BAR)
 	{
 		if(manager->file != NULL)
 		{
 			if(manager->file->permissions != p_READWRITE)
 			{
-				/* TODO: POPUP */
+				/* TODO: WPOPUP */
 			}
 
 			if(write_eFile(manager->file) == -1)
@@ -313,6 +328,46 @@ bool process_w_eManager(eManager *manager)
 
 
 /*
+ * @brief the process_r_input_eManager() function process a 'r' input 
+ *
+ * @param manager eManager pointer
+ *
+ * @return returns true if the program continues and false otherwise.
+ */
+
+bool process_r_eManager(eManager *manager)
+{
+	if(manager->mode == BAR)
+	{
+		manager->mode = DIR;
+		set_current_window_eScreen(manager->screen, WDIR_BOX);
+		set_current_menu_eScreen(manager->screen, MDIR);
+		next_item_menu_eScreen(manager->screen);
+	}
+	else if(manager->mode == WRITE)
+		process_DEFAULT_eManager(manager, 'r');
+
+	return true;
+}
+
+
+bool process_b_eManager(eManager *manager)
+{
+	if(manager->mode == DIR)
+	{
+		manager->mode = BAR;
+		set_current_window_eScreen(manager->screen, WBAR_BOX);
+		set_current_menu_eScreen(manager->screen, MBAR);
+		next_item_menu_eScreen(manager->screen);
+	}
+	else if(manager->mode == WRITE)
+		process_DEFAULT_eManager(manager, 'b');
+
+	return true;
+}
+
+
+/*
  * @brief the process_i_input_eManager() function process a 'i' input 
  *
  * @param manager eManager pointer
@@ -321,17 +376,39 @@ bool process_w_eManager(eManager *manager)
  */
 bool process_i_eManager(eManager *manager)
 {
-	if(manager->mode == NORMAL)
+	if(manager->mode == DIR || manager->mode == BAR)
 	{
 		if(manager->file != NULL)
 		{
 			manager->mode = WRITE;
-			set_current_window_eScreen(manager->screen, FILE_CONTENT);
+			set_current_window_eScreen(manager->screen, WFILE_CNT);
 		}
 	}
 	
 	else if(manager->mode == WRITE)
 		process_DEFAULT_eManager(manager, 'i');
+
+	return true;
+}
+
+
+/*
+ * @brief the process_ESCAPE_input_eManager() function process an ESCAPE input 
+ *
+ * @param manager eManager pointer
+ *
+ * @return returns true if the program continues and false otherwise.
+ */
+
+bool process_ESCAPE_eManager(eManager *manager)
+{
+	if(manager->mode == WRITE)
+	{
+		manager->mode = DIR;
+		set_current_window_eScreen(manager->screen, WDIR_BOX);
+		set_current_menu_eScreen(manager->screen, MDIR);
+		next_item_menu_eScreen(manager->screen);
+	}
 
 	return true;
 }
@@ -374,26 +451,6 @@ bool process_ENTER_eManager(eManager *manager)
 		free(buffer);	
 		buffer = NULL;
 
-	}
-
-	return true;
-}
-
-
-/*
- * @brief the process_ESCAPE_input_eManager() function process an ESCAPE input 
- *
- * @param manager eManager pointer
- *
- * @return returns true if the program continues and false otherwise.
- */
-
-bool process_ESCAPE_eManager(eManager *manager)
-{
-	if(manager->mode == WRITE)
-	{
-		manager->mode = NORMAL;
-		set_current_window_eScreen(manager->screen, REPOSITORY);
 	}
 
 	return true;
@@ -505,6 +562,11 @@ bool process_KEY_RIGHT_eManager(eManager *manager)
 			process_KEY_DOWN_eManager(manager);
 		}
 	}
+	else
+	{
+		next_item_menu_eScreen(manager->screen);
+	}
+
 	return true;
 }
 
@@ -531,6 +593,10 @@ bool process_KEY_LEFT_eManager(eManager *manager)
 			process_KEY_UP_eManager(manager);
 		}
 	}
+	else
+	{
+		previous_item_menu_eScreen(manager->screen);
+	}
 	return true;
 }
 
@@ -556,9 +622,13 @@ bool process_KEY_DOWN_eManager(eManager *manager)
 			manager->file->current_line = manager->file->current_line->next;
 
 			/* While cursor is out of screen (line to big), pull down the screen */
-			while(gety_cursor_eManager(manager)+5 > get_height_eScreen(manager->screen, FILE_CONTENT)-1)
+			while(gety_cursor_eManager(manager)+5 > get_height_eScreen(manager->screen, WFILE_CNT)-1)
 				manager->file->first_screen_line = manager->file->first_screen_line->next;
 		}
+	}
+	else
+	{
+		next_item_menu_eScreen(manager->screen);
 	}
 	return true;
 }
@@ -587,6 +657,10 @@ bool process_KEY_UP_eManager(eManager *manager)
 				
 			manager->file->current_line = manager->file->current_line->previous;
 		}
+	}
+	else
+	{
+		previous_item_menu_eScreen(manager->screen);
 	}
 
 	return true;
@@ -633,7 +707,7 @@ int digit_number(unsigned int n)
 unsigned int getx_cursor_eManager(eManager *manager)
 {
 	unsigned int pos = 0;
-	size_t width = get_width_eScreen(manager->screen, FILE_CONTENT); 
+	size_t width = get_width_eScreen(manager->screen, WFILE_CNT); 
 	
 	pos = screen_width_of_string(manager->file->current_line->string, manager->file->current_pos)%width;
 	
@@ -653,7 +727,7 @@ unsigned int gety_cursor_eManager(eManager *manager)
 	unsigned int y = 0;
 	eLine *current = NULL;
 
-	width = get_width_eScreen(manager->screen, FILE_CONTENT);
+	width = get_width_eScreen(manager->screen, WFILE_CNT);
 	
 	y=0;
 	current = manager->file->first_screen_line;

@@ -11,7 +11,7 @@
 #ifndef __EWINDOW_H__
 #define __EWINDOW_H__
 
-#define WINDOWS_NUMBER 7
+#define WINDOWS_NUMBER 8 
 
 #include <ncurses.h>
 
@@ -20,13 +20,14 @@
  */
 typedef enum {
 
-	REPOSITORY=0,
-	BAR_ITEMS=1,
-	BAR_BOX=2,
-	FILE_BOX=3,
-	FILE_LINESNUMBER=4,
-	FILE_CONTENT=5,
-	POPUP=6
+	WDIR_BOX=0,
+	WDIR_ITEMS,
+	WBAR_BOX,
+	WBAR_ITEMS,
+	WFILE_BOX,
+	WFILE_LNUM,
+	WFILE_CNT,
+	WPOPUP
 
 } WINDOW_TYPE;
 

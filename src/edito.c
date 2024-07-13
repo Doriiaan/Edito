@@ -20,21 +20,53 @@
 
 void init_terminal(void);
 void reset_terminal(void);
+void usage(void);
 
-int main()
+int main(int argc, char *argv[])
 {
 	bool run = true;
 	
-	eManager *manager;
-	eScreen *screen;
-	eFile *file;
+	eManager *manager = NULL;
+	eScreen *screen = NULL;
+	eFile *file = NULL;
+	eBar *bar = NULL;
+	eDirectory *project_repo = NULL;
+	char *reponame = 0; 
+
+	if(argc == 1)
+	{
+		reponame = ".";
+	}
+	else if(argc == 2)
+	{
+		reponame = argv[1];
+	}
+	else
+	{
+		usage();
+		exit(EXIT_FAILURE);
+	}
+		
 
 	/* Terminal initialization */
 	init_terminal();	
 
-	/* TODO: eManager have to do the job */
 	/* Screen structure initialization */
 	if((screen = create_eScreen(LINES, COLS)) == NULL)
+	{
+		reset_terminal();
+		exit(EXIT_FAILURE);
+	}
+	
+	/* Bar structure creation */
+	if((bar = create_eBar()) == NULL)
+	{
+		reset_terminal();
+		exit(EXIT_FAILURE);
+	}
+
+	/* Repository structure creation */
+	if((project_repo = create_eDirectory(reponame)) == NULL)
 	{
 		reset_terminal();
 		exit(EXIT_FAILURE);
@@ -48,12 +80,11 @@ int main()
 	}
 
 	set_eScreen_eManager(manager, screen);
+	set_eBar_eManager(manager, bar);
+	set_eDirectory_eManager(manager, project_repo);
 
 	/* Print every Windows */
 	update_all_eScreen(screen);
-
-	set_current_window_eScreen(manager->screen, REPOSITORY);
-	move_cursor_eScreen(manager->screen, REPOSITORY, 1, 1);
 
 	/* Main loop */
 	while(run)
@@ -95,4 +126,10 @@ void init_terminal(void)
 void reset_terminal(void)
 {
 	endwin(); /* Restore terminal */
+}
+
+
+void usage(void)
+{
+	printf("edito [directory]");
 }

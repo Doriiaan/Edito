@@ -12,19 +12,8 @@
 #define __EFILE_H__
 
 #include "eLine.h"
+#include "util.h"
 #include <stdbool.h>
-
-
-/**
- * @enum File permissions enumeration
- */
-typedef enum
-{
-	p_NOPERM,
-	p_READONLY,
-	p_READWRITE,
-	p_CREATE
-} PERM;
 
 
 /**
@@ -52,6 +41,10 @@ typedef struct efile_s
 
 	/** Filename */
 	char *filename;
+
+	char *path;
+	
+	char *realpath;
 
 	/** boolean to track status of file */
 	bool is_saved;

@@ -14,15 +14,16 @@
 #include "eFile.h"
 #include "eScreen.h"
 #include "eBar.h"
-#include "eRepository.h"
+#include "eDirectory.h"
 
 
 /**
  * @enum Program mode enumeration
  */
 typedef enum {
-	NORMAL,
-	WRITE	
+	DIR,
+	WRITE,
+	BAR
 
 } MODE;
 
@@ -44,8 +45,8 @@ typedef struct {
 	/* File bar */
 	eBar *bar;
 
-	/* Repository */
-	eRepository *project_repo;
+	/* Directory */
+	eDirectory *directory;
 
 } eManager;
 
@@ -94,21 +95,21 @@ int set_eFile_eManager(eManager *manager, eFile *file);
  * @brief The set_eBar_eManager() function set an eBar to eManager.
  *
  * @param manager eManager pointer
- * @param file eFile pointer
+ * @param bar eBar pointer
  *
  */
-int set_eBar_eManager(eManager *manager, eBar *bar);
+void set_eBar_eManager(eManager *manager, eBar *bar);
 
 
 /**
- * @brief The set_eRepository_eManager() function set an eRepository to eManager.
+ * @brief The set_eDirectory_eManager() function set an eDirectory to eManager.
  *
  * @param manager eManager pointer
- * @param file eFile pointer
+ * @param directory eDirectory pointer
  *
  * @note This function also print the content of the repository in the screen.
  */
-int set_eRepository_eManager(eManager *manager, eRepository *repo);
+void set_eDirectory_eManager(eManager *manager, eDirectory *directory);
 
 
 /**
