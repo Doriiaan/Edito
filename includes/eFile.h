@@ -42,8 +42,6 @@ typedef struct efile_s
 	/** Filename */
 	char *filename;
 
-	char *path;
-	
 	char *realpath;
 
 	/** boolean to track status of file */
@@ -111,7 +109,7 @@ int add_empty_line_eFile(eFile *efile, unsigned int pos);
  * @param efile eFile pointer pointer
  * @param pos Position of the line that will be deleted
  */
-void delete_line_eFile(eFile *efile, unsigned int pos);
+int delete_line_eFile(eFile *efile, unsigned int pos);
 
 
 /**
@@ -120,7 +118,7 @@ void delete_line_eFile(eFile *efile, unsigned int pos);
  * @param efile eFile pointer
  * @param ch character to insert
  */
-void insert_char_eFile(eFile *efile, const char ch);
+int insert_char_eFile(eFile *efile, const char ch);
 
 
 /**
@@ -128,7 +126,7 @@ void insert_char_eFile(eFile *efile, const char ch);
  *
  * @param efile eFile pointer 
  */
-void remove_char_eFile(eFile *efile);
+int remove_char_eFile(eFile *efile);
 
 
 /**
@@ -138,7 +136,7 @@ void remove_char_eFile(eFile *efile);
  * @param string string to insert
  * @param length lenght of string
  */
-void insert_string_eFile(eFile *efile, const char *string, size_t length);
+int insert_string_eFile(eFile *efile, const char *string, size_t length);
 
 
 /**
@@ -147,6 +145,6 @@ void insert_string_eFile(eFile *efile, const char *string, size_t length);
  * @param efile eFile pointer
  * @param length of string to remove
  */
-void remove_string_eFile(eFile *efile, size_t length);
+int remove_string_eFile(eFile *efile, size_t length);
 
 #endif

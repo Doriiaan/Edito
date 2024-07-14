@@ -4,6 +4,8 @@
 #include "eFile.h"
 #include "util.h"
 
+#include <stdbool.h>
+
 typedef struct eDirectory {
 
 	unsigned int n_files;
@@ -22,9 +24,9 @@ typedef struct eDirectory {
 	
 	char *dirname;
 
-	char *path;
-
 	char *realpath;
+
+	bool is_open;
 
 } eDirectory;
 

@@ -178,6 +178,10 @@ bool run_eManager(eManager *manager)
 	{
 		update_bar_eScreen(manager->screen);
 	}
+	else if(manager->mode == DIR)
+	{
+		update_directory_eScreen(manager->screen);
+	}
 
 	return result;
 }
@@ -765,3 +769,55 @@ unsigned int screen_width_of_string(const char *s, size_t length)
 	}
 	return width;
 }
+
+
+int fill_dir_eManager(eManager *manager, eDirectory *directory, unsigned int level)
+{
+	unsigned int i=0;
+	char *item = NULL;
+	size_t alloc_item_size = 0;
+	char *dirname = NULL;
+
+	if(manager == NULL || directory == NULL)
+		return -1;
+
+	if(level == 0)
+		dirname = directory->realpath;
+	else
+		dirname = directory->dirname;
+
+	alloc_item_size = (strlen(dirname)+3+level*2);
+	item = (char *) malloc(alloc_item_size*sizeof(char));
+	memset(item, 0, alloc_item_size*sizeof(char));
+	memset(item, ' ', level*2);
+	strcat(item, "> ");
+	strncat(item, dirname, strlen(dirname));
+	add_item_menu_eScreen(manager->screen, MDIR, item);
+
+	if(directory->is_open)
+	{
+		level++;
+		for(i=0; i<directory->n_dirs; i++)
+		{
+			fill_dir_eManager(manager, directory->dirs[i], level);
+		}
+	
+		for(i=0; i<directory->n_files; i++)
+		{
+			/* Char allocation */
+			if(alloc_item_size <= strlen(directory->files[i]->filename))
+			{
+				alloc_item_size = (strlen(directory->files[i]->filename)+level*2+1);
+				item = (char *) realloc(item, alloc_item_size*sizeof(char));
+				if(item==NULL)
+					return -1;
+			}
+			memset(item, 0, alloc_item_size*sizeof(char));
+			memset(item, ' ', level*2);
+			strncat(item, directory->files[i]->filename, strlen(directory->files[i]->filename));
+			add_item_menu_eScreen(manager->screen, MDIR, item);
+		}
+	}	
+	free(item);
+	return 0;
+}	

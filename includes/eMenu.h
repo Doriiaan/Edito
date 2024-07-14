@@ -41,9 +41,17 @@ typedef struct {
 
 	size_t alloc_size;
 
-	ITEM **items;
+	WINDOW *win;
+
+	WINDOW *sub;
 
 	MENU *menu;
+	
+	ITEM **items;
+	
+	char **items_title;
+
+	bool columnar; /* 1 in column, 0 in row */ 
 
 } eMenu;
 
@@ -53,12 +61,13 @@ typedef struct {
  *
  * @param win Menu menu. Displays title or border. 
  * @param sub Menu sub menu. Displays items.
+ * @param columnar Boolean. If columnar equal 1, data is displayed in columns.
  *
  * @return eMenu pointer or NULL if it was an error, see logs.
  *
  * @note delete_eMenu() must be called before exiting.
  */
-eMenu *create_eMenu(WINDOW *win, WINDOW *sub, int rows, int columns);
+eMenu *create_eMenu(WINDOW *win, WINDOW *sub, int rows, int columns, bool columnar);
 
 
 /**
@@ -91,4 +100,5 @@ void next_item_eMenu(eMenu *menu);
  */
 void previous_item_eMenu(eMenu *menu);
 
+void refresh_eMenu(eMenu *menu);
 #endif

@@ -61,7 +61,7 @@ void delete_eScreen(eScreen **screen);
  *
  * @param screen eScreen pointer
  */
-void update_repository_eScreen(eScreen *screen);
+void update_directory_eScreen(eScreen *screen);
 
 
 /*
@@ -187,4 +187,5 @@ void next_item_menu_eScreen(eScreen *screen);
 
 void previous_item_menu_eScreen(eScreen *screen);
 
+void refresh_menu_eScreen(eScreen *screen, MENU_TYPE type);
 #endif

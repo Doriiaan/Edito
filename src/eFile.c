@@ -25,7 +25,6 @@
 #include <errno.h> /* errno code */
 #include <unistd.h> /* access */
 #include <stdbool.h>
-#include <libgen.h> /* basename, dirname */
 
 
 #define BUFFER_LENGTH 256 /* Buffer length of the buffer used to read lines */
@@ -84,15 +83,15 @@ eFile* create_eFile(char *realpath)
 		return NULL;
 	}
 	
-	if((efile->permissions = file_permissions(realpath)) == p_NOPERM)
-	{
-		free(efile);
-		return NULL;	
-	}
+	efile->permissions = file_permissions(realpath);
 
-	efile->filename = basename(realpath);
-	efile->path = dirname(realpath);
-	efile->realpath = realpath;
+	efile->realpath = strdup(realpath);
+
+	if(efile->realpath[strlen(efile->realpath)-1] == '/')	
+		efile->realpath[strlen(efile->realpath)-1] = 0;
+	
+	efile->filename = ((efile->filename = strrchr(efile->realpath, '/')) != NULL) ? efile->filename+1 : efile->realpath;
+
 	efile->n_elines = 0;
 	efile->first_file_line = NULL;
 	efile->first_screen_line = NULL;
@@ -116,6 +115,9 @@ int open_eFile(eFile *efile)
 	FILE *fp = NULL;
 	char buffer[BUFFER_LENGTH];
 	memset(buffer, 0, BUFFER_LENGTH);	
+
+	if(efile == NULL || efile->permissions == p_NOPERM)
+		return -1;
 
 	/* If the file did not exist when calling create_eFile() */
 	if(efile->permissions == p_CREATE)
@@ -223,6 +225,9 @@ int write_eFile(eFile *efile)
 	if(efile == NULL)
 		return -1;
 
+	if(efile->is_saved)
+		return 0;
+
 	if(efile->permissions != p_READWRITE)
 		return -1;
 
@@ -272,6 +277,7 @@ void delete_eFile(eFile **efile)
 		return;
 
 	close_eFile(*efile);
+	free((*efile)->realpath);
 	free(*efile);
 	*efile = NULL;
 }
@@ -284,9 +290,14 @@ void delete_eFile(eFile **efile)
  */
 int add_empty_line_eFile(eFile *efile, unsigned int pos)
 {
-	eLine *current = efile->first_file_line;
+	eLine *current = NULL;
 	eLine *new = NULL;
 	unsigned int i = 1;
+
+	if(efile == NULL || efile->permissions == p_READWRITE)
+		return -1;
+
+	current = efile->first_file_line;
 
 	if(efile->first_file_line == NULL)
 	{
@@ -333,12 +344,17 @@ int add_empty_line_eFile(eFile *efile, unsigned int pos)
  * @param efile eFile pointer pointer
  * @param line_number Position of the line that will be deleted
  */
-void delete_line_eFile(eFile *efile, unsigned int line_number)
+int delete_line_eFile(eFile *efile, unsigned int line_number)
 {
-	eLine *current = efile->first_file_line;
+	eLine *current = NULL;
 	eLine *tmp = NULL;
 	unsigned int i = 1;
 	bool last_line=false;
+
+	if(efile == NULL || efile->permissions != p_READWRITE)
+		return -1;
+
+	current = efile->first_file_line;
 
 	if(line_number == efile->current_line->line_number)
 	{
@@ -376,7 +392,7 @@ void delete_line_eFile(eFile *efile, unsigned int line_number)
 	}
 
 	if(current == NULL)
-		return;
+		return -1;
 
 	if(current->next != NULL)
 		current->next->previous = current->previous;
@@ -396,6 +412,8 @@ void delete_line_eFile(eFile *efile, unsigned int line_number)
 	}
 
 	efile->is_saved = false;
+
+	return 0;
 }
 
 
@@ -405,10 +423,16 @@ void delete_line_eFile(eFile *efile, unsigned int line_number)
  * @param efile eFile pointer
  * @param ch character to insert
  */
-void insert_char_eFile(eFile *efile, const char ch)
+int insert_char_eFile(eFile *efile, const char ch)
 {
-	if(!insert_char_eLine(efile->current_line, ch, efile->current_pos))
-		efile->is_saved = false;	
+	if(efile == NULL || efile->permissions != p_READWRITE)
+		return -1;
+
+	if(insert_char_eLine(efile->current_line, ch, efile->current_pos))
+		return -1;
+
+	efile->is_saved = false;
+	return 0;
 }
 
 
@@ -417,10 +441,16 @@ void insert_char_eFile(eFile *efile, const char ch)
  *
  * @param efile eFile pointer 
  */
-void remove_char_eFile(eFile *efile)
+int remove_char_eFile(eFile *efile)
 {
-	if(!remove_char_eLine(efile->current_line, efile->current_pos))
-		efile->is_saved = false;	
+	if(efile == NULL || efile->permissions != p_READWRITE)
+		return -1;
+
+	if(remove_char_eLine(efile->current_line, efile->current_pos))
+		return -1;
+
+	efile->is_saved = false;
+	return 0;
 }
 
 
@@ -431,10 +461,16 @@ void remove_char_eFile(eFile *efile)
  * @param string string to insert
  * @param length lenght of string
  */
-void insert_string_eFile(eFile *efile, const char *string, size_t length)
+int insert_string_eFile(eFile *efile, const char *string, size_t length)
 {
-	if(!insert_string_eLine(efile->current_line, string, length, efile->current_pos))
-		efile->is_saved = false;
+	if(efile == NULL || efile->permissions != p_READWRITE)
+		return -1;
+
+	if(insert_string_eLine(efile->current_line, string, length, efile->current_pos))
+		return -1;
+
+	efile->is_saved = false;
+	return 0;
 }
 
 
@@ -444,8 +480,14 @@ void insert_string_eFile(eFile *efile, const char *string, size_t length)
  * @param efile eFile pointer
  * @param length of string to remove
  */
-void remove_string_eFile(eFile *efile, size_t length)
+int remove_string_eFile(eFile *efile, size_t length)
 {
-	if(!remove_string_eLine(efile->current_line, length, efile->current_pos))
-		efile->is_saved = false;	
+	if(efile == NULL || efile->permissions != p_READWRITE)
+		return -1;
+
+	if(remove_string_eLine(efile->current_line, length, efile->current_pos))
+		return -1;	
+
+	efile->is_saved = false;
+	return 0;
 }

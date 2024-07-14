@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/stat.h>
-#include <libgen.h> /* basename, dirname */
 #include <dirent.h> /* opendir, readdir */
 #include <unistd.h>
 
@@ -49,6 +48,8 @@ eDirectory *create_eDirectory(char *realpath)
     struct dirent *elem = NULL;
 	struct stat elem_info;
 	size_t alloc_size = 0;
+	char *elem_real_path = NULL;
+	size_t elem_real_path_length = 0;
 
 	permissions = dir_permissions(realpath);
 	if(permissions == p_NOPERM)
@@ -66,14 +67,19 @@ eDirectory *create_eDirectory(char *realpath)
 
 	directory->permissions = permissions;	
 	directory->realpath = strdup(realpath);
-	directory->dirname = basename(realpath);
-	directory->path = dirname(realpath);
+
+	if(directory->realpath[strlen(directory->realpath)-1] == '/')	
+		directory->realpath[strlen(directory->realpath)-1] = 0;
+	
+	directory->dirname = ((directory->dirname = strrchr(directory->realpath, '/')) != NULL) ? directory->dirname+1 : directory->realpath;
+	
 	directory->n_files = 0;
 	directory->alloc_files_size = 0;
 	directory->n_dirs = 0;
 	directory->alloc_dirs_size = 0;
 	directory->files = NULL;
 	directory->dirs = NULL;
+	directory->is_open = false;
 
 	dir = opendir(directory->realpath);
 	if(dir == NULL)
@@ -86,7 +92,20 @@ eDirectory *create_eDirectory(char *realpath)
 		if(!strcmp(elem->d_name, ".") || !strcmp(elem->d_name, ".."))
 			continue;
 
-		stat(elem->d_name, &elem_info);
+		if(elem_real_path_length < sizeof(char)*(strlen(directory->realpath)+strlen(elem->d_name)+2))
+		{	
+			elem_real_path_length = sizeof(char)*(strlen(directory->realpath)+strlen(elem->d_name)+2);
+			elem_real_path = realloc(elem_real_path, elem_real_path_length);
+			memset(elem_real_path, 0, elem_real_path_length);
+		}
+		
+		strcpy(elem_real_path, directory->realpath);
+		strcat(elem_real_path, "/");
+		strcat(elem_real_path, elem->d_name);
+
+		if(stat(elem_real_path, &elem_info) != 0)
+			continue;
+
 
 		if(S_ISREG(elem_info.st_mode))
 		{
@@ -102,7 +121,7 @@ eDirectory *create_eDirectory(char *realpath)
 				directory->alloc_files_size = alloc_size;
 				alloc_size = 0;
 			}
-			directory->files[directory->n_files] = create_eFile(elem->d_name);
+			directory->files[directory->n_files] = create_eFile(elem_real_path);
 			directory->n_files++;
 		}
 		else if(S_ISDIR(elem_info.st_mode))
@@ -119,10 +138,11 @@ eDirectory *create_eDirectory(char *realpath)
 				directory->alloc_dirs_size = alloc_size;
 				alloc_size = 0;
 			}
-			directory->dirs[directory->n_dirs] = create_eDirectory(elem->d_name);
+			directory->dirs[directory->n_dirs] = create_eDirectory(elem_real_path);
 			directory->n_dirs++;
 		}
 	}
+	free(elem_real_path);
 	closedir(dir);
 
 	return directory;	

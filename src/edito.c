@@ -82,6 +82,9 @@ int main(int argc, char *argv[])
 	set_eScreen_eManager(manager, screen);
 	set_eBar_eManager(manager, bar);
 	set_eDirectory_eManager(manager, project_repo);
+	manager->directory->is_open = true;
+	fill_dir_eManager(manager, manager->directory, 0);
+	refresh_menu_eScreen(manager->screen, MDIR);
 
 	/* Print every Windows */
 	update_all_eScreen(screen);

@@ -65,7 +65,7 @@ eScreen *create_eScreen(int lines, int columns)
 	/* Create WINDOWs */
 	screen->windows[WDIR_BOX] = create_eWindow(height_repository, width_repository, 0, 0);
 	
-	screen->windows[WDIR_ITEMS] = create_der_eWindow(screen->windows[WDIR_BOX], height_repository-2, width_repository-2, 1, 1);
+	screen->windows[WDIR_ITEMS] = create_der_eWindow(screen->windows[WDIR_BOX], height_repository-2, width_repository-3, 1, 2);
 
 	screen->windows[WBAR_BOX] = create_eWindow(height_bar, width_bar,0 , width_repository);
 	
@@ -77,13 +77,11 @@ eScreen *create_eScreen(int lines, int columns)
 
 	screen->windows[WFILE_CNT] = NULL;
 
-	screen->windows[WPOPUP] = NULL;
-
 	screen->current_window = screen->windows[WDIR_BOX];
 
 	/* Create MENUs */
-	screen->menus[MBAR] = create_eMenu(screen->windows[WBAR_BOX]->window, screen->windows[WBAR_ITEMS]->window, 1, 1);
-	screen->menus[MDIR] = create_eMenu(screen->windows[WDIR_BOX]->window, screen->windows[WDIR_ITEMS]->window, 1, 1);
+	screen->menus[MBAR] = create_eMenu(screen->windows[WBAR_BOX]->window, screen->windows[WBAR_ITEMS]->window, 1, 1, 1);
+	screen->menus[MDIR] = create_eMenu(screen->windows[WDIR_BOX]->window, screen->windows[WDIR_ITEMS]->window, 1, 1, 0);
 
 	screen->current_menu = screen->menus[MDIR];
 
@@ -116,11 +114,10 @@ void delete_eScreen(eScreen **screen)
  *
  * @param screen eScreen pointer
  */
-void update_repository_eScreen(eScreen *screen)
+void update_directory_eScreen(eScreen *screen)
 {
 	box(screen->windows[WDIR_BOX]->window, 0, 0);
-	wnoutrefresh(screen->windows[WDIR_BOX]->window);
-	doupdate();
+	wrefresh(screen->windows[WDIR_BOX]->window);
 }
 
 
@@ -163,6 +160,7 @@ void update_all_eScreen(eScreen *screen)
 	box(screen->windows[WFILE_BOX]->window, 0, 0);
 
 	post_menu(screen->menus[MBAR]->menu);
+	post_menu(screen->menus[MDIR]->menu);
 	
 	for(int i=0 ; i<WINDOWS_NUMBER ; i++)
 	{
@@ -377,4 +375,9 @@ void next_item_menu_eScreen(eScreen *screen)
 void previous_item_menu_eScreen(eScreen *screen)
 {
 	previous_item_eMenu(screen->current_menu);
+}
+
+void refresh_menu_eScreen(eScreen *screen, MENU_TYPE type)
+{
+	refresh_eMenu(screen->menus[type]);
 }

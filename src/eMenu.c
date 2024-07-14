@@ -17,6 +17,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+static void init_menu(eMenu *menu);
+static void reset_menu(eMenu *menu);
 
 /**
  * @brief The create_eMenu() function allocate and initialize an eMenu structure.
@@ -28,7 +30,7 @@
  *
  * @note delete_eMenu() must be called before exiting.
  */
-eMenu *create_eMenu(WINDOW *win, WINDOW *sub, int rows, int columns)
+eMenu *create_eMenu(WINDOW *win, WINDOW *sub, int rows, int columns, bool columnar)
 {
 	eMenu *menu = NULL;
 	
@@ -36,20 +38,24 @@ eMenu *create_eMenu(WINDOW *win, WINDOW *sub, int rows, int columns)
 	if(menu == NULL)
 		return NULL;
 
+	menu->win = win;
+	menu->sub = sub;
+	menu->items_title = (char **) malloc(sizeof(char*));
+	menu->items_title[0] = NULL;
 	menu->items = (ITEM **) malloc(sizeof(ITEM*));
 	menu->items[0] = (ITEM *)NULL;
 	menu->n_items = 0;
 	menu->alloc_size = 1;
 	menu->rows = rows;
 	menu->columns = columns;
+	menu->columnar = columnar;
 
 	menu->menu = new_menu(menu->items);
-	set_menu_format(menu->menu, rows, columns);
+	set_menu_format(menu->menu, menu->rows, menu->columns);
 	set_menu_mark(menu->menu, "");
-	set_menu_pad(menu->menu, 0);
 
-	set_menu_win(menu->menu, win);
-	set_menu_sub(menu->menu, sub);
+	set_menu_win(menu->menu, menu->win);
+	set_menu_sub(menu->menu, menu->sub);
 
 	return menu;
 }
@@ -71,6 +77,13 @@ void delete_eMenu(eMenu **menu)
 		free_item((*menu)->items[i]);	
 	}
 	free((*menu)->items);
+
+	for(unsigned int i=0; i<(*menu)->n_items; i++)
+	{
+		free((*menu)->items_title[i]);	
+	}
+
+	free((*menu)->items_title);
 	free(*menu);
 	*menu = NULL;
 }
@@ -85,29 +98,33 @@ void delete_eMenu(eMenu **menu)
  */
 int add_item_eMenu(eMenu *menu, const char *item)
 {
+	int sub_cols=0, sub_rows=0;
+
 	if(menu == NULL)
 		return -1;
-
+	
 	/* Alloc_size must be equal to n_items+1. Last item must be set to NULL */
-	if(menu->n_items+1 >= menu->alloc_size)
+	if(menu->n_items >= menu->alloc_size)
 	{
-		menu->items = (ITEM **) realloc(menu->items, get_next_power_of_two(menu->n_items+2)*sizeof(ITEM *));
-		if(menu->items == NULL)
+		menu->items_title = (char **) realloc(menu->items_title, get_next_power_of_two(menu->n_items)*sizeof(char *));
+		if(menu->items_title == NULL)
 			return -1;
 
-		menu->alloc_size = get_next_power_of_two(menu->n_items+1);
+		menu->alloc_size = get_next_power_of_two(menu->n_items);
 	}
 
-	menu->items[menu->n_items] = new_item(item, "");
-	item_opts_off(menu->items[menu->n_items], O_NONCYCLIC | O_SHOWDESC);
-	menu->items[menu->n_items+1] = (ITEM*)NULL;
-	if(menu->items[menu->n_items] == NULL)
+	menu->items_title[menu->n_items] = strdup(item);
+	if(menu->items_title[menu->n_items] == NULL)
 		return -1;
 
 	menu->n_items++;
-	menu->columns++;
-	set_menu_format(menu->menu, menu->rows, menu->columns); 
-	set_menu_items(menu->menu, menu->items);
+
+	getmaxyx(menu->sub, sub_rows, sub_cols);
+	if(menu->columnar && menu->columns < sub_cols)
+		menu->columns++;
+	else if(!menu->columnar && menu->rows < sub_rows)
+		menu->rows++;
+
 	return 0;
 }
 
@@ -128,4 +145,58 @@ void next_item_eMenu(eMenu *menu)
 void previous_item_eMenu(eMenu *menu)
 {
 	menu_driver(menu->menu, REQ_PREV_ITEM);
+}
+
+/**
+ * @brief The refresh_eMenu() function refresh the menu on the screen
+ *
+ */
+void refresh_eMenu(eMenu *menu)
+{
+	reset_menu(menu);
+	init_menu(menu);
+	post_menu(menu->menu);
+}
+
+void reset_menu(eMenu *menu)
+{
+	int i=0;
+	int count = item_count(menu->menu); 
+
+	free_menu(menu->menu);
+	menu->menu = NULL;
+
+	for(i=0; i<count; i++)
+	{
+		if(menu->items[i] != NULL)
+		{
+			free_item(menu->items[i]);
+			menu->items[i]=NULL;
+		}
+	}
+	if(menu->items != NULL)
+	{
+		free(menu->items);
+		menu->items = NULL;
+	}
+}
+
+void init_menu(eMenu *menu)
+{
+	unsigned int i=0;
+	menu->items = (ITEM **) malloc(sizeof(ITEM *)*(menu->n_items+1));
+
+	for(i=0; i<menu->n_items; i++)
+	{
+		menu->items[i] = new_item(menu->items_title[i], "");
+		item_opts_off(menu->items[i], O_NONCYCLIC | O_SHOWDESC);
+	}
+	menu->items[menu->n_items] = NULL;
+	
+	menu->menu = new_menu(menu->items);
+	set_menu_format(menu->menu, menu->rows, menu->columns);
+	set_menu_mark(menu->menu, "");
+
+	set_menu_win(menu->menu, menu->win);
+	set_menu_sub(menu->menu, menu->sub);
 }
