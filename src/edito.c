@@ -89,6 +89,21 @@ int main(int argc, char *argv[])
 	/* Print every Windows */
 	update_all_eScreen(screen);
 
+	add_item_menu_eScreen(manager->screen, MBAR, "lala");
+	add_item_menu_eScreen(manager->screen, MBAR, "lolo");
+	add_item_menu_eScreen(manager->screen, MBAR, "lulu");
+
+	refresh_menu_eScreen(manager->screen, MBAR);
+
+	add_item_menu_eScreen(manager->screen, MBAR, "iaia");
+	add_item_menu_eScreen(manager->screen, MBAR, "hhqsdbfq");
+	add_item_menu_eScreen(manager->screen, MBAR, "qsdfsqdf");
+	add_item_menu_eScreen(manager->screen, MBAR, "loulou");
+
+	refresh_menu_eScreen(manager->screen, MBAR);
+	
+	update_all_eScreen(manager->screen);
+
 	/* Main loop */
 	while(run)
 	{

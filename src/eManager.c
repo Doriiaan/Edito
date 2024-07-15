@@ -28,7 +28,7 @@ static bool process_DEFAULT_eManager(eManager *manager, int input);
 static bool process_q_eManager(eManager *manager);
 static bool process_w_eManager(eManager *manager);
 static bool process_i_eManager(eManager *manager);
-static bool process_r_eManager(eManager *manager);
+static bool process_d_eManager(eManager *manager);
 static bool process_b_eManager(eManager *manager);
 static bool process_ENTER_eManager(eManager *manager);
 static bool process_ESCAPE_eManager(eManager *manager);
@@ -39,7 +39,6 @@ static bool process_KEY_LEFT_eManager(eManager *manager);
 static bool process_KEY_DOWN_eManager(eManager *manager);
 static bool process_KEY_UP_eManager(eManager *manager);
 
-static int digit_number(unsigned int n);
 unsigned int screen_width_of_string(const char *s, size_t length);
 
 
@@ -211,8 +210,8 @@ bool process_input_eManager(eManager *manager, int input)
 			return process_b_eManager(manager);
 
 
-		case 'r':
-			return process_r_eManager(manager);
+		case 'd':
+			return process_d_eManager(manager);
 
 
 		case 'w':
@@ -332,21 +331,20 @@ bool process_w_eManager(eManager *manager)
 
 
 /*
- * @brief the process_r_input_eManager() function process a 'r' input 
+ * @brief the process_d_input_eManager() function process a 'd' input 
  *
  * @param manager eManager pointer
  *
  * @return returns true if the program continues and false otherwise.
  */
 
-bool process_r_eManager(eManager *manager)
+bool process_d_eManager(eManager *manager)
 {
 	if(manager->mode == BAR)
 	{
 		manager->mode = DIR;
 		set_current_window_eScreen(manager->screen, WDIR_BOX);
 		set_current_menu_eScreen(manager->screen, MDIR);
-		next_item_menu_eScreen(manager->screen);
 	}
 	else if(manager->mode == WRITE)
 		process_DEFAULT_eManager(manager, 'r');
@@ -362,7 +360,6 @@ bool process_b_eManager(eManager *manager)
 		manager->mode = BAR;
 		set_current_window_eScreen(manager->screen, WBAR_BOX);
 		set_current_menu_eScreen(manager->screen, MBAR);
-		next_item_menu_eScreen(manager->screen);
 	}
 	else if(manager->mode == WRITE)
 		process_DEFAULT_eManager(manager, 'b');
@@ -668,36 +665,6 @@ bool process_KEY_UP_eManager(eManager *manager)
 	}
 
 	return true;
-}
-
-
-/*
- * @brief The digit_number() function return the number of digit in a number.
- */
-int digit_number(unsigned int n) 
-{
-    if (n < 10) 
-		return 1;
-    if (n < 100) 
-		return 2;
-    if (n < 1000) 
-		return 3;
-    if (n < 10000) 
-		return 4;
-    if (n < 100000) 
-		return 5;
-    if (n < 1000000) 
-		return 6;
-    if (n < 1000000) 
-		return 6;
-    if (n < 10000000) 
-		return 7;
-    if (n < 100000000) 
-		return 8;
-    if (n < 1000000000) 
-		return 9;
-
-    return 10;
 }
 
 

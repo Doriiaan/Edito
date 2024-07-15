@@ -33,12 +33,6 @@ typedef enum {
  */
 typedef struct {
 
-	int rows;
-
-	int columns;
-
-	unsigned int n_items;
-
 	size_t alloc_size;
 
 	WINDOW *win;
@@ -49,7 +43,15 @@ typedef struct {
 	
 	ITEM **items;
 	
-	char **items_title;
+	char **virtual_items_title;
+
+	char **physical_items_title;
+
+	int rows;
+
+	int columns;
+
+	unsigned int n_items;
 
 	bool columnar; /* 1 in column, 0 in row */ 
 
@@ -61,13 +63,13 @@ typedef struct {
  *
  * @param win Menu menu. Displays title or border. 
  * @param sub Menu sub menu. Displays items.
- * @param columnar Boolean. If columnar equal 1, data is displayed in columns.
+ * @param columnar, true, if the table displays elements in columns, false if it displays them in rows
  *
  * @return eMenu pointer or NULL if it was an error, see logs.
  *
  * @note delete_eMenu() must be called before exiting.
  */
-eMenu *create_eMenu(WINDOW *win, WINDOW *sub, int rows, int columns, bool columnar);
+eMenu *create_eMenu(WINDOW *win, WINDOW *sub, bool columnar);
 
 
 /**

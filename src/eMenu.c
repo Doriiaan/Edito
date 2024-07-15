@@ -25,12 +25,13 @@ static void reset_menu(eMenu *menu);
  *
  * @param win Menu menu. Displays title or border. 
  * @param sub Menu sub menu. Displays items.
+ * @param columnar, true, if the table displays elements in columns, false if it displays them in rows
  *
  * @return eMenu pointer or NULL if it was an error, see logs.
  *
  * @note delete_eMenu() must be called before exiting.
  */
-eMenu *create_eMenu(WINDOW *win, WINDOW *sub, int rows, int columns, bool columnar)
+eMenu *create_eMenu(WINDOW *win, WINDOW *sub, bool columnar)
 {
 	eMenu *menu = NULL;
 	
@@ -40,22 +41,17 @@ eMenu *create_eMenu(WINDOW *win, WINDOW *sub, int rows, int columns, bool column
 
 	menu->win = win;
 	menu->sub = sub;
-	menu->items_title = (char **) malloc(sizeof(char*));
-	menu->items_title[0] = NULL;
-	menu->items = (ITEM **) malloc(sizeof(ITEM*));
-	menu->items[0] = (ITEM *)NULL;
-	menu->n_items = 0;
+	menu->virtual_items_title = (char **) malloc(sizeof(char*));
+	menu->virtual_items_title[0] = NULL;
 	menu->alloc_size = 1;
-	menu->rows = rows;
-	menu->columns = columns;
+	menu->n_items = 0;
+
+	menu->menu = NULL;
+	menu->items = NULL;
+	menu->physical_items_title = NULL;
+	menu->rows = 1;
+	menu->columns = 1;
 	menu->columnar = columnar;
-
-	menu->menu = new_menu(menu->items);
-	set_menu_format(menu->menu, menu->rows, menu->columns);
-	set_menu_mark(menu->menu, "");
-
-	set_menu_win(menu->menu, menu->win);
-	set_menu_sub(menu->menu, menu->sub);
 
 	return menu;
 }
@@ -72,18 +68,14 @@ void delete_eMenu(eMenu **menu)
 	if(*menu != NULL)
 		return;
 
-	for(unsigned int i=0; i<(*menu)->n_items; i++)
-	{
-		free_item((*menu)->items[i]);	
-	}
-	free((*menu)->items);
+	reset_menu(*menu);
 
 	for(unsigned int i=0; i<(*menu)->n_items; i++)
 	{
-		free((*menu)->items_title[i]);	
+		free((*menu)->virtual_items_title[i]);	
 	}
+	free((*menu)->virtual_items_title);
 
-	free((*menu)->items_title);
 	free(*menu);
 	*menu = NULL;
 }
@@ -106,20 +98,21 @@ int add_item_eMenu(eMenu *menu, const char *item)
 	/* Alloc_size must be equal to n_items+1. Last item must be set to NULL */
 	if(menu->n_items >= menu->alloc_size)
 	{
-		menu->items_title = (char **) realloc(menu->items_title, get_next_power_of_two(menu->n_items)*sizeof(char *));
-		if(menu->items_title == NULL)
+		menu->virtual_items_title = (char **) realloc(menu->virtual_items_title, get_next_power_of_two(menu->n_items)*sizeof(char *));
+		if(menu->virtual_items_title == NULL)
 			return -1;
 
 		menu->alloc_size = get_next_power_of_two(menu->n_items);
 	}
 
-	menu->items_title[menu->n_items] = strdup(item);
-	if(menu->items_title[menu->n_items] == NULL)
+	menu->virtual_items_title[menu->n_items] = strdup(item);
+	if(menu->virtual_items_title[menu->n_items] == NULL)
 		return -1;
 
 	menu->n_items++;
 
 	getmaxyx(menu->sub, sub_rows, sub_cols);
+
 	if(menu->columnar && menu->columns < sub_cols)
 		menu->columns++;
 	else if(!menu->columnar && menu->rows < sub_rows)
@@ -138,6 +131,7 @@ void next_item_eMenu(eMenu *menu)
 	menu_driver(menu->menu, REQ_NEXT_ITEM);
 }
 
+
 /**
  * @brief The previous_item_eMenu() move the cursor to the previous item.
  *
@@ -147,23 +141,31 @@ void previous_item_eMenu(eMenu *menu)
 	menu_driver(menu->menu, REQ_PREV_ITEM);
 }
 
+
 /**
  * @brief The refresh_eMenu() function refresh the menu on the screen
  *
  */
 void refresh_eMenu(eMenu *menu)
 {
+	unpost_menu(menu->menu);
 	reset_menu(menu);
 	init_menu(menu);
 	post_menu(menu->menu);
 }
 
+
+/*
+ * @brief the reset_menu() function, free the ncurses items and menu
+ *
+ */
 void reset_menu(eMenu *menu)
 {
 	int i=0;
 	int count = item_count(menu->menu); 
 
-	free_menu(menu->menu);
+	if(menu->menu != NULL)
+		free_menu(menu->menu);
 	menu->menu = NULL;
 
 	for(i=0; i<count; i++)
@@ -173,22 +175,46 @@ void reset_menu(eMenu *menu)
 			free_item(menu->items[i]);
 			menu->items[i]=NULL;
 		}
+		if(menu->physical_items_title[i] != NULL)
+		{
+			free(menu->physical_items_title[i]);
+			menu->physical_items_title[i] = NULL;
+		}
 	}
+
 	if(menu->items != NULL)
 	{
 		free(menu->items);
 		menu->items = NULL;
 	}
+
+	if(menu->physical_items_title != NULL)
+	{
+		free(menu->physical_items_title);
+		menu->physical_items_title = NULL;
+	}
 }
 
+
+/*
+ * @brief the init_menu() function, create the ncurses items and menu with menu->virtual_items_title 
+ *
+ */
 void init_menu(eMenu *menu)
 {
 	unsigned int i=0;
+	menu->physical_items_title = (char **) malloc(sizeof(char *)*menu->n_items);
+	if(menu->physical_items_title == NULL)
+		return;
+
 	menu->items = (ITEM **) malloc(sizeof(ITEM *)*(menu->n_items+1));
+	if(menu->items == NULL)
+		return;
 
 	for(i=0; i<menu->n_items; i++)
 	{
-		menu->items[i] = new_item(menu->items_title[i], "");
+		menu->physical_items_title[i] = strdup(menu->virtual_items_title[i]);
+		menu->items[i] = new_item(menu->physical_items_title[i], "");
 		item_opts_off(menu->items[i], O_NONCYCLIC | O_SHOWDESC);
 	}
 	menu->items[menu->n_items] = NULL;
@@ -196,6 +222,9 @@ void init_menu(eMenu *menu)
 	menu->menu = new_menu(menu->items);
 	set_menu_format(menu->menu, menu->rows, menu->columns);
 	set_menu_mark(menu->menu, "");
+
+	/* description 1 blank, rows default line, columns 1 blank */
+	set_menu_spacing(menu->menu, 1, 0, 1);
 
 	set_menu_win(menu->menu, menu->win);
 	set_menu_sub(menu->menu, menu->sub);

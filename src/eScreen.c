@@ -80,8 +80,8 @@ eScreen *create_eScreen(int lines, int columns)
 	screen->current_window = screen->windows[WDIR_BOX];
 
 	/* Create MENUs */
-	screen->menus[MBAR] = create_eMenu(screen->windows[WBAR_BOX]->window, screen->windows[WBAR_ITEMS]->window, 1, 1, 1);
-	screen->menus[MDIR] = create_eMenu(screen->windows[WDIR_BOX]->window, screen->windows[WDIR_ITEMS]->window, 1, 1, 0);
+	screen->menus[MBAR] = create_eMenu(screen->windows[WBAR_BOX]->window, screen->windows[WBAR_ITEMS]->window, 1);
+	screen->menus[MDIR] = create_eMenu(screen->windows[WDIR_BOX]->window, screen->windows[WDIR_ITEMS]->window, 0);
 
 	screen->current_menu = screen->menus[MDIR];
 
@@ -129,9 +129,7 @@ void update_directory_eScreen(eScreen *screen)
 void update_bar_eScreen(eScreen *screen)
 {
 	box(screen->windows[WBAR_BOX]->window, 0, 0);
-	post_menu(screen->menus[MBAR]->menu);
-	wnoutrefresh(screen->windows[WBAR_BOX]->window);
-	doupdate();
+	wrefresh(screen->windows[WBAR_BOX]->window);
 }
 
 
@@ -159,9 +157,6 @@ void update_all_eScreen(eScreen *screen)
 	box(screen->windows[WBAR_BOX]->window, 0, 0);
 	box(screen->windows[WFILE_BOX]->window, 0, 0);
 
-	post_menu(screen->menus[MBAR]->menu);
-	post_menu(screen->menus[MDIR]->menu);
-	
 	for(int i=0 ; i<WINDOWS_NUMBER ; i++)
 	{
 		if(screen->windows[i])

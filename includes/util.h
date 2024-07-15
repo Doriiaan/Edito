@@ -2,7 +2,7 @@
 #define __UTIL_H__
 
 /**
- * @enum File permissions enumeration
+ * @enum File and eRepository permissions enumeration
  */
 typedef enum
 {
@@ -14,5 +14,11 @@ typedef enum
 
 
 unsigned int get_next_power_of_two(unsigned int n);
+
+
+/*
+ * @brief The digit_number() function return the number of digit in a number.
+ */
+int digit_number(unsigned int n);
 
 #endif
