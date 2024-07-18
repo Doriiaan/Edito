@@ -52,6 +52,7 @@ eMenu *create_eMenu(WINDOW *win, WINDOW *sub, bool columnar)
 	menu->rows = 1;
 	menu->columns = 1;
 	menu->columnar = columnar;
+	menu->n_scroll = 0;
 
 	return menu;
 }
@@ -70,7 +71,7 @@ void delete_eMenu(eMenu **menu)
 
 	reset_menu(*menu);
 
-	for(unsigned int i=0; i<(*menu)->n_items; i++)
+	for(int i=0; i<(*menu)->n_items; i++)
 	{
 		free((*menu)->virtual_items_title[i]);	
 	}
@@ -78,6 +79,27 @@ void delete_eMenu(eMenu **menu)
 
 	free(*menu);
 	*menu = NULL;
+}
+
+
+void erase_eMenu(eMenu *menu)
+{	
+	if(menu==NULL)
+		return;
+
+	if(menu->virtual_items_title==NULL)
+		return;
+
+	for(int i=0; i<menu->n_items; i++)
+	{
+		if(menu->virtual_items_title[i] != NULL)
+		{
+			free(menu->virtual_items_title[i]);	
+			menu->virtual_items_title[i] = NULL;
+		}
+	}
+
+	menu->n_items = 0;
 }
 
 
@@ -122,12 +144,45 @@ int add_item_eMenu(eMenu *menu, const char *item)
 }
 
 
+int delete_item_eMenu(eMenu *menu, int index)
+{
+	if(menu == NULL || index >= menu->n_items)
+		return -1;
+
+	free(menu->virtual_items_title[index]);
+	menu->n_items--;
+
+	for(int i=index; i<menu->n_items; i++)
+	{
+		menu->virtual_items_title[i] = menu->virtual_items_title[i+1];
+	}
+	menu->virtual_items_title[menu->n_items] = NULL;
+
+	return 0;
+}
+
 /**
  * @brief The next_item_eMenu() move the cursor to the next item.
  *
  */
 void next_item_eMenu(eMenu *menu)
 {
+	int max_height = 0;
+	int max_width = 0;
+
+	int cur_height = 0;
+	int cur_width = 0;
+
+	getmaxyx(menu->sub, max_height, max_width);
+	getyx(menu->sub, cur_height, cur_width);
+	(void)max_width;
+	(void)cur_width;
+
+	if(max_height-1 == cur_height)
+	{
+		menu->n_scroll++;
+	}
+
 	menu_driver(menu->menu, REQ_NEXT_ITEM);
 }
 
@@ -138,7 +193,47 @@ void next_item_eMenu(eMenu *menu)
  */
 void previous_item_eMenu(eMenu *menu)
 {
+	int cur_height = 0;
+	int cur_width = 0;
+
+	getyx(menu->sub, cur_height, cur_width);
+	(void)cur_width;
+
+	if(cur_height == 0)
+	{
+		menu->n_scroll--;
+	}
+
 	menu_driver(menu->menu, REQ_PREV_ITEM);
+}
+
+
+/**
+ * @brief The current_item_eMenu() move the cursor to the current item.
+ *
+ */
+void current_item_eMenu(eMenu *menu)
+{
+	pos_menu_cursor(menu->menu);
+}
+
+
+int get_current_item_index_eMenu(eMenu *menu)
+{
+	return item_index(current_item(menu->menu));
+}
+
+void set_cursor_position_eMenu(eMenu *menu, int position)
+{
+	for(int i=0; i<menu->n_scroll; i++)
+	{
+		menu_driver(menu->menu, REQ_SCR_DLINE);
+	}
+
+	for(int i=0; i < position-menu->n_scroll; i++) 
+	{
+		menu_driver(menu->menu, REQ_DOWN_ITEM);
+	}	
 }
 
 
@@ -148,10 +243,12 @@ void previous_item_eMenu(eMenu *menu)
  */
 void refresh_eMenu(eMenu *menu)
 {
+	int pos = get_current_item_index_eMenu(menu);
 	unpost_menu(menu->menu);
 	reset_menu(menu);
 	init_menu(menu);
 	post_menu(menu->menu);
+	set_cursor_position_eMenu(menu, pos);
 }
 
 
@@ -202,7 +299,7 @@ void reset_menu(eMenu *menu)
  */
 void init_menu(eMenu *menu)
 {
-	unsigned int i=0;
+	int i=0;
 	menu->physical_items_title = (char **) malloc(sizeof(char *)*menu->n_items);
 	if(menu->physical_items_title == NULL)
 		return;
@@ -229,3 +326,6 @@ void init_menu(eMenu *menu)
 	set_menu_win(menu->menu, menu->win);
 	set_menu_sub(menu->menu, menu->sub);
 }
+
+
+

@@ -355,7 +355,7 @@ bool process_d_eManager(eManager *manager)
 
 bool process_b_eManager(eManager *manager)
 {
-	if(manager->mode == DIR)
+	if(manager->mode == DIR && count_eBar(manager->bar) != 0)
 	{
 		manager->mode = BAR;
 		set_current_window_eScreen(manager->screen, WBAR_BOX);
@@ -408,7 +408,7 @@ bool process_ESCAPE_eManager(eManager *manager)
 		manager->mode = DIR;
 		set_current_window_eScreen(manager->screen, WDIR_BOX);
 		set_current_menu_eScreen(manager->screen, MDIR);
-		next_item_menu_eScreen(manager->screen);
+		current_item_menu_eScreen(manager->screen);
 	}
 
 	return true;
@@ -426,6 +426,9 @@ bool process_ENTER_eManager(eManager *manager)
 {
 	char *buffer = NULL;
 	int buffer_length = 0;
+	int item_index = 0;
+	eFile *file = NULL;
+	eDirectory *directory = NULL;
 
 	/*
 	 * 1. Allocate buffer
@@ -452,6 +455,33 @@ bool process_ENTER_eManager(eManager *manager)
 		free(buffer);	
 		buffer = NULL;
 
+	}
+	else if(manager->mode == DIR)
+	{
+		item_index = get_current_item_index_menu_eScreen(manager->screen, MDIR);	
+		get_item_at_index_eDirectory(manager->directory, item_index, &directory, &file);
+		if(directory != NULL)
+		{
+			/* close the directory and delete dirs/files from menu */
+			if(directory->is_open)
+			{
+				directory->is_open = false;
+			}
+			else
+			{
+				directory->is_open = true;
+			}
+			fill_directory_menu_eManager(manager, manager->directory, 0);
+			refresh_menu_eScreen(manager->screen, MDIR);
+		}
+		else if(file != NULL)
+		{
+
+		}
+		else
+		{
+			//ERROR
+		}
 	}
 
 	return true;
@@ -737,8 +767,8 @@ unsigned int screen_width_of_string(const char *s, size_t length)
 	return width;
 }
 
-
-int fill_dir_eManager(eManager *manager, eDirectory *directory, unsigned int level)
+/* Recursive */
+int fill_directory_menu_eManager(eManager *manager, eDirectory *directory, unsigned int level)
 {
 	unsigned int i=0;
 	char *item = NULL;
@@ -748,8 +778,12 @@ int fill_dir_eManager(eManager *manager, eDirectory *directory, unsigned int lev
 	if(manager == NULL || directory == NULL)
 		return -1;
 
+	/* Root element show path and erase all menu*/
 	if(level == 0)
+	{
+		erase_menu_eScreen(manager->screen, MDIR);
 		dirname = directory->realpath;
+	}
 	else
 		dirname = directory->dirname;
 
@@ -766,13 +800,13 @@ int fill_dir_eManager(eManager *manager, eDirectory *directory, unsigned int lev
 		level++;
 		for(i=0; i<directory->n_dirs; i++)
 		{
-			fill_dir_eManager(manager, directory->dirs[i], level);
+			fill_directory_menu_eManager(manager, directory->dirs[i], level);
 		}
 	
 		for(i=0; i<directory->n_files; i++)
 		{
 			/* Char allocation */
-			if(alloc_item_size <= strlen(directory->files[i]->filename))
+			if(alloc_item_size <= strlen(directory->files[i]->filename)+2*level+1)
 			{
 				alloc_item_size = (strlen(directory->files[i]->filename)+level*2+1);
 				item = (char *) realloc(item, alloc_item_size*sizeof(char));
@@ -787,4 +821,4 @@ int fill_dir_eManager(eManager *manager, eDirectory *directory, unsigned int lev
 	}	
 	free(item);
 	return 0;
-}	
+}

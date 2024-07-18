@@ -33,8 +33,6 @@ typedef enum {
  */
 typedef struct {
 
-	size_t alloc_size;
-
 	WINDOW *win;
 
 	WINDOW *sub;
@@ -48,10 +46,14 @@ typedef struct {
 	char **physical_items_title;
 
 	int rows;
-
+	
 	int columns;
 
-	unsigned int n_items;
+	int n_items; // int because index curses parameter are integer.
+	
+	int alloc_size;
+
+	int n_scroll;
 
 	bool columnar; /* 1 in column, 0 in row */ 
 
@@ -89,6 +91,9 @@ void delete_eMenu(eMenu **menu);
  */
 int add_item_eMenu(eMenu *menu, const char *item);
 
+int delete_item_eMenu(eMenu *menu, int index);
+
+void erase_eMenu(eMenu *menu);
 
 /**
  * @brief The next_item_eMenu() move the cursor to the next item.
@@ -102,5 +107,17 @@ void next_item_eMenu(eMenu *menu);
  */
 void previous_item_eMenu(eMenu *menu);
 
+
+void current_item_eMenu(eMenu *menu);
+
+
+int get_current_item_index_eMenu(eMenu *menu);
+
+
+void set_cursor_position_eMenu(eMenu *menu, int position);
+
+
 void refresh_eMenu(eMenu *menu);
+
+
 #endif

@@ -27,4 +27,6 @@ int remove_file_eBar(eBar *bar, unsigned int index);
 
 eFile *get_file_eBar(eBar *bar, unsigned int index);
 
+unsigned int count_eBar(eBar *bar);
+
 #endif

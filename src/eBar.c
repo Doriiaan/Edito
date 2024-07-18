@@ -74,3 +74,8 @@ int remove_file_eBar(eBar *bar, unsigned int index)
 	bar->n_files--;
 	return 0;
 }
+
+unsigned int count_eBar(eBar *bar)
+{
+	return bar->n_files;
+}

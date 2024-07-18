@@ -8,19 +8,19 @@
 
 typedef struct eDirectory {
 
+	size_t alloc_files_size;
+	
+	size_t alloc_dirs_size;
+	
+	eFile **files;
+
+	struct eDirectory **dirs;
+
 	unsigned int n_files;
 	
 	unsigned int n_dirs;
 
 	PERM permissions;
-
-	eFile **files;
-
-	size_t alloc_files_size;
-	
-	struct eDirectory **dirs;
-	
-	size_t alloc_dirs_size;
 	
 	char *dirname;
 
@@ -34,5 +34,17 @@ typedef struct eDirectory {
 eDirectory *create_eDirectory(char *realpath);
 
 void delete_eDirectory(eDirectory **directory);
+
+int get_item_at_index_eDirectory(eDirectory *directory, unsigned int item_index, eDirectory **out_directory, eFile **out_file);
+// ADD file
+// ADD directory
+
+// DEL file
+// DEL directory
+
+// GET files
+
+// begin dir
+// begin 
 
 #endif

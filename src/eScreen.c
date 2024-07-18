@@ -366,13 +366,27 @@ void next_item_menu_eScreen(eScreen *screen)
 	next_item_eMenu(screen->current_menu);
 }
 
-
 void previous_item_menu_eScreen(eScreen *screen)
 {
 	previous_item_eMenu(screen->current_menu);
 }
 
+void current_item_menu_eScreen(eScreen *screen)
+{
+	current_item_eMenu(screen->current_menu);
+}
+
+int get_current_item_index_menu_eScreen(eScreen *screen, MENU_TYPE type)
+{
+	return get_current_item_index_eMenu(screen->menus[type]);
+}
+
 void refresh_menu_eScreen(eScreen *screen, MENU_TYPE type)
 {
 	refresh_eMenu(screen->menus[type]);
+}
+
+void erase_menu_eScreen(eScreen *screen, MENU_TYPE type)
+{
+	erase_eMenu(screen->menus[type]);
 }

@@ -187,5 +187,15 @@ void next_item_menu_eScreen(eScreen *screen);
 
 void previous_item_menu_eScreen(eScreen *screen);
 
+
+void current_item_menu_eScreen(eScreen *screen);
+
+
+int get_current_item_index_menu_eScreen(eScreen *screen, MENU_TYPE type);
+
+
 void refresh_menu_eScreen(eScreen *screen, MENU_TYPE type);
+
+
+void erase_menu_eScreen(eScreen *screen, MENU_TYPE type);
 #endif

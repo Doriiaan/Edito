@@ -28,7 +28,6 @@ int main(int argc, char *argv[])
 	
 	eManager *manager = NULL;
 	eScreen *screen = NULL;
-	eFile *file = NULL;
 	eBar *bar = NULL;
 	eDirectory *project_repo = NULL;
 	char *reponame = 0; 
@@ -83,26 +82,13 @@ int main(int argc, char *argv[])
 	set_eBar_eManager(manager, bar);
 	set_eDirectory_eManager(manager, project_repo);
 	manager->directory->is_open = true;
-	fill_dir_eManager(manager, manager->directory, 0);
+	fill_directory_menu_eManager(manager, manager->directory, 0);
 	refresh_menu_eScreen(manager->screen, MDIR);
 
 	/* Print every Windows */
 	update_all_eScreen(screen);
-
-	add_item_menu_eScreen(manager->screen, MBAR, "lala");
-	add_item_menu_eScreen(manager->screen, MBAR, "lolo");
-	add_item_menu_eScreen(manager->screen, MBAR, "lulu");
-
-	refresh_menu_eScreen(manager->screen, MBAR);
-
-	add_item_menu_eScreen(manager->screen, MBAR, "iaia");
-	add_item_menu_eScreen(manager->screen, MBAR, "hhqsdbfq");
-	add_item_menu_eScreen(manager->screen, MBAR, "qsdfsqdf");
-	add_item_menu_eScreen(manager->screen, MBAR, "loulou");
-
-	refresh_menu_eScreen(manager->screen, MBAR);
 	
-	update_all_eScreen(manager->screen);
+	current_item_menu_eScreen(manager->screen);
 
 	/* Main loop */
 	while(run)
@@ -111,7 +97,8 @@ int main(int argc, char *argv[])
 	}
 
 	delete_eScreen(&screen);
-	delete_eFile(&file);
+	delete_eBar(&bar);
+	delete_eDirectory(&project_repo);
 	delete_eManager(&manager);
 
 	reset_terminal();

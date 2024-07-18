@@ -142,5 +142,5 @@ unsigned int getx_cursor_eManager(eManager *manager);
 unsigned int gety_cursor_eManager(eManager *manager);
 
 
-int fill_dir_eManager(eManager *manager, eDirectory *directory, unsigned int level);
+int fill_directory_menu_eManager(eManager *manager, eDirectory *directory, unsigned int level);
 #endif

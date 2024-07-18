@@ -57,7 +57,7 @@ eDirectory *create_eDirectory(char *realpath)
 
 	if(permissions == p_CREATE)
 	{
-		if(mkdir(directory->realpath, 755) == -1)
+		if(mkdir(realpath, 0x755) == -1)
 			return NULL;
 	}
 
@@ -157,11 +157,60 @@ void delete_eDirectory(eDirectory **directory)
 		return;
 
 	for(i=0; i<(*directory)->n_dirs; i++)
-		delete_eDirectory(&((*directory)->dirs[i]));
+		delete_eDirectory(&(*directory)->dirs[i]);
 
 	for(i=0; i<(*directory)->n_files; i++)
-		delete_eFile(&((*directory)->files[i]));
+		delete_eFile(&(*directory)->files[i]);
 	
 	free((*directory)->realpath);
 	free(*directory);
 }
+
+
+int get_item_at_index_eDirectory(eDirectory *directory, unsigned int item_index, eDirectory **out_directory, eFile **out_file)
+{
+	int result = 0;
+
+	if(directory == NULL)
+		return -1;
+
+	if(item_index == 0)
+	{
+		*out_directory = directory;
+		return 0;
+	}
+
+	for(unsigned int i=0; i<directory->n_dirs; i++)
+	{
+		item_index--;
+		if(item_index == 0)
+		{
+			*out_directory = directory->dirs[i];
+			return 0;
+		}
+
+		if(directory->dirs[i]->is_open)
+		{
+			result = get_item_at_index_eDirectory(directory->dirs[i], item_index, out_directory, out_file);
+			if(result == -1)
+				return -1;
+			else if(result == 0)
+				return 0;
+			else
+				item_index = result;
+		}
+	
+	}
+
+	for(unsigned int i=0; i<directory->n_files; i++)
+	{
+		item_index--;
+		if(item_index == 0)
+		{
+			*out_file = directory->files[i];
+			return 0;
+		}
+	}
+	return item_index;
+}
+
