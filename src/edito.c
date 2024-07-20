@@ -81,13 +81,16 @@ int main(int argc, char *argv[])
 	set_eScreen_eManager(manager, screen);
 	set_eBar_eManager(manager, bar);
 	set_eDirectory_eManager(manager, project_repo);
+
 	manager->directory->is_open = true;
+
 	fill_directory_menu_eManager(manager, manager->directory, 0);
 	refresh_menu_eScreen(manager->screen, MDIR);
 
-	/* Print every Windows */
+	/* Print every Windows and Menus on the screen */
 	update_all_eScreen(screen);
 	
+	/* Set cursor on the current menu item */
 	current_item_menu_eScreen(manager->screen);
 
 	/* Main loop */

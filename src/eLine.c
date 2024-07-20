@@ -26,11 +26,12 @@
 /**
  * @brief The create_eLine() function allocate and initialize an eLine.
  *
- * @param string: String of line.
+ * @param string: String of line
  * @param length: Length of the string (excluding null terminator)
- * @param line_number: Line number.
- * @param next: Next line in file.
- * @param previous: Previous line in file.
+ * @param line_number: Line number	
+ * @param next: Next line in file
+ * @param previous: Previous line in file
+ *
  * @return Pointer on the line structure or NULL if allocation failed.
  *
  * @note delete_eLine() must be called before exiting.
@@ -78,6 +79,24 @@ eLine *create_eLine(char *string, size_t length, unsigned int line_number, eLine
 
 
 /**
+ * @brief The delete_eLine() function delete and deallocate eLine and set pointer to NULL.
+ *
+ * @param eline: eLine pointer pointer
+ */
+void delete_eLine(eLine **eline)
+{
+	if(*eline == NULL)
+		return;	
+		
+	if((*eline)->string != NULL)
+		free((*eline)->string);
+	
+	free(*eline);
+	*eline = NULL;
+}
+
+
+/**
  * @brief The insert_string_eLine() function insert length character of the string in the line at position pos.
  *
  * @param eline: eLine 
@@ -85,8 +104,7 @@ eLine *create_eLine(char *string, size_t length, unsigned int line_number, eLine
  * @param length: Number of character to insert from string into the eLine
  * @param pos: Position where to insert the string
  *
- * @return 0 on success, -1 on error, see logs
- *
+ * @return 0 on success, -1 in failure.
  */
 int insert_string_eLine(eLine *eline, const char *string, size_t length, unsigned int pos)
 {
@@ -128,20 +146,31 @@ int insert_string_eLine(eLine *eline, const char *string, size_t length, unsigne
 
 
 /**
- * @brief The delete_eLine() function delete and deallocate eLine and set pointer to NULL
+ * @brief The remove_string_eLine() function remove length character of the line at position pos.
  *
- * @param: eline pointer pointer
+ * @param eline: eLine 
+ * @param length: Number of character to remove from the eLine
+ * @param pos: Position where to delete the string
+ *
+ * @return 0 on success, -1 in failure.
  */
-void delete_eLine(eLine **eline)
+int remove_string_eLine(eLine *eline, size_t length, unsigned int pos)
 {
-	if(*eline == NULL)
-		return;	
-		
-	if((*eline)->string != NULL)
-		free((*eline)->string);
-	
-	free(*eline);
-	*eline = NULL;
+	int real_length = 0;
+
+	if(eline ==NULL)
+		return -1;
+
+	if(pos > eline->length)
+		return -1;
+
+	/* If pos + length > eline->length*/
+	real_length = strnlen(eline->string+pos, length);
+
+	/* This move final 0 */
+	memmove(eline->string+pos, eline->string + pos + real_length, eline->length-real_length-pos+1);
+	eline->length -= real_length;
+	return 0;
 }
 
 
@@ -150,10 +179,9 @@ void delete_eLine(eLine **eline)
  *
  * @param eline: eLine
  * @param ch: The character to insert
- * @param pos: Position where to insert the character
+ * @param pos: Position where to insert the string
  *
- * @return 0 on success, -1 on error, see logs
- *
+ * @return 0 on success, -1 in failure.
  */
 int insert_char_eLine(eLine *eline, const char ch, unsigned int pos)
 {
@@ -183,43 +211,12 @@ int insert_char_eLine(eLine *eline, const char ch, unsigned int pos)
 
 
 /**
- * @brief The remove_string_eLine() function remove length character of the line at position pos.
- *
- * @param eline: eLine 
- * @param length: Number of character to remove from the eLine
- * @param pos: Position where to delete the string
- *
- * @return 0 on success, -1 on error, see logs
- *
- */
-int remove_string_eLine(eLine *eline, size_t length, unsigned int pos)
-{
-	int real_length = 0;
-
-	if(eline ==NULL)
-		return -1;
-
-	if(pos > eline->length)
-		return -1;
-
-	/* If pos + length > eline->length*/
-	real_length = strnlen(eline->string+pos, length);
-
-	/* This move final 0 */
-	memmove(eline->string+pos, eline->string + pos + real_length, eline->length-real_length-pos+1);
-	eline->length -= real_length;
-	return 0;
-}
-
-
-/**
  * @brief The remove_char_eLine() function remove a character in the line at position pos.
  *
  * @param eline: eLine
- * @param pos: Position where to remove the character
+ * @param pos: Position where to delete the remove 
  *
- * @return 0 on success, -1 on error, see logs
- *
+ * @return 0 on success, -1 in failure.
  */
 int remove_char_eLine(eLine *eline, unsigned int pos)
 {
@@ -242,14 +239,14 @@ int remove_char_eLine(eLine *eline, unsigned int pos)
 
 
 /**
- * @brief The get_char_eLine() function get a string in the line at position pos and return how many character actually got.
+ * @brief The get_string_eLine() function get a string in the line at position pos and return how many character actually got.
  *
- * @param eline : eLine
- * @param string : buffer where string of line is copied
- * @param length : length of buffer
- * @param pos : Position where to remove the character
+ * @param eline: eLine
+ * @param string: buffer where string of line is copied
+ * @param length: length of buffer
+ * @param pos: Position where to remove the character
  *
- * @return 0 on success, -1 on error, see logs
+ * @return 0 on success, -1 in failure.
  *
  * @note : This function has security and get the max between strnlen(string, length) and eline->length character.
  */
@@ -266,6 +263,3 @@ int get_string_eLine(eLine *eline, char *buffer, size_t length, unsigned int pos
 	
 	return min;
 }
-
-
-

@@ -18,21 +18,22 @@
 
 typedef struct {
 
-	/* Calculate in columns */
+	/** Number of columns */
 	size_t width;
 
-	/* Calculate in lines */
+	/** Number of lines */
 	size_t height;
 	
-	/* Array of every window */
+	/** Array of every window */
 	eWindow *windows[WINDOWS_NUMBER]; 
 	
-	/* Pointer on the current window */
+	/** Current window */
 	eWindow *current_window;
 
-	/* Array of every menu */
+	/** Array of every menu */
 	eMenu *menus[MENU_NUMBER];
 
+	/** Current menu */
 	eMenu *current_menu;
 
 } eScreen;
@@ -41,7 +42,10 @@ typedef struct {
 /**
  * @brief The create_eScreen() function allocate and initialize an eScreen structure.
  *
- * @return eScreen pointer or NULL if it was an error, see logs.
+ * @param n_lines: Number of lines of screen
+ * @param n_cols: Number of columns in screen
+ *
+ * @return eScreen pointer or NULL if it was an error.
  *
  * @note delete_eScreen() must be called before exiting.
  */
@@ -51,7 +55,7 @@ eScreen * create_eScreen(int n_lines, int n_cols);
 /**
  * @brief The delete_eScreen() function deallocate the eScreen structure and set the pointer to the structure to NULL.
  *
- * @param manager eManager pointer pointer
+ * @param manager: eManager pointer pointer
  */
 void delete_eScreen(eScreen **screen);
 
@@ -59,7 +63,7 @@ void delete_eScreen(eScreen **screen);
 /**
  * @brief The update_repository_eScreen() function refresh the menu window.
  *
- * @param screen eScreen pointer
+ * @param screen: eScreen pointer
  */
 void update_directory_eScreen(eScreen *screen);
 
@@ -67,7 +71,7 @@ void update_directory_eScreen(eScreen *screen);
 /*
  * @brief The update_bar_eScreen() function refresh the bar window.
  *
- * @param screen eScreen pointer
+ * @param screen: eScreen pointer
  */
 void update_bar_eScreen(eScreen *screen);
 
@@ -75,7 +79,7 @@ void update_bar_eScreen(eScreen *screen);
 /**
  * @brief The update_file_eScreen() function refresh the file content and file number window.
  *
- * @param screen eScreen pointer
+ * @param screen: eScreen pointer
  */
 void update_file_eScreen(eScreen *screen);
 
@@ -83,7 +87,7 @@ void update_file_eScreen(eScreen *screen);
 /**
  * @brief the update_all_eScreen() function refresh all the window of the screen.
  *
- * @param screen eScreen pointer
+ * @param screen: eScreen pointer
  */
 void update_all_eScreen(eScreen *screen);
 
@@ -96,8 +100,8 @@ void update_all_eScreen(eScreen *screen);
 /**
  * @brief The create_file_window_eScreen() function allocate and initialize file windows.
  *
- * @param screen eScreen pointer
- * @param number_length number of digit in the lines number
+ * @param screen: eScreen pointer
+ * @param number_length: number of digit in the lines number
  *
  */
 void create_file_window_eScreen(eScreen *screen, unsigned int number_length);
@@ -107,8 +111,8 @@ void create_file_window_eScreen(eScreen *screen, unsigned int number_length);
 /**
  * @brief The resize_file_window_eScreen() function resize file windows.
  *
- * @param screen eScreen pointer
- * @param number_length number of digit in the lines number
+ * @param screen: eScreen pointer
+ * @param number_length: number of digit in the lines number
  */
 void resize_file_eScreen(eScreen *screen, unsigned int number_length);
 
@@ -117,9 +121,9 @@ void resize_file_eScreen(eScreen *screen, unsigned int number_length);
 /**
  * @brief The print_content_eScreen() function print the content of the file in the window, do not change the cursor position
  *
- * @param screen eScreen pointer
- * @param first_line First line to print
- * @param number_length Number of digit of the higher line of the file
+ * @param screen: eScreen pointer
+ * @param first_line: First line to print
+ * @param number_length: Number of digit of the higher line of the file
  */
 void print_content_eScreen(eScreen *screen, eLine *first_line);
 
@@ -127,7 +131,8 @@ void print_content_eScreen(eScreen *screen, eLine *first_line);
 /**
  * @brief The set_current_eScreen() function set the current window and cursor of the screen.
  *
- * @param type The type of the window (the type refers to the window)
+ * @param screen: eScreen pointer
+ * @param type: Window type
  */
 void set_current_window_eScreen(eScreen *screen, WINDOW_TYPE type);
 
@@ -135,8 +140,9 @@ void set_current_window_eScreen(eScreen *screen, WINDOW_TYPE type);
 /**
  * @brief the move_cursor_eScreen() function move the cursor of the current_window.
  *
- * @param y y position
- * @param x x position
+ * @param screen: eScreen pointer
+ * @param y: y position
+ * @param x: x position
  */
 void move_cursor_eScreen(eScreen *screen, unsigned int y, unsigned int x);
 
@@ -144,7 +150,8 @@ void move_cursor_eScreen(eScreen *screen, unsigned int y, unsigned int x);
 /**
  * @brief the get_width_eSreen() return the width of the window pointed by type.
  *
- * @param type Window type.
+ * @param screen: eScreen pointer
+ * @param type: Window type
  */
 unsigned int get_width_eScreen(eScreen *screen, WINDOW_TYPE type);
 
@@ -152,7 +159,8 @@ unsigned int get_width_eScreen(eScreen *screen, WINDOW_TYPE type);
 /**
  * @brief the get_height_eSreen() return the height of the window pointed by type.
  *
- * @param type Window type.
+ * @param screen: eScreen pointer
+ * @param type: Window type
  */
 unsigned int get_height_eScreen(eScreen *screen, WINDOW_TYPE type);
 
@@ -160,10 +168,11 @@ unsigned int get_height_eScreen(eScreen *screen, WINDOW_TYPE type);
 /**
  * @brief The get_input_eScreen() function request an input to the user.
  *
- * @param screen eScreen pointer
+ * @param screen: eScreen pointer
+ *
+ * @return User input
  */
 int get_input_eScreen(eScreen *screen);
-
 
 
 /* ==========================================================
@@ -174,28 +183,73 @@ int get_input_eScreen(eScreen *screen);
 /**
  * @brief The set_current_eScreen() function set the current window and cursor of the screen.
  *
- * @param type The type of the window (the type refers to the window)
+ * @param screen: eScreen pointer
+ * @param type: Menu type
  */
 void set_current_menu_eScreen(eScreen *screen, MENU_TYPE type);
 
 
+/**
+ * @brief The add_item_menu_eScreen() function add an item to the menu designed by type.
+ *
+ * @param screen: eScreen pointer
+ * @param type: Menu type
+ * @param item: item title
+ *
+ * @return 0 in success or -1 in failure.
+ */
 int add_item_menu_eScreen(eScreen *screen, MENU_TYPE type, const char *item);
 
 
-void next_item_menu_eScreen(eScreen *screen);
+/**
+ * @brief The erase_menu_eScreen() function erase the virtual menu.
+ *
+ * @param screen: eScreen pointer
+ * @param type: Menu type
+ */
+void erase_menu_eScreen(eScreen *screen, MENU_TYPE type);
 
 
-void previous_item_menu_eScreen(eScreen *screen);
-
-
-void current_item_menu_eScreen(eScreen *screen);
-
-
-int get_current_item_index_menu_eScreen(eScreen *screen, MENU_TYPE type);
-
-
+/**
+ * @brief The refresh_menu_eScreen() function refresh the menu designed by type. Refresh put virtual elements into physical elements.
+ *
+ * @param screen: eScreen pointer
+ * @param type: Menu type
+ */
 void refresh_menu_eScreen(eScreen *screen, MENU_TYPE type);
 
 
-void erase_menu_eScreen(eScreen *screen, MENU_TYPE type);
+/**
+ * @brief The next_item_menu_eScreen() function do a next action on the current menu.
+ *
+ * @param screen: eScreen pointer
+ */
+void next_item_menu_eScreen(eScreen *screen);
+
+
+/**
+ * @brief The previous_item_menu_eScreen() function do a previous action on the current menu.
+ *
+ * @param screen: eScreen pointer
+ */
+void previous_item_menu_eScreen(eScreen *screen);
+
+
+/**
+ * @brief The current_item_menu_eScreen() function set the cursor on the current item of the current menu.
+ *
+ * @param screen: eScreen pointer
+ */
+void current_item_menu_eScreen(eScreen *screen);
+
+
+/**
+ * @brief The get_current_item_index_menu_eScreen() function return the index of the current item of the menu
+ *
+ * @param screen: eScreen pointer
+ * @param type: Menu type
+ */
+int get_current_item_index_menu_eScreen(eScreen *screen, MENU_TYPE type);
+
+
 #endif

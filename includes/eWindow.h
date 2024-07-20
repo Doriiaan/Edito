@@ -53,6 +53,11 @@ typedef struct eWindow {
 /**
  * @brief The create_eWindow() function allocate and initialize an eWindow structure.
  *
+ * @param height: Window height (in lines)
+ * @param width: Window width (in columns)
+ * @param y: y position of the window in the Screen
+ * @param x: x position of the winwow in the Screen
+ *
  * @return eWindow pointer or NULL if it was an error, see logs.
  *
  * @note delete_eWindow() must be called before exiting.
@@ -63,6 +68,12 @@ eWindow *create_eWindow(size_t height, size_t width, unsigned int y, unsigned in
 /**
  * @brief The create_der_eWindow() function allocate and initialize an eWindow structure.
  *
+ * @param orig: Window parent
+ * @param height: Window height (in lines)
+ * @param width: Window width (in columns)
+ * @param y: y position of the window in the Screen
+ * @param x: x position of the winwow in the Screen
+ * 
  * @return eWindow pointer or NULL if it was an error, see logs.
  *
  * @note y and x are relative to the origin of the eWindow orig.

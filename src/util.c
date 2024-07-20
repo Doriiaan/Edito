@@ -39,6 +39,3 @@ int digit_number(unsigned int n)
 
     return 10;
 }
-
-
-
