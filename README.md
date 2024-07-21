@@ -19,7 +19,7 @@ sudo apt-get install libncurses6 libncurses-dev
 cd Edito/
 make
 cd ./build
-./edito
+./edito [directory]
 ```
 
 ## On Redhat/Centos
@@ -30,7 +30,7 @@ sudo dnf install ncurses ncurses-devel
 cd Edito/
 make
 cd ./build
-./edito
+./edito [directory]
 ```
 
 # Licence
