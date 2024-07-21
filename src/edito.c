@@ -3,8 +3,8 @@
  * @file edito.h
  * @brief Contain the main function of edito
  * @author ALARY Dorian
- * @version 0.1
- * @date 23/06/2024
+ * @version 1.0
+ * @date 21/07/2024
  * @copyright GNU Public License
  * ===================================================
  */
@@ -87,11 +87,13 @@ int main(int argc, char *argv[])
 	fill_directory_menu_eManager(manager, manager->directory, 0);
 	refresh_menu_eScreen(manager->screen, MDIR);
 
+	print_help_message_eManager(manager);
+
 	/* Print every Windows and Menus on the screen */
 	update_all_eScreen(screen);
 	
 	/* Set cursor on the current menu item */
-	current_item_menu_eScreen(manager->screen);
+	move_current_item_menu_eScreen(manager->screen, MDIR);
 
 	/* Main loop */
 	while(run)
@@ -121,7 +123,7 @@ void init_terminal(void)
     initscr(); /* Init window structure */
 
 	noecho(); /* Deactivate echo from getch */
-	cbreak(); /* Deactivate buffering but allow Ctrl+C */
+	raw(); /* Deactivate buffering and disallow signals like Ctrl+C, Ctrl+S */
 	set_escdelay(50);
 }
 

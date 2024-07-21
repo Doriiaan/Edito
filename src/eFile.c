@@ -3,8 +3,8 @@
  * @file eFile.c
  * @brief Contain eFile structure and functions
  * @author ALARY Dorian
- * @version 0.1
- * @date 23/06/2024
+ * @version 1.0
+ * @date 21/07/2024
  * @copyright GNU Public License.
  *
  * @details This file contains all the structures, variables and functions used to manage the file and its contents. 
@@ -301,7 +301,7 @@ int add_empty_line_eFile(eFile *efile, unsigned int pos)
 	eLine *new = NULL;
 	unsigned int i = 1;
 
-	if(efile == NULL || efile->permissions == p_READWRITE)
+	if(efile == NULL)
 		return -1;
 
 	current = efile->first_file_line;
@@ -360,7 +360,7 @@ int delete_line_eFile(eFile *efile, unsigned int line_number)
 	unsigned int i = 1;
 	bool last_line=false;
 
-	if(efile == NULL || efile->permissions != p_READWRITE)
+	if(efile == NULL)
 		return -1;
 
 	current = efile->first_file_line;
@@ -436,7 +436,7 @@ int delete_line_eFile(eFile *efile, unsigned int line_number)
  */
 int insert_char_eFile(eFile *efile, const char ch)
 {
-	if(efile == NULL || efile->permissions != p_READWRITE)
+	if(efile == NULL)
 		return -1;
 
 	if(insert_char_eLine(efile->current_line, ch, efile->current_pos))
@@ -456,7 +456,7 @@ int insert_char_eFile(eFile *efile, const char ch)
  */
 int remove_char_eFile(eFile *efile)
 {
-	if(efile == NULL || efile->permissions != p_READWRITE)
+	if(efile == NULL)
 		return -1;
 
 	if(remove_char_eLine(efile->current_line, efile->current_pos))
@@ -478,7 +478,7 @@ int remove_char_eFile(eFile *efile)
  */
 int insert_string_eFile(eFile *efile, const char *string, size_t length)
 {
-	if(efile == NULL || efile->permissions != p_READWRITE)
+	if(efile == NULL)
 		return -1;
 
 	if(insert_string_eLine(efile->current_line, string, length, efile->current_pos))
@@ -499,7 +499,7 @@ int insert_string_eFile(eFile *efile, const char *string, size_t length)
  */
 int remove_string_eFile(eFile *efile, size_t length)
 {
-	if(efile == NULL || efile->permissions != p_READWRITE)
+	if(efile == NULL)
 		return -1;
 
 	if(remove_string_eLine(efile->current_line, length, efile->current_pos))

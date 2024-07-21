@@ -3,8 +3,8 @@
  * @file eBar.c
  * @brief Contain eBar structure and functions
  * @author ALARY Dorian
- * @version 0.1
- * @date 23/06/2024
+ * @version 1.0
+ * @date 21/07/2024
  * @copyright GNU Public License.
  *
  * @details This file contains all the structures, variables and functions used to manage the bar structure. 
@@ -17,6 +17,7 @@
 #include "util.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 
 /**
@@ -69,10 +70,6 @@ void delete_eBar(eBar **bar)
 int add_file_eBar(eBar *bar, eFile *file)
 {
 	if(bar == NULL || file == NULL)
-		return -1;
-
-	/* Try to open the file */
-	if(open_eFile(file) == -1)
 		return -1;
 
 	/* If the list isn't large enough */
@@ -140,4 +137,26 @@ eFile *get_file_eBar(eBar *bar, unsigned int index)
 unsigned int count_eBar(eBar *bar)
 {
 	return bar->n_files;
+}
+
+
+/**
+ * @brief The is_file_in_bar() function return true if the file is in the bar.
+ *
+ * @param bar: eBar pointer
+ * @param file: eFile pointer
+ *
+ * @return true if the file is in the bar, false otherwise.
+ */
+bool is_file_in_eBar(eBar *bar, eFile *file)
+{
+	if(bar == NULL ||file == NULL)
+		return false;
+
+	for(unsigned int i; i<bar->n_files; i++)
+	{
+		if(!strcmp(bar->files[i]->filename, file->filename))
+			return true;
+	}
+	return false;
 }

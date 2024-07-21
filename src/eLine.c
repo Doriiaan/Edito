@@ -3,8 +3,8 @@
  * @file eLine.c
  * @brief Contain eLine structure and functions
  * @author ALARY Dorian
- * @version 0.1
- * @date 23/06/2024
+ * @version 1.0
+ * @date 21/07/2024
  * @copyright GNU Public License.
  *
  * @details This file contains all the structures, variables and functions used to manage lines. 

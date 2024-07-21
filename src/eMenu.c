@@ -3,8 +3,8 @@
  * @file eMenu.c
  * @brief eMenu is a View part of the MVC design
  * @author ALARY Dorian
- * @version 0.1
- * @date 27/06/2024
+ * @version 1.0
+ * @date 21/07/2024
  * @copyright GNU Public License.
  *
  * @details This file contain every functions and variable relative to the eMenu structure. 
@@ -196,11 +196,11 @@ void refresh_eMenu(eMenu *menu)
 
 
 /**
- * @brief The next_item_eMenu() move the cursor to the next item.
+ * @brief The move_next_item_eMenu() move the cursor to the next item.
  *
  * @param menu: eMenu pointer pointer
  */
-void next_item_eMenu(eMenu *menu)
+void move_next_item_eMenu(eMenu *menu)
 {
 	int max_height = 0;
 	int max_width = 0;
@@ -214,7 +214,7 @@ void next_item_eMenu(eMenu *menu)
 	(void)cur_width;
 
 	/* calculates the number of scrolls */
-	if(max_height-1 == cur_height && get_current_item_index_eMenu(menu) != item_count(menu->menu)-1)
+	if(!menu->columnar && max_height-1 == cur_height && get_current_item_index_eMenu(menu) != item_count(menu->menu)-1)
 	{
 		menu->n_scroll++;
 	}
@@ -224,11 +224,11 @@ void next_item_eMenu(eMenu *menu)
 
 
 /**
- * @brief The previous_item_eMenu() move the cursor to the previous item.
+ * @brief The move_previous_item_eMenu() move the cursor to the previous item.
  *
  * @param menu: eMenu pointer pointer
  */
-void previous_item_eMenu(eMenu *menu)
+void move_previous_item_eMenu(eMenu *menu)
 {
 	int cur_height = 0;
 	int cur_width = 0;
@@ -237,7 +237,7 @@ void previous_item_eMenu(eMenu *menu)
 	(void)cur_width;
 
 	/* calculates the number of scrolls */
-	if(cur_height == 0 && get_current_item_index_eMenu(menu) != 0)
+	if(!menu->columnar && cur_height == 0 && get_current_item_index_eMenu(menu) != 0)
 	{
 		menu->n_scroll--;
 	}
@@ -246,13 +246,26 @@ void previous_item_eMenu(eMenu *menu)
 }
 
 
-/** @brief The current_item_eMenu(eMenu *menu) move the cursor to the current item. Useful, if the cursor has been moved by addch, ...
+/** 
+ * @brief The move_current_item_eMenu(eMenu *menu) move the cursor to the current item. 
  *
  * @param menu: eMenu pointer pointer
  */
-void current_item_eMenu(eMenu *menu)
+void move_current_item_eMenu(eMenu *menu)
 {
 	pos_menu_cursor(menu->menu);
+}
+
+
+/**
+ * @brief The move_pattern_item_eMenu() function move the cursor to the next item with pattern matching.
+ *
+ * @param menu: eMenu pointer pointer
+ * @param pattern: pattern to match 
+ */
+void move_pattern_item_eMenu(eMenu *menu, const char *pattern)
+{
+	set_menu_pattern(menu->menu, pattern);
 }
 
 

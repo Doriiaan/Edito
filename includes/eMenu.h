@@ -2,8 +2,8 @@
  * @file 		eMenu.h
  * @brief 		eMenu Header
  * @author 		ALARY Dorian
- * @version 	0.1
- * @date 		23/06/2024
+ * @version 1.0
+ * @date 21/07/2024
  * @copyright 	GNU Public License.
  *
  */
@@ -133,26 +133,36 @@ void refresh_eMenu(eMenu *menu);
 
 
 /**
- * @brief The next_item_eMenu() move the cursor to the next item.
+ * @brief The move_next_item_eMenu() move the cursor to the next item.
  *
  * @param menu: eMenu pointer pointer
  */
-void next_item_eMenu(eMenu *menu);
+void move_next_item_eMenu(eMenu *menu);
 
 
 /**
- * @brief The previous_item_eMenu() move the cursor to the previous item.
+ * @brief The move_previous_item_eMenu() move the cursor to the previous item.
  *
  * @param menu: eMenu pointer pointer
  */
-void previous_item_eMenu(eMenu *menu);
+void move_previous_item_eMenu(eMenu *menu);
 
 
-/** @brief The current_item_eMenu(eMenu *menu) move the cursor to the current item. Useful, if the cursor has been moved by addch, ...
+/** 
+ * @brief The move_current_item_eMenu(eMenu *menu) move the cursor to the current item.
  *
  * @param menu: eMenu pointer pointer
  */
-void current_item_eMenu(eMenu *menu);
+void move_current_item_eMenu(eMenu *menu);
+
+
+/**
+ * @brief The move_pattern_item_eMenu() function move the cursor to the next item with pattern matching.
+ *
+ * @param menu: eMenu pointer pointer
+ * @param pattern: pattern to match 
+ */
+void move_pattern_item_eMenu(eMenu *menu, const char *pattern);
 
 
 /**

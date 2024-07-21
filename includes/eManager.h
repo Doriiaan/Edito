@@ -2,8 +2,8 @@
  * @file 		eManager.h
  * @brief 		eManager Header
  * @author 		ALARY Dorian
- * @version 	0.1
- * @date 		23/06/2024
+ * @version 1.0
+ * @date 21/07/2024
  * @copyright 	GNU Public License.
  *
  */
@@ -16,6 +16,7 @@
 #include "eBar.h"
 #include "eDirectory.h"
 
+#define HELP_LENGTH 200
 
 /**
  * @enum Program mode enumeration
@@ -45,8 +46,14 @@ typedef struct {
 	/* Directory */
 	eDirectory *directory;
 
-	/* Editor mode */
+	/* Current mode */
 	MODE mode;
+	
+	/* Last mode */
+	MODE lastmode;
+
+	/* Help message */
+	char help_msg[HELP_LENGTH];
 
 } eManager;
 
@@ -152,4 +159,5 @@ unsigned int gety_cursor_eManager(eManager *manager);
  */
 int fill_directory_menu_eManager(eManager *manager, eDirectory *directory, unsigned int level);
 
+void print_help_message_eManager(eManager *manager);
 #endif

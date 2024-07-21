@@ -3,8 +3,8 @@
  * @file eManager.c
  * @brief Manager is the Controller of the MVC design
  * @author ALARY Dorian
- * @version 0.1
- * @date 27/06/2024
+ * @version 1.0
+ * @date 21/07/2024
  * @copyright GNU Public License.
  *
  * @details This file contain every functions and variable relative to the eManager structure. 
@@ -20,16 +20,17 @@
 #include <string.h>
 #include <ctype.h>
 
+#define CTRL(x) (x & 0x1F)
 
 /* Internal functions */
 static bool process_input_eManager(eManager *manager, int input);
 
 static bool process_DEFAULT_eManager(eManager *manager, int input);
-static bool process_q_eManager(eManager *manager);
-static bool process_w_eManager(eManager *manager);
-static bool process_i_eManager(eManager *manager);
-static bool process_d_eManager(eManager *manager);
-static bool process_b_eManager(eManager *manager);
+static bool process_ctrlq_eManager(eManager *manager);
+static bool process_ctrls_eManager(eManager *manager);
+static bool process_ctrlf_eManager(eManager *manager);
+static bool process_ctrld_eManager(eManager *manager);
+static bool process_ctrlb_eManager(eManager *manager);
 static bool process_ENTER_eManager(eManager *manager);
 static bool process_ESCAPE_eManager(eManager *manager);
 static bool process_BACKSPACE_eManager(eManager *manager);
@@ -39,7 +40,9 @@ static bool process_KEY_LEFT_eManager(eManager *manager);
 static bool process_KEY_DOWN_eManager(eManager *manager);
 static bool process_KEY_UP_eManager(eManager *manager);
 
-unsigned int screen_width_of_string(const char *s, size_t length);
+static void change_mode_eManager(eManager *manager, MODE mode);
+static unsigned int screen_width_of_string(const char *s, size_t length);
+static void add_help_message_eManager(eManager *manager, const char *message);
 
 
 /**
@@ -59,11 +62,13 @@ eManager *create_eManager()
 		return NULL;
 	}
 
+	manager->lastmode = DIR;
 	manager->mode = DIR;	
 	manager->screen = NULL;
 	manager->file = NULL;
 	manager->directory = NULL;
 	manager->bar = NULL;
+	manager->help_msg[0] = 0;
 
 	return manager;
 }
@@ -129,17 +134,10 @@ void set_eDirectory_eManager(eManager *manager, eDirectory *directory)
  * @param file: eFile pointer
  *
  * return 0 on success, -1 in failure 
- * @note This function also print the content of the file in the screen.
  */
 int set_eFile_eManager(eManager *manager, eFile *file)
 {
-	// TODO: in the future, do not open in this function but in open_file_eBar
-	if(open_eFile(file) == -1)
-		return -1;
-
 	manager->file = file;
-	create_file_window_eScreen(manager->screen, digit_number(file->n_elines));
-	print_content_eScreen(manager->screen, file->first_screen_line);
 	
 	return 0;
 }
@@ -158,7 +156,12 @@ bool run_eManager(eManager *manager)
 	bool result = false;
 
 	curs_set(1);
-	input = get_input_eScreen(manager->screen);
+	if(manager->mode == WRITE)
+		input = get_input_eScreen(manager->screen, WFILE_BOX);
+	else if(manager->mode == DIR)
+		input = get_input_eScreen(manager->screen, WDIR_BOX);
+	else if(manager->mode == BAR)
+		input = get_input_eScreen(manager->screen, WBAR_BOX);
 	curs_set(0);
 
 	result =  process_input_eManager(manager, input);
@@ -166,19 +169,24 @@ bool run_eManager(eManager *manager)
 	if(result == false)
 		return false;
 
+	print_help_message_eManager(manager);
+	update_help_eScreen(manager->screen);
+
 	if(manager->mode == WRITE)
 	{
 		resize_file_eScreen(manager->screen, digit_number(manager->file->n_elines));
 		print_content_eScreen(manager->screen, manager->file->first_screen_line);
-		move_cursor_eScreen(manager->screen, gety_cursor_eManager(manager), getx_cursor_eManager(manager));
+		move_cursor_eScreen(manager->screen, gety_cursor_eManager(manager), getx_cursor_eManager(manager), WFILE_CNT);
 		update_file_eScreen(manager->screen);
 	}
 	else if(manager->mode == BAR)
 	{
+		move_current_item_menu_eScreen(manager->screen, MBAR);
 		update_bar_eScreen(manager->screen);
 	}
 	else if(manager->mode == DIR)
 	{
+		move_current_item_menu_eScreen(manager->screen, MDIR);
 		update_directory_eScreen(manager->screen);
 	}
 
@@ -198,24 +206,25 @@ bool process_input_eManager(eManager *manager, int input)
 {
 	switch(input)
 	{
-		case 'q':
-			return process_q_eManager(manager);
+		/* exit */
+		case CTRL('q'):
+			return process_ctrlq_eManager(manager);
+
+		/* Enter file */
+		case CTRL('f'):
+			return process_ctrlf_eManager(manager);
+
+		/* Enter bar */
+		case CTRL('b'):
+			return process_ctrlb_eManager(manager);
+
+		/* Enter directory */
+		case CTRL('d'):
+			return process_ctrld_eManager(manager);
 
 
-		case 'i':
-			return process_i_eManager(manager);
-
-
-		case 'b':
-			return process_b_eManager(manager);
-
-
-		case 'd':
-			return process_d_eManager(manager);
-
-
-		case 'w':
-			return process_w_eManager(manager);
+		case CTRL('s'):
+			return process_ctrls_eManager(manager);
 
 
 		/* ENTER */
@@ -280,119 +289,91 @@ bool process_DEFAULT_eManager(eManager *manager, int input)
 }
 
 /*
- * @brief the process_q_input_eManager() function process a 'q' input. 
+ * @brief the process_ctrlq_input_eManager() function process a CTRLE input. 
  *
  * @param manager: eManager pointer
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool process_q_eManager(eManager *manager)
+bool process_ctrlq_eManager(eManager *manager)
 {
-	if(manager->mode == DIR || manager->mode == BAR)
-		return false;
-
-	else if(manager->mode == WRITE)
-		process_DEFAULT_eManager(manager, 'q');
-
-	return true;
+	(void)manager;
+	return false;
 }
 
 
 /*
- * @brief the process_w_input_eManager() function process a 'w' input. 
+ * @brief the process_ctrls_input_eManager() function process a CTRLS input. 
  *
  * @param manager: eManager pointer
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool process_w_eManager(eManager *manager)
+bool process_ctrls_eManager(eManager *manager)
 {
-	if(manager->mode == DIR || manager->mode == BAR)
+	if(manager->file != NULL && manager->mode == WRITE)
 	{
-		if(manager->file != NULL)
+		if(manager->file->permissions != p_READWRITE)
 		{
-			if(manager->file->permissions != p_READWRITE)
-			{
-				/* TODO: WPOPUP */
-			}
-
-			if(write_eFile(manager->file) == -1)
-			{
-				/* tmp file */
-			}
+			add_help_message_eManager(manager, "Readonly file.");
 		}
-	}
-	else if(manager->mode == WRITE)
-		process_DEFAULT_eManager(manager, 'w');
-
-	return true;
-}
-
-
-/*
- * @brief the process_d_input_eManager() function process a 'd' input. 
- *
- * @param manager: eManager pointer
- *
- * @return returns true if the program continues and false otherwise.
- */
-bool process_d_eManager(eManager *manager)
-{
-	if(manager->mode == BAR)
-	{
-		manager->mode = DIR;
-		set_current_window_eScreen(manager->screen, WDIR_BOX);
-		set_current_menu_eScreen(manager->screen, MDIR);
-	}
-	else if(manager->mode == WRITE)
-		process_DEFAULT_eManager(manager, 'r');
-
-	return true;
-}
-
-
-/*
- * @brief the process_b_input_eManager() function process a 'b' input. 
- *
- * @param manager: eManager pointer
- *
- * @return returns true if the program continues and false otherwise.
- */
-bool process_b_eManager(eManager *manager)
-{
-	if(manager->mode == DIR && count_eBar(manager->bar) != 0)
-	{
-		manager->mode = BAR;
-		set_current_window_eScreen(manager->screen, WBAR_BOX);
-		set_current_menu_eScreen(manager->screen, MBAR);
-	}
-	else if(manager->mode == WRITE)
-		process_DEFAULT_eManager(manager, 'b');
-
-	return true;
-}
-
-
-/*
- * @brief the process_i_input_eManager() function process a 'i' input. 
- *
- * @param manager: eManager pointer
- *
- * @return returns true if the program continues and false otherwise.
- */
-bool process_i_eManager(eManager *manager)
-{
-	if(manager->mode == DIR || manager->mode == BAR)
-	{
-		if(manager->file != NULL)
+		else if(write_eFile(manager->file) == -1)
 		{
-			manager->mode = WRITE;
-			set_current_window_eScreen(manager->screen, WFILE_CNT);
+			/* tmp file */
 		}
+		add_help_message_eManager(manager, "File saved.");
 	}
-	
-	else if(manager->mode == WRITE)
-		process_DEFAULT_eManager(manager, 'i');
+
+	return true;
+}
+
+
+/*
+ * @brief the process_ctrld_input_eManager() function process a CTRLD input. 
+ *
+ * @param manager: eManager pointer
+ *
+ * @return returns true if the program continues and false otherwise.
+ */
+bool process_ctrld_eManager(eManager *manager)
+{
+	change_mode_eManager(manager, DIR);
+
+	return true;
+}
+
+
+/*
+ * @brief the process_ctrlb_input_eManager() function process a CTRLB input. 
+ *
+ * @param manager: eManager pointer
+ *
+ * @return returns true if the program continues and false otherwise.
+ */
+bool process_ctrlb_eManager(eManager *manager)
+{
+	if(count_eBar(manager->bar) != 0)
+		change_mode_eManager(manager, BAR);
+	else
+		add_help_message_eManager(manager, "No files open.");
+
+	return true;
+}
+
+
+/*
+ * @brief the process_ctrlf_input_eManager() function process a CTRLF input. 
+ *
+ * @param manager: eManager pointer
+ *
+ * @return returns true if the program continues and false otherwise.
+ */
+bool process_ctrlf_eManager(eManager *manager)
+{
+	if(manager->file != NULL)
+		change_mode_eManager(manager, WRITE);
+	else
+		add_help_message_eManager(manager, "No files open.");
 
 	return true;
 }
@@ -408,13 +389,7 @@ bool process_i_eManager(eManager *manager)
 
 bool process_ESCAPE_eManager(eManager *manager)
 {
-	if(manager->mode == WRITE)
-	{
-		manager->mode = DIR;
-		set_current_window_eScreen(manager->screen, WDIR_BOX);
-		set_current_menu_eScreen(manager->screen, MDIR);
-		current_item_menu_eScreen(manager->screen);
-	}
+	change_mode_eManager(manager, manager->lastmode);
 
 	return true;
 }
@@ -473,12 +448,69 @@ bool process_ENTER_eManager(eManager *manager)
 		}
 		else if(file != NULL)
 		{
+			/* If file isn't in the bar */
+			if(!is_file_in_eBar(manager->bar, file))
+			{	
+				/* Try to open the file */
+				if(open_eFile(file) == -1)
+				{
+					add_help_message_eManager(manager, "Impossible to open file.");
+					return true;
+				}
+				if(file->permissions == p_READONLY)
+					add_help_message_eManager(manager, "Readonly file.");
+				
 
+				/* Add file to eBar or quit, adding file to eBar */
+				if(add_file_eBar(manager->bar, file) == -1)
+					return true;
+
+				/* Add filename to the bar menu */
+				buffer_length = strlen(file->filename)+1;
+				buffer = (char *) malloc(buffer_length*sizeof(char));
+				memset(buffer, 0, buffer_length);
+				strcpy(buffer, file->filename);
+
+				/* Add item to the menu, and refresh the window */
+				add_item_menu_eScreen(manager->screen, MBAR, buffer);
+				refresh_menu_eScreen(manager->screen, MBAR);
+
+				/* Deplace cursor to the file in the menu bar */
+				move_pattern_item_menu_eScreen(manager->screen, MBAR, file->filename);
+				update_bar_eScreen(manager->screen);
+
+				/* Create or resize file Window for the file (resize for lines number) */
+				if(manager->screen->windows[WFILE_CNT] == NULL)
+					create_file_window_eScreen(manager->screen, file->n_elines);
+				else
+					resize_file_eScreen(manager->screen, file->n_elines);
+
+				/* Enter write mode */
+				set_eFile_eManager(manager, file);
+				change_mode_eManager(manager, WRITE);
+			}
+			/* The file is in the bar */
+			else
+			{
+				/* Deplace cursor to the file in the menu bar */
+				move_pattern_item_menu_eScreen(manager->screen, MBAR, file->filename);
+				update_bar_eScreen(manager->screen);
+				resize_file_eScreen(manager->screen, file->n_elines);
+				
+				/* Enter write mode */
+				set_eFile_eManager(manager, file);
+				change_mode_eManager(manager, WRITE);
+			}
 		}
-		else
-		{
-			//ERROR
-		}
+	}
+	else if(manager->mode == BAR)
+	{
+		item_index = get_current_item_index_menu_eScreen(manager->screen, MBAR);
+		file = get_file_eBar(manager->bar, item_index);
+
+		/* Enter write mode */
+		set_eFile_eManager(manager, file);
+		change_mode_eManager(manager, WRITE);
 	}
 
 	return true;
@@ -587,10 +619,11 @@ bool process_KEY_RIGHT_eManager(eManager *manager)
 			process_KEY_DOWN_eManager(manager);
 		}
 	}
-	else
-	{
-		next_item_menu_eScreen(manager->screen);
-	}
+	/* Do not look good, but its ok */
+	else if(manager->mode == DIR)
+		move_next_item_menu_eScreen(manager->screen, MDIR);
+	else if(manager->mode == BAR)
+		move_next_item_menu_eScreen(manager->screen, MBAR);
 
 	return true;
 }
@@ -618,10 +651,11 @@ bool process_KEY_LEFT_eManager(eManager *manager)
 			process_KEY_UP_eManager(manager);
 		}
 	}
-	else
-	{
-		previous_item_menu_eScreen(manager->screen);
-	}
+	else if(manager->mode == DIR)
+		move_previous_item_menu_eScreen(manager->screen, MDIR);
+	else if(manager->mode == BAR)
+		move_previous_item_menu_eScreen(manager->screen, MBAR);
+
 	return true;
 }
 
@@ -651,10 +685,10 @@ bool process_KEY_DOWN_eManager(eManager *manager)
 				manager->file->first_screen_line = manager->file->first_screen_line->next;
 		}
 	}
-	else
-	{
-		next_item_menu_eScreen(manager->screen);
-	}
+	else if(manager->mode == DIR)
+		move_next_item_menu_eScreen(manager->screen, MDIR);
+	else if(manager->mode == BAR)
+		move_next_item_menu_eScreen(manager->screen, MBAR);
 	return true;
 }
 
@@ -683,10 +717,10 @@ bool process_KEY_UP_eManager(eManager *manager)
 			manager->file->current_line = manager->file->current_line->previous;
 		}
 	}
-	else
-	{
-		previous_item_menu_eScreen(manager->screen);
-	}
+	else if(manager->mode == DIR)
+		move_previous_item_menu_eScreen(manager->screen, MDIR);
+	else if(manager->mode == BAR)
+		move_previous_item_menu_eScreen(manager->screen, MBAR);
 
 	return true;
 }
@@ -763,8 +797,9 @@ unsigned int screen_width_of_string(const char *s, size_t length)
 	{
 		if(s[i] == '\t')
 			width += TABSIZE - width%TABSIZE;
+
 		else
-			width += 1;
+			width++; 
 		i++;
 	}
 	return width;
@@ -842,4 +877,55 @@ int fill_directory_menu_eManager(eManager *manager, eDirectory *directory, unsig
 	}	
 	free(item);
 	return 0;
+}
+
+
+/**
+ * @brief The change_mode_eManager() function change the mode of the manager and save current mode in last mode.
+ *
+ * @param manager: eManager pointer
+ * @param mode: eManager mode
+ */
+void change_mode_eManager(eManager *manager, MODE mode)
+{
+	manager->lastmode = manager->mode;
+	manager->mode = mode;
+}
+
+
+static void add_help_message_eManager(eManager *manager, const char *message)
+{
+	/* If manager is NULL or if the manager already has a help message */
+	if(manager == NULL || manager->help_msg[0] != 0)
+		return;
+
+	strncpy(manager->help_msg, message, HELP_LENGTH);
+}
+
+void print_help_message_eManager(eManager *manager)
+{
+	char msg[HELP_LENGTH] = {0};
+
+	if(manager == NULL)
+		return;
+
+	if(manager->help_msg[0] == 0)
+	{
+		if(manager->mode == DIR)
+			strncpy(msg, "Ctrl+Q: Quit    Ctrl+B: Bar    Ctrl+F: File    ^ / v : UP / DOWN    Enter: Open file", HELP_LENGTH);
+
+		else if(manager->mode == BAR)
+			strncpy(msg, "Ctrl+Q: Quit    Ctrl+D: Directory    Ctrl+F: File    <- / -> : Left / Right    Enter: Open file", HELP_LENGTH);
+
+		else if(manager->mode == WRITE)
+			strncpy(msg, "Ctrl+Q: Quit    Ctrl+D: Directory    Ctrl+B: BAR    Ctrl+S: Save file", HELP_LENGTH);
+		
+		if(msg[0] != 0)
+			print_help_eScreen(manager->screen, msg);
+	}
+	else
+	{
+		print_help_eScreen(manager->screen, manager->help_msg);
+		memset(manager->help_msg, 0, HELP_LENGTH);
+	}
 }

@@ -2,8 +2,8 @@
  * @file 		eScreen.h
  * @brief 		eScreen Header
  * @author 		ALARY Dorian
- * @version 	0.1
- * @date 		23/06/2024
+ * @version 1.0
+ * @date 21/07/2024
  * @copyright 	GNU Public License.
  *
  */
@@ -27,14 +27,8 @@ typedef struct {
 	/** Array of every window */
 	eWindow *windows[WINDOWS_NUMBER]; 
 	
-	/** Current window */
-	eWindow *current_window;
-
 	/** Array of every menu */
 	eMenu *menus[MENU_NUMBER];
-
-	/** Current menu */
-	eMenu *current_menu;
 
 } eScreen;
 
@@ -50,6 +44,14 @@ typedef struct {
  * @note delete_eScreen() must be called before exiting.
  */
 eScreen * create_eScreen(int n_lines, int n_cols);
+
+
+/**
+ * @brief The update_repository_eScreen() function refresh the menu window.
+ *
+ * @param screen: eScreen pointer
+ */
+void update_help_eScreen(eScreen *screen);
 
 
 /**
@@ -129,22 +131,14 @@ void print_content_eScreen(eScreen *screen, eLine *first_line);
 
 
 /**
- * @brief The set_current_eScreen() function set the current window and cursor of the screen.
- *
- * @param screen: eScreen pointer
- * @param type: Window type
- */
-void set_current_window_eScreen(eScreen *screen, WINDOW_TYPE type);
-
-
-/**
- * @brief the move_cursor_eScreen() function move the cursor of the current_window.
+ * @brief the move_cursor_eScreen() function move the cursor on the window designed by type.
  *
  * @param screen: eScreen pointer
  * @param y: y position
  * @param x: x position
+ * @param type: Window type
  */
-void move_cursor_eScreen(eScreen *screen, unsigned int y, unsigned int x);
+void move_cursor_eScreen(eScreen *screen, unsigned int y, unsigned int x, WINDOW_TYPE type);
 
 
 /**
@@ -165,29 +159,31 @@ unsigned int get_width_eScreen(eScreen *screen, WINDOW_TYPE type);
 unsigned int get_height_eScreen(eScreen *screen, WINDOW_TYPE type);
 
 
-/**
+ /**
  * @brief The get_input_eScreen() function request an input to the user.
  *
  * @param screen: eScreen pointer
+ * @param type: Window type
  *
  * @return User input
  */
-int get_input_eScreen(eScreen *screen);
+int get_input_eScreen(eScreen *screen, WINDOW_TYPE type);
+
+
+/**
+ * @brief The print_help() function print the string to display in the Help window.
+ *
+ * @param screen: eScreen pointer
+ * @param string: string to display
+ *
+ * @note Ncurses refresh must be called.
+ */
+void print_help_eScreen(eScreen *screen, const char *string);
 
 
 /* ==========================================================
  * eMenu functions
  * ========================================================== */
-
-
-/**
- * @brief The set_current_eScreen() function set the current window and cursor of the screen.
- *
- * @param screen: eScreen pointer
- * @param type: Menu type
- */
-void set_current_menu_eScreen(eScreen *screen, MENU_TYPE type);
-
 
 /**
  * @brief The add_item_menu_eScreen() function add an item to the menu designed by type.
@@ -220,27 +216,40 @@ void refresh_menu_eScreen(eScreen *screen, MENU_TYPE type);
 
 
 /**
- * @brief The next_item_menu_eScreen() function do a next action on the current menu.
+ * @brief The move_next_item_menu_eScreen() function do a next action on the menu designed by type.
  *
  * @param screen: eScreen pointer
+ * @param type: Menu type
  */
-void next_item_menu_eScreen(eScreen *screen);
+void move_next_item_menu_eScreen(eScreen *screen, MENU_TYPE type);
 
 
 /**
- * @brief The previous_item_menu_eScreen() function do a previous action on the current menu.
+ * @brief The move_previous_item_menu_eScreen() function do a previous action on the menu designed by type.
  *
  * @param screen: eScreen pointer
+ * @param type: Menu type
  */
-void previous_item_menu_eScreen(eScreen *screen);
+void move_previous_item_menu_eScreen(eScreen *screen, MENU_TYPE type);
 
 
 /**
- * @brief The current_item_menu_eScreen() function set the cursor on the current item of the current menu.
+ * @brief The move_current_item_menu_eScreen() function move the cursor on the current item of menu designed by type.
  *
  * @param screen: eScreen pointer
+ * @param type: Menu type
  */
-void current_item_menu_eScreen(eScreen *screen);
+void move_current_item_menu_eScreen(eScreen *screen, MENU_TYPE type);
+
+
+/**
+ * @brief The move_pattern_item_menu_eScreen() function move the cursor to the next match on the menu designed by type.
+ *
+ * @param screen: eScreen pointer
+ * @param type: Menu type
+ * @param pattern: pattern to match
+ */
+void move_pattern_item_menu_eScreen(eScreen *screen, MENU_TYPE type, const char *pattern);
 
 
 /**

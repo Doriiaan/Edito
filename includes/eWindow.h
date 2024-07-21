@@ -2,8 +2,8 @@
  * @file 		eWindow.h
  * @brief 		eWindow Header
  * @author 		ALARY Dorian
- * @version 	0.1
- * @date 		23/06/2024
+ * @version 1.0
+ * @date 21/07/2024
  * @copyright 	GNU Public License.
  *
  */
@@ -11,7 +11,7 @@
 #ifndef __EWINDOW_H__
 #define __EWINDOW_H__
 
-#define WINDOWS_NUMBER 7
+#define WINDOWS_NUMBER 8
 
 #include <ncurses.h>
 
@@ -26,7 +26,8 @@ typedef enum {
 	WBAR_ITEMS,
 	WFILE_BOX,
 	WFILE_LNUM,
-	WFILE_CNT
+	WFILE_CNT,
+	WHELP
 
 } WINDOW_TYPE;
 

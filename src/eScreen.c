@@ -3,8 +3,8 @@
  * @file eScreen.c
  * @brief Contain eScreen structure and functions
  * @author ALARY Dorian
- * @version 0.1
- * @date 27/06/2024
+ * @version 1.0
+ * @date 21/07/2024
  * @copyright GNU Public License.
  *
  * @details This file contains all the structures, variables and functions used to manage the screen and its windows. 
@@ -38,6 +38,7 @@ eScreen *create_eScreen(int lines, int columns)
 	int width_repository = 0, height_repository = 0;
 	int width_bar = 0, height_bar = 0;
 	int width_file_box = 0, height_file_box = 0;
+	int width_help = 0, height_help = 0;
 	
 	screen = (eScreen *) malloc(sizeof(eScreen));
 	if(screen == NULL)
@@ -50,8 +51,11 @@ eScreen *create_eScreen(int lines, int columns)
 	screen->height = lines;
 	
 	/* Set WINDOWs dimension */
+	width_help = columns;
+	height_help = 3;
+
 	width_repository = columns/5;
-	height_repository = lines;
+	height_repository = lines - height_help;
 
 	width_bar = columns - width_repository;
 	height_bar = lines/10;
@@ -61,8 +65,7 @@ eScreen *create_eScreen(int lines, int columns)
 		height_bar = 3;
 
 	width_file_box = width_bar;
-	height_file_box = lines - height_bar;
-
+	height_file_box = lines - height_bar - height_help;
 
 	/* Create WINDOWs */
 	screen->windows[WDIR_BOX] = create_eWindow(height_repository, width_repository, 0, 0);
@@ -79,13 +82,11 @@ eScreen *create_eScreen(int lines, int columns)
 
 	screen->windows[WFILE_CNT] = NULL;
 
-	screen->current_window = screen->windows[WDIR_BOX];
+	screen->windows[WHELP] = create_eWindow(height_help, width_help, height_file_box + height_bar, 0);
 
 	/* Create MENUs */
 	screen->menus[MBAR] = create_eMenu(screen->windows[WBAR_BOX]->window, screen->windows[WBAR_ITEMS]->window, 1);
 	screen->menus[MDIR] = create_eMenu(screen->windows[WDIR_BOX]->window, screen->windows[WDIR_ITEMS]->window, 0);
-
-	screen->current_menu = screen->menus[MDIR];
 
 	return screen;
 }
@@ -123,10 +124,21 @@ void delete_eScreen(eScreen **screen)
  *
  * @param screen: eScreen pointer
  */
+void update_help_eScreen(eScreen *screen)
+{
+	wrefresh(screen->windows[WHELP]->window);
+}
+
+/**
+ * @brief The update_repository_eScreen() function refresh the menu window.
+ *
+ * @param screen: eScreen pointer
+ */
 void update_directory_eScreen(eScreen *screen)
 {
 	box(screen->windows[WDIR_BOX]->window, 0, 0);
 	wrefresh(screen->windows[WDIR_BOX]->window);
+	wrefresh(screen->windows[WDIR_ITEMS]->window);
 }
 
 
@@ -139,6 +151,7 @@ void update_bar_eScreen(eScreen *screen)
 {
 	box(screen->windows[WBAR_BOX]->window, 0, 0);
 	wrefresh(screen->windows[WBAR_BOX]->window);
+	wrefresh(screen->windows[WBAR_ITEMS]->window);
 }
 
 
@@ -165,10 +178,9 @@ void update_all_eScreen(eScreen *screen)
 	box(screen->windows[WDIR_BOX]->window, 0, 0);
 	box(screen->windows[WBAR_BOX]->window, 0, 0);
 	box(screen->windows[WFILE_BOX]->window, 0, 0);
-
 	for(int i=0 ; i<WINDOWS_NUMBER ; i++)
 	{
-		if(screen->windows[i])
+		if(screen->windows[i] != NULL)
 			wnoutrefresh(screen->windows[i]->window);
 	}
 	
@@ -292,27 +304,16 @@ void print_content_eScreen(eScreen *screen, eLine *first_line)
 
 
 /**
- * @brief The set_current_eScreen() function set the current window and cursor of the screen.
- *
- * @param screen: eScreen pointer
- * @param type: Window type
- */
-void set_current_window_eScreen(eScreen *screen, WINDOW_TYPE type)
-{
-	screen->current_window = screen->windows[type];
-}
-
-
-/**
- * @brief the move_cursor_eScreen() function move the cursor of the current_window.
+ * @brief the move_cursor_eScreen() function move the cursor on the window designed by type.
  *
  * @param screen: eScreen pointer
  * @param y: y position
  * @param x: x position
+ * @param type: Window type
  */
-void move_cursor_eScreen(eScreen *screen, unsigned int y, unsigned int x)
+void move_cursor_eScreen(eScreen *screen, unsigned int y, unsigned int x, WINDOW_TYPE type)
 {
-	wmove(screen->current_window->window, y, x);
+	wmove(screen->windows[type]->window, y, x);
 }
 
 
@@ -344,30 +345,33 @@ unsigned int get_height_eScreen(eScreen *screen, WINDOW_TYPE type)
  * @brief The get_input_eScreen() function request an input to the user.
  *
  * @param screen: eScreen pointer
+ * @param type: Window type
  *
  * @return User input
  */
-int get_input_eScreen(eScreen *screen)
+int get_input_eScreen(eScreen *screen, WINDOW_TYPE type)
 {
-	return wgetch(screen->current_window->window);
+	return wgetch(screen->windows[type]->window);
+}
+
+/**
+ * @brief The print_help() function print the string to display in the Help window.
+ *
+ * @param screen: eScreen pointer
+ * @param string: string to display
+ *
+ * @note Ncurses refresh must be called.
+ */
+void print_help_eScreen(eScreen *screen, const char *string)
+{
+	werase(screen->windows[WHELP]->window);
+	mvwaddstr(screen->windows[WHELP]->window , 1, 1, string);
 }
 
 
 /* ==========================================================
  * eMenu functions
  * ========================================================== */
-
-/**
- * @brief The set_current_eScreen() function set the current window and cursor of the screen.
- *
- * @param screen: eScreen pointer
- * @param type: Menu type
- */
-void set_current_menu_eScreen(eScreen *screen, MENU_TYPE type)
-{
-	screen->current_menu = screen->menus[type];
-}
-
 
 /**
  * @brief The add_item_menu_eScreen() function add an item to the menu designed by type.
@@ -409,35 +413,51 @@ void refresh_menu_eScreen(eScreen *screen, MENU_TYPE type)
 
 
 /**
- * @brief The next_item_menu_eScreen() function do a next action on the current menu.
+ * @brief The move_next_item_menu_eScreen() function do a next action on the menu designed by type.
  *
  * @param screen: eScreen pointer
+ * @param type: Menu type
  */
-void next_item_menu_eScreen(eScreen *screen)
+void move_next_item_menu_eScreen(eScreen *screen, MENU_TYPE type)
 {
-	next_item_eMenu(screen->current_menu);
+	move_next_item_eMenu(screen->menus[type]);
 }
 
 
 /**
- * @brief The previous_item_menu_eScreen() function do a previous action on the current menu.
+ * @brief The move_previous_item_menu_eScreen() function do a previous action on the menu designed by type.
  *
  * @param screen: eScreen pointer
+ * @param type: Menu type
  */
-void previous_item_menu_eScreen(eScreen *screen)
+void move_previous_item_menu_eScreen(eScreen *screen, MENU_TYPE type)
 {
-	previous_item_eMenu(screen->current_menu);
+	move_previous_item_eMenu(screen->menus[type]);
 }
 
 
 /**
- * @brief The current_item_menu_eScreen() function set the cursor on the current item of the current menu.
+ * @brief The move_current_item_menu_eScreen() function move the cursor on the current item of menu designed by type.
  *
  * @param screen: eScreen pointer
+ * @param type: Menu type
  */
-void current_item_menu_eScreen(eScreen *screen)
+void move_current_item_menu_eScreen(eScreen *screen, MENU_TYPE type)
 {
-	current_item_eMenu(screen->current_menu);
+	move_current_item_eMenu(screen->menus[type]);
+}
+
+
+/**
+ * @brief The move_pattern_item_menu_eScreen() function move the cursor to the next match on the menu designed by type.
+ *
+ * @param screen: eScreen pointer
+ * @param type: Menu type
+ * @param pattern: pattern to match
+ */
+void move_pattern_item_menu_eScreen(eScreen *screen, MENU_TYPE type, const char *pattern)
+{
+	move_pattern_item_eMenu(screen->menus[type], pattern);
 }
 
 

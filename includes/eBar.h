@@ -2,8 +2,8 @@
  * @file 		eBar.h
  * @brief 		eBar Header
  * @author 		ALARY Dorian
- * @version 	0.1
- * @date 		23/06/2024
+ * @version 1.0
+ * @date 21/07/2024
  * @copyright 	GNU Public License.
  *
  */
@@ -91,5 +91,16 @@ eFile *get_file_eBar(eBar *bar, unsigned int index);
  * @return number of eFile stored in eBar.
  */
 unsigned int count_eBar(eBar *bar);
+
+
+/**
+ * @brief The is_file_in_bar() function return true if the file is in the bar.
+ *
+ * @param bar: eBar pointer
+ * @param file: eFile pointer
+ *
+ * @return true if the file is in the bar, false otherwise.
+ */
+bool is_file_in_eBar(eBar *bar, eFile *file);
 
 #endif

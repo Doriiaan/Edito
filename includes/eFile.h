@@ -2,8 +2,8 @@
  * @file 		eFile.h
  * @brief 		eFile Header
  * @author 		ALARY Dorian
- * @version 	0.1
- * @date 		23/06/2024
+ * @version 1.0
+ * @date 21/07/2024
  * @copyright 	GNU Public License.
  *
  */

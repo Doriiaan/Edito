@@ -3,8 +3,8 @@
  * @file eWindow.c
  * @brief eWindow is a View part of the MVC design
  * @author ALARY Dorian
- * @version 0.1
- * @date 27/06/2024
+ * @version 1.0
+ * @date 21/07/2024
  * @copyright GNU Public License.
  *
  * @details This file contain every functions and variable relative to the eWindow structure. 
