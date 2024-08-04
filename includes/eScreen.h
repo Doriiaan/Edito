@@ -47,14 +47,6 @@ eScreen * create_eScreen(int n_lines, int n_cols);
 
 
 /**
- * @brief The update_repository_eScreen() function refresh the menu window.
- *
- * @param screen: eScreen pointer
- */
-void update_help_eScreen(eScreen *screen);
-
-
-/**
  * @brief The delete_eScreen() function deallocate the eScreen structure and set the pointer to the structure to NULL.
  *
  * @param manager: eManager pointer pointer
@@ -84,6 +76,14 @@ void update_bar_eScreen(eScreen *screen);
  * @param screen: eScreen pointer
  */
 void update_file_eScreen(eScreen *screen);
+
+
+/**
+ * @brief The update_repository_eScreen() function refresh the menu window.
+ *
+ * @param screen: eScreen pointer
+ */
+void update_help_eScreen(eScreen *screen);
 
 
 /**
@@ -171,14 +171,14 @@ int get_input_eScreen(eScreen *screen, WINDOW_TYPE type);
 
 
 /**
- * @brief The print_help() function print the string to display in the Help window.
+ * @brief The print_help() function print the array of string in the Help window. Last element of string array must be NULL.
  *
  * @param screen: eScreen pointer
  * @param string: string to display
  *
- * @note Ncurses refresh must be called.
+ * @note update_help_eScreen must be called.
  */
-void print_help_eScreen(eScreen *screen, const char *string);
+void print_help_eScreen(eScreen *screen, char const * const * const string_array);
 
 
 /* ==========================================================

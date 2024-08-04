@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 	fill_directory_menu_eManager(manager, manager->directory, 0);
 	refresh_menu_eScreen(manager->screen, MDIR);
 
-	print_help_message_eManager(manager);
+	send_help_msg_to_screen_eManager(manager);
 
 	/* Print every Windows and Menus on the screen */
 	update_all_eScreen(screen);

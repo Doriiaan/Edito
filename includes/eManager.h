@@ -16,8 +16,6 @@
 #include "eBar.h"
 #include "eDirectory.h"
 
-#define HELP_LENGTH 200
-
 /**
  * @enum Program mode enumeration
  */
@@ -28,32 +26,31 @@ typedef enum {
 
 } MODE;
 
-
 /**
  * @struct eManager structure to play the Controler role in MVC 
  */
 typedef struct {
 
-	/* Screen */
+	/** Screen */
 	eScreen *screen;
 
-	/* Current opened file */
+	/** Current opened file */
 	eFile *file;
 
-	/* File bar */
+	/** File bar */
 	eBar *bar;
 
-	/* Directory */
+	/** Directory */
 	eDirectory *directory;
 
-	/* Current mode */
+	/** Current mode */
 	MODE mode;
 	
-	/* Last mode */
+	/** Last mode */
 	MODE lastmode;
 
-	/* Help message */
-	char help_msg[HELP_LENGTH];
+	/** Help message */
+	char *help_msg;
 
 } eManager;
 
@@ -159,5 +156,14 @@ unsigned int gety_cursor_eManager(eManager *manager);
  */
 int fill_directory_menu_eManager(eManager *manager, eDirectory *directory, unsigned int level);
 
-void print_help_message_eManager(eManager *manager);
+
+/**
+ * @brief The send_help_msg_to_screen_eManager() function send help message to the screen.
+ *
+ * @note If no message is set, send default help message.
+ *
+ * @param manager: eManager pointer
+ */
+void send_help_msg_to_screen_eManager(eManager *manager);
+
 #endif
