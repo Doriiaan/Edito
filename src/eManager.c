@@ -42,7 +42,41 @@ static bool process_KEY_UP_eManager(eManager *manager);
 
 static void change_mode_eManager(eManager *manager, MODE mode);
 static unsigned int screen_width_of_string(const char *s, size_t length);
-static void add_help_message_eManager(eManager *manager, const char *message);
+static void add_help_msg_eManager(eManager *manager, const char *message);
+
+
+/* CONSTANTS */
+char const * const DEFAULT_HELP_MESSAGE[sizeof(MODE)][6] =
+{
+	/* DIR */
+	{
+		"Ctrl+Q: Quit",
+		"Ctrl+B: Bar",
+		"Ctrl+F: File",
+		"^ / v : UP / DOWN",
+		"Enter: Open file / dir",
+		NULL
+	},
+
+	/* WRITE */
+	{
+		"Ctrl+Q: Quit",
+		"Ctrl+D: Directory",
+		"Ctrl+B: BAR",
+		"Ctrl+S: Save file",
+		NULL
+	},
+
+	/* BAR */
+	{
+		"Ctrl+Q: Quit",
+		"Ctrl+D: Directory",
+		"Ctrl+F: File",
+		"<- / -> : Left / Right",
+		"Enter: Open file",
+		NULL
+	}
+};
 
 
 /**
@@ -68,7 +102,7 @@ eManager *create_eManager()
 	manager->file = NULL;
 	manager->directory = NULL;
 	manager->bar = NULL;
-	manager->help_msg[0] = 0;
+	manager->help_msg = NULL;
 
 	return manager;
 }
@@ -155,6 +189,7 @@ bool run_eManager(eManager *manager)
 	int input = 0;
 	bool result = false;
 
+	/* Get input */
 	curs_set(1);
 	if(manager->mode == WRITE)
 		input = get_input_eScreen(manager->screen, WFILE_BOX);
@@ -164,12 +199,14 @@ bool run_eManager(eManager *manager)
 		input = get_input_eScreen(manager->screen, WBAR_BOX);
 	curs_set(0);
 
+	/* Process input */
 	result =  process_input_eManager(manager, input);
 
 	if(result == false)
 		return false;
 
-	print_help_message_eManager(manager);
+	/* Update screen */
+	send_help_msg_to_screen_eManager(manager);
 	update_help_eScreen(manager->screen);
 
 	if(manager->mode == WRITE)
@@ -315,13 +352,13 @@ bool process_ctrls_eManager(eManager *manager)
 	{
 		if(manager->file->permissions != p_READWRITE)
 		{
-			add_help_message_eManager(manager, "Readonly file.");
+			add_help_msg_eManager(manager, "Readonly file.");
 		}
 		else if(write_eFile(manager->file) == -1)
 		{
 			/* tmp file */
 		}
-		add_help_message_eManager(manager, "File saved.");
+		add_help_msg_eManager(manager, "File saved.");
 	}
 
 	return true;
@@ -355,7 +392,7 @@ bool process_ctrlb_eManager(eManager *manager)
 	if(count_eBar(manager->bar) != 0)
 		change_mode_eManager(manager, BAR);
 	else
-		add_help_message_eManager(manager, "No files open.");
+		add_help_msg_eManager(manager, "No files open.");
 
 	return true;
 }
@@ -373,7 +410,7 @@ bool process_ctrlf_eManager(eManager *manager)
 	if(manager->file != NULL)
 		change_mode_eManager(manager, WRITE);
 	else
-		add_help_message_eManager(manager, "No files open.");
+		add_help_msg_eManager(manager, "No files open.");
 
 	return true;
 }
@@ -454,11 +491,11 @@ bool process_ENTER_eManager(eManager *manager)
 				/* Try to open the file */
 				if(open_eFile(file) == -1)
 				{
-					add_help_message_eManager(manager, "Impossible to open file.");
+					add_help_msg_eManager(manager, "Impossible to open file.");
 					return true;
 				}
 				if(file->permissions == p_READONLY)
-					add_help_message_eManager(manager, "Readonly file.");
+					add_help_msg_eManager(manager, "Readonly file.");
 				
 
 				/* Add file to eBar or quit, adding file to eBar */
@@ -893,39 +930,55 @@ void change_mode_eManager(eManager *manager, MODE mode)
 }
 
 
-static void add_help_message_eManager(eManager *manager, const char *message)
+/**
+ * @brief The add_help_msg_eManager() function set the next help message. If there is already a message, the message isn't modified.
+ *
+ * @param manager: eManager pointer
+ * @param message: Message to set
+ */
+static void add_help_msg_eManager(eManager *manager, const char *message)
 {
 	/* If manager is NULL or if the manager already has a help message */
-	if(manager == NULL || manager->help_msg[0] != 0)
+	if(manager == NULL || manager->help_msg != NULL)
 		return;
 
-	strncpy(manager->help_msg, message, HELP_LENGTH);
+	manager->help_msg = (char *) malloc((strlen(message)+1)*sizeof(char));
+	memset(manager->help_msg, 0, strlen(message)+1);
+
+	strncpy(manager->help_msg, message, strlen(message)+1);
 }
 
-void print_help_message_eManager(eManager *manager)
-{
-	char msg[HELP_LENGTH] = {0};
 
-	if(manager == NULL)
+/**
+ * @brief The send_help_msg_to_screen_eManager() function send help message to the screen.
+ *
+ * @note If no message is set, send default help message.
+ *
+ * @param manager: eManager pointer
+ */
+void send_help_msg_to_screen_eManager(eManager *manager)
+{
+	char const ** string_array = NULL;
+
+	if(manager == NULL || manager->screen == NULL)
 		return;
 
-	if(manager->help_msg[0] == 0)
+	/* if there is no message, send default message */
+	if(manager->help_msg == NULL)
 	{
-		if(manager->mode == DIR)
-			strncpy(msg, "Ctrl+Q: Quit    Ctrl+B: Bar    Ctrl+F: File    ^ / v : UP / DOWN    Enter: Open file", HELP_LENGTH);
-
-		else if(manager->mode == BAR)
-			strncpy(msg, "Ctrl+Q: Quit    Ctrl+D: Directory    Ctrl+F: File    <- / -> : Left / Right    Enter: Open file", HELP_LENGTH);
-
-		else if(manager->mode == WRITE)
-			strncpy(msg, "Ctrl+Q: Quit    Ctrl+D: Directory    Ctrl+B: BAR    Ctrl+S: Save file", HELP_LENGTH);
-		
-		if(msg[0] != 0)
-			print_help_eScreen(manager->screen, msg);
+		print_help_eScreen(manager->screen, DEFAULT_HELP_MESSAGE[manager->mode]);
 	}
 	else
 	{
-		print_help_eScreen(manager->screen, manager->help_msg);
-		memset(manager->help_msg, 0, HELP_LENGTH);
+		string_array = (char const **) malloc(2*sizeof(char const *));
+		string_array[0] = manager->help_msg;
+		string_array[1] = NULL;
+
+		print_help_eScreen(manager->screen, string_array);
+
+		free(manager->help_msg);
+		manager->help_msg = NULL;
+		free(string_array);
+		string_array = NULL;
 	}
 }

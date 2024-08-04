@@ -52,7 +52,7 @@ eScreen *create_eScreen(int lines, int columns)
 	
 	/* Set WINDOWs dimension */
 	width_help = columns;
-	height_help = 3;
+	height_help = 4;
 
 	width_repository = columns/5;
 	height_repository = lines - height_help;
@@ -124,16 +124,6 @@ void delete_eScreen(eScreen **screen)
  *
  * @param screen: eScreen pointer
  */
-void update_help_eScreen(eScreen *screen)
-{
-	wrefresh(screen->windows[WHELP]->window);
-}
-
-/**
- * @brief The update_repository_eScreen() function refresh the menu window.
- *
- * @param screen: eScreen pointer
- */
 void update_directory_eScreen(eScreen *screen)
 {
 	box(screen->windows[WDIR_BOX]->window, 0, 0);
@@ -165,6 +155,17 @@ void update_file_eScreen(eScreen *screen)
 	wnoutrefresh(screen->windows[WFILE_LNUM]->window);
 	wnoutrefresh(screen->windows[WFILE_CNT]->window);
 	doupdate();
+}
+
+
+/**
+ * @brief The update_repository_eScreen() function refresh the menu window.
+ *
+ * @param screen: eScreen pointer
+ */
+void update_help_eScreen(eScreen *screen)
+{
+	wrefresh(screen->windows[WHELP]->window);
 }
 
 
@@ -354,18 +355,49 @@ int get_input_eScreen(eScreen *screen, WINDOW_TYPE type)
 	return wgetch(screen->windows[type]->window);
 }
 
+
 /**
- * @brief The print_help() function print the string to display in the Help window.
+ * @brief The print_help() function print the array of string in the Help window. Last element of string array must be NULL.
  *
  * @param screen: eScreen pointer
  * @param string: string to display
  *
- * @note Ncurses refresh must be called.
+ * @note update_help_eScreen must be called.
  */
-void print_help_eScreen(eScreen *screen, const char *string)
+void print_help_eScreen(eScreen *screen, char const * const * const string_array)
 {
+	if(screen == NULL)
+		return;
+
+	int i_elem = 0; /* Position of current elem in string arrray */
+	int next_line = 1; /* In which line is the next element */
+	int next_col = 1; /* In which col is the next element */
+	size_t max_width_size_elem = 0; /* Max size taken by an element in the column */
+	size_t remaining_size = screen->width - next_col - 1; /* Remaining size in lines */
+	int n_line = screen->windows[WHELP]->height-2;
+
 	werase(screen->windows[WHELP]->window);
-	mvwaddstr(screen->windows[WHELP]->window , 1, 1, string);
+
+	while(string_array[i_elem] != NULL)
+	{
+		if(max_width_size_elem < strlen(string_array[i_elem]))
+			max_width_size_elem = strlen(string_array[i_elem]);
+
+		if(max_width_size_elem > remaining_size)
+			break;
+
+		mvwaddstr(screen->windows[WHELP]->window, next_line, next_col, string_array[i_elem]);
+
+		next_line++;
+		if(next_line > n_line)
+		{
+			next_line = 1;
+			next_col += max_width_size_elem+8;
+			max_width_size_elem = 0;
+		}
+		i_elem++;
+		remaining_size = screen->width - next_col - 1;
+	}
 }
 
 
