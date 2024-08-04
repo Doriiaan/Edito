@@ -23,26 +23,26 @@
 #define CTRL(x) (x & 0x1F)
 
 /* Internal functions */
-static bool process_input_eManager(eManager *manager, int input);
+static bool process_input_eManager(eManager * manager, int input);
 
-static bool process_DEFAULT_eManager(eManager *manager, int input);
-static bool process_ctrlq_eManager(eManager *manager);
-static bool process_ctrls_eManager(eManager *manager);
-static bool process_ctrlf_eManager(eManager *manager);
-static bool process_ctrld_eManager(eManager *manager);
-static bool process_ctrlb_eManager(eManager *manager);
-static bool process_ENTER_eManager(eManager *manager);
-static bool process_ESCAPE_eManager(eManager *manager);
-static bool process_BACKSPACE_eManager(eManager *manager);
-static bool process_DELETE_eManager(eManager *manager);
-static bool process_KEY_RIGHT_eManager(eManager *manager);
+static bool process_DEFAULT_eManager(eManager * manager, int input);
+static bool process_ctrlq_eManager(eManager * manager);
+static bool process_ctrls_eManager(eManager * manager);
+static bool process_ctrlf_eManager(eManager * manager);
+static bool process_ctrld_eManager(eManager * manager);
+static bool process_ctrlb_eManager(eManager * manager);
+static bool process_ENTER_eManager(eManager * manager);
+static bool process_ESCAPE_eManager(eManager * manager);
+static bool process_BACKSPACE_eManager(eManager * manager);
+static bool process_DELETE_eManager(eManager * manager);
+static bool process_KEY_RIGHT_eManager(eManager * manager);
 static bool process_KEY_LEFT_eManager(eManager *manager);
 static bool process_KEY_DOWN_eManager(eManager *manager);
 static bool process_KEY_UP_eManager(eManager *manager);
 
-static void change_mode_eManager(eManager *manager, MODE mode);
-static unsigned int screen_width_of_string(const char *s, size_t length);
-static void add_help_msg_eManager(eManager *manager, const char *message);
+static void change_mode_eManager(eManager * manager, MODE mode);
+static unsigned int screen_width_of_string(char const * s, size_t length);
+static void add_help_msg_eManager(eManager * manager, char const * message);
 
 
 /* CONSTANTS */
@@ -86,7 +86,7 @@ char const * const DEFAULT_HELP_MESSAGE[sizeof(MODE)][6] =
  *
  * @note delete_eManager() must be called before exiting.
  */
-eManager *create_eManager()
+eManager * create_eManager()
 {
 	eManager *manager = NULL;
 
@@ -113,7 +113,7 @@ eManager *create_eManager()
  *
  * @param manager: eManager pointer pointer
  */
-void delete_eManager(eManager **manager)
+void delete_eManager(eManager ** manager)
 {
 	if(*manager == NULL)
 		return;
@@ -129,7 +129,7 @@ void delete_eManager(eManager **manager)
  * @param manager: eManager pointer
  * @param screen: eScreen pointer
  */
-void set_eScreen_eManager(eManager *manager, eScreen *screen)
+void set_eScreen_eManager(eManager * manager, eScreen * screen)
 {
 	manager->screen = screen;
 }
@@ -141,7 +141,7 @@ void set_eScreen_eManager(eManager *manager, eScreen *screen)
  * @param manager: eManager pointer
  * @param bar: eBar pointer
  */
-void set_eBar_eManager(eManager *manager, eBar *bar)
+void set_eBar_eManager(eManager *manager, eBar * bar)
 {
 	manager->bar = bar;
 }
@@ -155,7 +155,7 @@ void set_eBar_eManager(eManager *manager, eBar *bar)
  *
  * @note This function also print the content of the repository in the screen.
  */
-void set_eDirectory_eManager(eManager *manager, eDirectory *directory)
+void set_eDirectory_eManager(eManager *manager, eDirectory * directory)
 {
 	manager->directory = directory;
 }
@@ -169,7 +169,7 @@ void set_eDirectory_eManager(eManager *manager, eDirectory *directory)
  *
  * return 0 on success, -1 in failure 
  */
-int set_eFile_eManager(eManager *manager, eFile *file)
+int set_eFile_eManager(eManager *manager, eFile * file)
 {
 	manager->file = file;
 	
@@ -184,7 +184,7 @@ int set_eFile_eManager(eManager *manager, eFile *file)
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool run_eManager(eManager *manager)
+bool run_eManager(eManager * manager)
 {
 	int input = 0;
 	bool result = false;
@@ -239,7 +239,7 @@ bool run_eManager(eManager *manager)
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool process_input_eManager(eManager *manager, int input)
+bool process_input_eManager(eManager * manager, int input)
 {
 	switch(input)
 	{
@@ -312,7 +312,7 @@ bool process_input_eManager(eManager *manager, int input)
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool process_DEFAULT_eManager(eManager *manager, int input)
+bool process_DEFAULT_eManager(eManager * manager, int input)
 {
 	if(manager->mode == WRITE)
 	{
@@ -332,7 +332,7 @@ bool process_DEFAULT_eManager(eManager *manager, int input)
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool process_ctrlq_eManager(eManager *manager)
+bool process_ctrlq_eManager(eManager * manager)
 {
 	(void)manager;
 	return false;
@@ -346,7 +346,7 @@ bool process_ctrlq_eManager(eManager *manager)
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool process_ctrls_eManager(eManager *manager)
+bool process_ctrls_eManager(eManager * manager)
 {
 	if(manager->file != NULL && manager->mode == WRITE)
 	{
@@ -372,7 +372,7 @@ bool process_ctrls_eManager(eManager *manager)
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool process_ctrld_eManager(eManager *manager)
+bool process_ctrld_eManager(eManager * manager)
 {
 	change_mode_eManager(manager, DIR);
 
@@ -387,7 +387,7 @@ bool process_ctrld_eManager(eManager *manager)
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool process_ctrlb_eManager(eManager *manager)
+bool process_ctrlb_eManager(eManager * manager)
 {
 	if(count_eBar(manager->bar) != 0)
 		change_mode_eManager(manager, BAR);
@@ -405,7 +405,7 @@ bool process_ctrlb_eManager(eManager *manager)
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool process_ctrlf_eManager(eManager *manager)
+bool process_ctrlf_eManager(eManager * manager)
 {
 	if(manager->file != NULL)
 		change_mode_eManager(manager, WRITE);
@@ -424,7 +424,7 @@ bool process_ctrlf_eManager(eManager *manager)
  * @return returns true if the program continues and false otherwise.
  */
 
-bool process_ESCAPE_eManager(eManager *manager)
+bool process_ESCAPE_eManager(eManager * manager)
 {
 	change_mode_eManager(manager, manager->lastmode);
 
@@ -439,7 +439,7 @@ bool process_ESCAPE_eManager(eManager *manager)
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool process_ENTER_eManager(eManager *manager)
+bool process_ENTER_eManager(eManager * manager)
 {
 	char *buffer = NULL;
 	int buffer_length = 0;
@@ -543,7 +543,7 @@ bool process_ENTER_eManager(eManager *manager)
 	else if(manager->mode == BAR)
 	{
 		item_index = get_current_item_index_menu_eScreen(manager->screen, MBAR);
-		file = get_file_eBar(manager->bar, item_index);
+		file = (eFile *) get_file_eBar(manager->bar, item_index);
 
 		/* Enter write mode */
 		set_eFile_eManager(manager, file);
@@ -561,7 +561,7 @@ bool process_ENTER_eManager(eManager *manager)
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool process_BACKSPACE_eManager(eManager *manager)
+bool process_BACKSPACE_eManager(eManager * manager)
 {
 	char *buffer = NULL;
 	int buffer_length = 0;
@@ -604,7 +604,7 @@ bool process_BACKSPACE_eManager(eManager *manager)
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool process_DELETE_eManager(eManager *manager)
+bool process_DELETE_eManager(eManager * manager)
 {
 	char *buffer = NULL;
 	int buffer_length = 0;
@@ -642,7 +642,7 @@ bool process_DELETE_eManager(eManager *manager)
  * @return returns true if the program continues and false otherwise.
  */
 
-bool process_KEY_RIGHT_eManager(eManager *manager)
+bool process_KEY_RIGHT_eManager(eManager * manager)
 {
 	if(manager->mode == WRITE)
 	{
@@ -674,7 +674,7 @@ bool process_KEY_RIGHT_eManager(eManager *manager)
  * @return returns true if the program continues and false otherwise.
  */
 
-bool process_KEY_LEFT_eManager(eManager *manager)
+bool process_KEY_LEFT_eManager(eManager * manager)
 {
 	if(manager->mode == WRITE)
 	{
@@ -705,7 +705,7 @@ bool process_KEY_LEFT_eManager(eManager *manager)
  * @return returns true if the program continues and false otherwise.
  */
 
-bool process_KEY_DOWN_eManager(eManager *manager)
+bool process_KEY_DOWN_eManager(eManager * manager)
 {
 	if(manager->mode == WRITE)
 	{
@@ -737,7 +737,7 @@ bool process_KEY_DOWN_eManager(eManager *manager)
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool process_KEY_UP_eManager(eManager *manager)
+bool process_KEY_UP_eManager(eManager * manager)
 {
 	if(manager->mode == WRITE)
 	{
@@ -770,7 +770,7 @@ bool process_KEY_UP_eManager(eManager *manager)
  *
  * @return returns x position.
  */
-unsigned int getx_cursor_eManager(eManager *manager)
+unsigned int getx_cursor_eManager(eManager const * manager)
 {
 	unsigned int pos = 0;
 	size_t width = get_width_eScreen(manager->screen, WFILE_CNT); 
@@ -788,7 +788,7 @@ unsigned int getx_cursor_eManager(eManager *manager)
  *
  * @return returns y position.
  */
-unsigned int gety_cursor_eManager(eManager *manager)
+unsigned int gety_cursor_eManager(eManager const * manager)
 {
 	size_t width = 0;
 	unsigned int y = 0;
@@ -824,7 +824,7 @@ unsigned int gety_cursor_eManager(eManager *manager)
  *
  * @return the size in terminal cell of string.
  */
-unsigned int screen_width_of_string(const char *s, size_t length)
+unsigned int screen_width_of_string(char const * s, size_t length)
 {
 	size_t real_length = strnlen(s, length);
 	unsigned int i = 0;
@@ -853,7 +853,7 @@ unsigned int screen_width_of_string(const char *s, size_t length)
  * @return 0 on success or -1 in failure.
  * @note This is a recursive function. 
  */
-int fill_directory_menu_eManager(eManager *manager, eDirectory *directory, unsigned int level)
+int fill_directory_menu_eManager(eManager const * manager, eDirectory const * directory, unsigned int level)
 {
 	unsigned int i=0;
 	char *item = NULL;
@@ -923,7 +923,7 @@ int fill_directory_menu_eManager(eManager *manager, eDirectory *directory, unsig
  * @param manager: eManager pointer
  * @param mode: eManager mode
  */
-void change_mode_eManager(eManager *manager, MODE mode)
+void change_mode_eManager(eManager * manager, MODE mode)
 {
 	manager->lastmode = manager->mode;
 	manager->mode = mode;
@@ -936,7 +936,7 @@ void change_mode_eManager(eManager *manager, MODE mode)
  * @param manager: eManager pointer
  * @param message: Message to set
  */
-static void add_help_msg_eManager(eManager *manager, const char *message)
+static void add_help_msg_eManager(eManager * manager, char const * message)
 {
 	/* If manager is NULL or if the manager already has a help message */
 	if(manager == NULL || manager->help_msg != NULL)
@@ -956,7 +956,7 @@ static void add_help_msg_eManager(eManager *manager, const char *message)
  *
  * @param manager: eManager pointer
  */
-void send_help_msg_to_screen_eManager(eManager *manager)
+void send_help_msg_to_screen_eManager(eManager * manager)
 {
 	char const ** string_array = NULL;
 

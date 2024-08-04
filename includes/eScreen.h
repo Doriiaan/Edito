@@ -51,7 +51,7 @@ eScreen * create_eScreen(int n_lines, int n_cols);
  *
  * @param manager: eManager pointer pointer
  */
-void delete_eScreen(eScreen **screen);
+void delete_eScreen(eScreen ** screen);
 
 
 /**
@@ -59,7 +59,7 @@ void delete_eScreen(eScreen **screen);
  *
  * @param screen: eScreen pointer
  */
-void update_directory_eScreen(eScreen *screen);
+void update_directory_eScreen(eScreen * screen);
 
 
 /*
@@ -67,7 +67,7 @@ void update_directory_eScreen(eScreen *screen);
  *
  * @param screen: eScreen pointer
  */
-void update_bar_eScreen(eScreen *screen);
+void update_bar_eScreen(eScreen * screen);
 
 
 /**
@@ -75,7 +75,7 @@ void update_bar_eScreen(eScreen *screen);
  *
  * @param screen: eScreen pointer
  */
-void update_file_eScreen(eScreen *screen);
+void update_file_eScreen(eScreen * screen);
 
 
 /**
@@ -83,7 +83,7 @@ void update_file_eScreen(eScreen *screen);
  *
  * @param screen: eScreen pointer
  */
-void update_help_eScreen(eScreen *screen);
+void update_help_eScreen(eScreen * screen);
 
 
 /**
@@ -91,7 +91,7 @@ void update_help_eScreen(eScreen *screen);
  *
  * @param screen: eScreen pointer
  */
-void update_all_eScreen(eScreen *screen);
+void update_all_eScreen(eScreen * screen);
 
  
 
@@ -106,7 +106,7 @@ void update_all_eScreen(eScreen *screen);
  * @param number_length: number of digit in the lines number
  *
  */
-void create_file_window_eScreen(eScreen *screen, unsigned int number_length);
+void create_file_window_eScreen(eScreen * screen, unsigned int number_length);
 
 
 // TODO: a faire sauter -> remplacer par resize_eWindow
@@ -116,7 +116,7 @@ void create_file_window_eScreen(eScreen *screen, unsigned int number_length);
  * @param screen: eScreen pointer
  * @param number_length: number of digit in the lines number
  */
-void resize_file_eScreen(eScreen *screen, unsigned int number_length);
+void resize_file_eScreen(eScreen * screen, unsigned int number_length);
 
 
 // TODO: A faire sauter -> remplacer par print_line_eWindow(eWindow *window, unsigned int x, unsigned int y, const char fmt, ...); 
@@ -127,7 +127,7 @@ void resize_file_eScreen(eScreen *screen, unsigned int number_length);
  * @param first_line: First line to print
  * @param number_length: Number of digit of the higher line of the file
  */
-void print_content_eScreen(eScreen *screen, eLine *first_line);
+void print_content_eScreen(eScreen * screen, eLine const * first_line);
 
 
 /**
@@ -138,7 +138,7 @@ void print_content_eScreen(eScreen *screen, eLine *first_line);
  * @param x: x position
  * @param type: Window type
  */
-void move_cursor_eScreen(eScreen *screen, unsigned int y, unsigned int x, WINDOW_TYPE type);
+void move_cursor_eScreen(eScreen * screen, unsigned int y, unsigned int x, WINDOW_TYPE type);
 
 
 /**
@@ -147,7 +147,7 @@ void move_cursor_eScreen(eScreen *screen, unsigned int y, unsigned int x, WINDOW
  * @param screen: eScreen pointer
  * @param type: Window type
  */
-unsigned int get_width_eScreen(eScreen *screen, WINDOW_TYPE type);
+unsigned int get_width_eScreen(eScreen const * screen, WINDOW_TYPE type);
 
 
 /**
@@ -156,7 +156,7 @@ unsigned int get_width_eScreen(eScreen *screen, WINDOW_TYPE type);
  * @param screen: eScreen pointer
  * @param type: Window type
  */
-unsigned int get_height_eScreen(eScreen *screen, WINDOW_TYPE type);
+unsigned int get_height_eScreen(eScreen const * screen, WINDOW_TYPE type);
 
 
  /**
@@ -167,7 +167,7 @@ unsigned int get_height_eScreen(eScreen *screen, WINDOW_TYPE type);
  *
  * @return User input
  */
-int get_input_eScreen(eScreen *screen, WINDOW_TYPE type);
+int get_input_eScreen(eScreen * screen, WINDOW_TYPE type);
 
 
 /**
@@ -178,7 +178,7 @@ int get_input_eScreen(eScreen *screen, WINDOW_TYPE type);
  *
  * @note update_help_eScreen must be called.
  */
-void print_help_eScreen(eScreen *screen, char const * const * const string_array);
+void print_help_eScreen(eScreen * screen, char const * const * string_array);
 
 
 /* ==========================================================
@@ -194,7 +194,7 @@ void print_help_eScreen(eScreen *screen, char const * const * const string_array
  *
  * @return 0 in success or -1 in failure.
  */
-int add_item_menu_eScreen(eScreen *screen, MENU_TYPE type, const char *item);
+int add_item_menu_eScreen(eScreen * screen, MENU_TYPE type, char const * item);
 
 
 /**
@@ -203,7 +203,7 @@ int add_item_menu_eScreen(eScreen *screen, MENU_TYPE type, const char *item);
  * @param screen: eScreen pointer
  * @param type: Menu type
  */
-void erase_menu_eScreen(eScreen *screen, MENU_TYPE type);
+void erase_menu_eScreen(eScreen * screen, MENU_TYPE type);
 
 
 /**
@@ -212,7 +212,7 @@ void erase_menu_eScreen(eScreen *screen, MENU_TYPE type);
  * @param screen: eScreen pointer
  * @param type: Menu type
  */
-void refresh_menu_eScreen(eScreen *screen, MENU_TYPE type);
+void refresh_menu_eScreen(eScreen * screen, MENU_TYPE type);
 
 
 /**
@@ -221,7 +221,7 @@ void refresh_menu_eScreen(eScreen *screen, MENU_TYPE type);
  * @param screen: eScreen pointer
  * @param type: Menu type
  */
-void move_next_item_menu_eScreen(eScreen *screen, MENU_TYPE type);
+void move_next_item_menu_eScreen(eScreen * screen, MENU_TYPE type);
 
 
 /**
@@ -230,7 +230,7 @@ void move_next_item_menu_eScreen(eScreen *screen, MENU_TYPE type);
  * @param screen: eScreen pointer
  * @param type: Menu type
  */
-void move_previous_item_menu_eScreen(eScreen *screen, MENU_TYPE type);
+void move_previous_item_menu_eScreen(eScreen * screen, MENU_TYPE type);
 
 
 /**
@@ -239,7 +239,7 @@ void move_previous_item_menu_eScreen(eScreen *screen, MENU_TYPE type);
  * @param screen: eScreen pointer
  * @param type: Menu type
  */
-void move_current_item_menu_eScreen(eScreen *screen, MENU_TYPE type);
+void move_current_item_menu_eScreen(eScreen * screen, MENU_TYPE type);
 
 
 /**
@@ -249,7 +249,7 @@ void move_current_item_menu_eScreen(eScreen *screen, MENU_TYPE type);
  * @param type: Menu type
  * @param pattern: pattern to match
  */
-void move_pattern_item_menu_eScreen(eScreen *screen, MENU_TYPE type, const char *pattern);
+void move_pattern_item_menu_eScreen(eScreen * screen, MENU_TYPE type, char const * pattern);
 
 
 /**
@@ -258,7 +258,7 @@ void move_pattern_item_menu_eScreen(eScreen *screen, MENU_TYPE type, const char 
  * @param screen: eScreen pointer
  * @param type: Menu type
  */
-int get_current_item_index_menu_eScreen(eScreen *screen, MENU_TYPE type);
+int get_current_item_index_menu_eScreen(eScreen const * screen, MENU_TYPE type);
 
 
 #endif

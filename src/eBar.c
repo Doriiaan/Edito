@@ -27,7 +27,7 @@
  *
  * @note delete_eBar() must be called before exiting.
  */
-eBar *create_eBar()
+eBar * create_eBar()
 {
 	eBar *bar = NULL;
 
@@ -46,7 +46,7 @@ eBar *create_eBar()
  *
  * @param bar: eBar pointer pointer
  */
-void delete_eBar(eBar **bar)
+void delete_eBar(eBar ** bar)
 {
 	if(*bar == NULL)
 		return;
@@ -67,7 +67,7 @@ void delete_eBar(eBar **bar)
  *
  * @return 0 on success or -1 in failure.
  */
-int add_file_eBar(eBar *bar, eFile *file)
+int add_file_eBar(eBar * bar, eFile const * file)
 {
 	if(bar == NULL || file == NULL)
 		return -1;
@@ -76,7 +76,7 @@ int add_file_eBar(eBar *bar, eFile *file)
 	if(bar->n_files >= bar->alloc_size)
 	{
 		bar->alloc_size = get_next_power_of_two(bar->n_files);
-		bar->files = (eFile **) realloc(bar->files, bar->alloc_size*sizeof(eFile));
+		bar->files = (eFile const **) realloc(bar->files, bar->alloc_size*sizeof(eFile));
 		if(bar->files == NULL)
 		{
 			return -1;
@@ -98,12 +98,11 @@ int add_file_eBar(eBar *bar, eFile *file)
  *
  * @return 0 on success or -1 in failure.
  */
-int remove_file_eBar(eBar *bar, unsigned int index)
+int remove_file_eBar(eBar * bar, unsigned int index)
 {
 	if(bar == NULL || index >= bar->n_files)
 		return -1;
 
-	//TODO: close eFile
 	bar->files[index] = NULL;
 	bar->n_files--;
 	return 0;
@@ -118,7 +117,7 @@ int remove_file_eBar(eBar *bar, unsigned int index)
  *
  * @return eFile pointer on sucess or NULL in failure.
  */
-eFile *get_file_eBar(eBar *bar, unsigned int index)
+eFile const * get_file_eBar(eBar const * bar, unsigned int index)
 {
 	if(bar == NULL || index >= bar->n_files)
 		return NULL;
@@ -134,7 +133,7 @@ eFile *get_file_eBar(eBar *bar, unsigned int index)
  *
  * @return number of eFile stored in eBar.
  */
-unsigned int count_eBar(eBar *bar)
+unsigned int count_eBar(eBar const * bar)
 {
 	return bar->n_files;
 }
@@ -148,7 +147,7 @@ unsigned int count_eBar(eBar *bar)
  *
  * @return true if the file is in the bar, false otherwise.
  */
-bool is_file_in_eBar(eBar *bar, eFile *file)
+bool is_file_in_eBar(eBar const * bar, eFile const * file)
 {
 	if(bar == NULL ||file == NULL)
 		return false;

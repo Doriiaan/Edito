@@ -36,7 +36,7 @@
  *
  * @note delete_eLine() must be called before exiting.
  */
-eLine *create_eLine(char *string, size_t length, unsigned int line_number, eLine *previous, eLine *next)
+eLine *create_eLine(char const * string, size_t length, unsigned int line_number, eLine * previous, eLine * next)
 {
 	eLine *eline = (eLine *) malloc(sizeof(eLine));
 	if(eline == NULL)
@@ -83,7 +83,7 @@ eLine *create_eLine(char *string, size_t length, unsigned int line_number, eLine
  *
  * @param eline: eLine pointer pointer
  */
-void delete_eLine(eLine **eline)
+void delete_eLine(eLine ** eline)
 {
 	if(*eline == NULL)
 		return;	
@@ -106,7 +106,7 @@ void delete_eLine(eLine **eline)
  *
  * @return 0 on success, -1 in failure.
  */
-int insert_string_eLine(eLine *eline, const char *string, size_t length, unsigned int pos)
+int insert_string_eLine(eLine * eline, char const * string, size_t length, unsigned int pos)
 {
 	size_t string_length = 0;
 	size_t new_length = 0;
@@ -154,7 +154,7 @@ int insert_string_eLine(eLine *eline, const char *string, size_t length, unsigne
  *
  * @return 0 on success, -1 in failure.
  */
-int remove_string_eLine(eLine *eline, size_t length, unsigned int pos)
+int remove_string_eLine(eLine * eline, size_t length, unsigned int pos)
 {
 	int real_length = 0;
 
@@ -183,7 +183,7 @@ int remove_string_eLine(eLine *eline, size_t length, unsigned int pos)
  *
  * @return 0 on success, -1 in failure.
  */
-int insert_char_eLine(eLine *eline, const char ch, unsigned int pos)
+int insert_char_eLine(eLine * eline, const char ch, unsigned int pos)
 {
 	if(eline == NULL)
 		return -1;
@@ -218,7 +218,7 @@ int insert_char_eLine(eLine *eline, const char ch, unsigned int pos)
  *
  * @return 0 on success, -1 in failure.
  */
-int remove_char_eLine(eLine *eline, unsigned int pos)
+int remove_char_eLine(eLine * eline, unsigned int pos)
 {
 	if(eline == NULL)
 		return -1;
@@ -250,7 +250,7 @@ int remove_char_eLine(eLine *eline, unsigned int pos)
  *
  * @note : This function has security and get the max between strnlen(string, length) and eline->length character.
  */
-int get_string_eLine(eLine *eline, char *buffer, size_t length, unsigned int pos)
+int get_string_eLine(eLine const * eline, char * buffer, size_t length, unsigned int pos)
 {
 	size_t min = 0;
 	

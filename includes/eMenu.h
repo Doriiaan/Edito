@@ -83,7 +83,7 @@ typedef struct {
  *
  * @note delete_eMenu() must be called before exiting.
  */
-eMenu *create_eMenu(WINDOW *win, WINDOW *sub, bool columnar);
+eMenu * create_eMenu(WINDOW * win, WINDOW * sub, bool columnar);
 
 
 /**
@@ -91,7 +91,7 @@ eMenu *create_eMenu(WINDOW *win, WINDOW *sub, bool columnar);
  *
  * @param menu: eMenu pointer pointer
  */
-void delete_eMenu(eMenu **menu);
+void delete_eMenu(eMenu ** menu);
 
 
 /**
@@ -102,7 +102,7 @@ void delete_eMenu(eMenu **menu);
  *
  * @return 0 on success, -1 in failure.
  */
-int add_item_eMenu(eMenu *menu, const char *item);
+int add_item_eMenu(eMenu * menu, char const * item);
 
 
 /**
@@ -113,7 +113,7 @@ int add_item_eMenu(eMenu *menu, const char *item);
  *
  * @return 0 on success, -1 in failure.
  */
-int delete_item_eMenu(eMenu *menu, int index);
+int delete_item_eMenu(eMenu * menu, int index);
 
 
 /**
@@ -121,7 +121,7 @@ int delete_item_eMenu(eMenu *menu, int index);
  *
  * @param menu: eMenu pointer pointer
  */
-void erase_eMenu(eMenu *menu);
+void erase_eMenu(eMenu * menu);
 
 
 /**
@@ -129,7 +129,7 @@ void erase_eMenu(eMenu *menu);
  *
  * @param menu: eMenu pointer pointer
  */
-void refresh_eMenu(eMenu *menu);
+void refresh_eMenu(eMenu * menu);
 
 
 /**
@@ -137,7 +137,7 @@ void refresh_eMenu(eMenu *menu);
  *
  * @param menu: eMenu pointer pointer
  */
-void move_next_item_eMenu(eMenu *menu);
+void move_next_item_eMenu(eMenu * menu);
 
 
 /**
@@ -145,7 +145,7 @@ void move_next_item_eMenu(eMenu *menu);
  *
  * @param menu: eMenu pointer pointer
  */
-void move_previous_item_eMenu(eMenu *menu);
+void move_previous_item_eMenu(eMenu * menu);
 
 
 /** 
@@ -153,7 +153,7 @@ void move_previous_item_eMenu(eMenu *menu);
  *
  * @param menu: eMenu pointer pointer
  */
-void move_current_item_eMenu(eMenu *menu);
+void move_current_item_eMenu(eMenu * menu);
 
 
 /**
@@ -162,7 +162,7 @@ void move_current_item_eMenu(eMenu *menu);
  * @param menu: eMenu pointer pointer
  * @param pattern: pattern to match 
  */
-void move_pattern_item_eMenu(eMenu *menu, const char *pattern);
+void move_pattern_item_eMenu(eMenu * menu, char const * pattern);
 
 
 /**
@@ -172,7 +172,7 @@ void move_pattern_item_eMenu(eMenu *menu, const char *pattern);
  * 
  * @return The current item index.
  */
-int get_current_item_index_eMenu(eMenu *menu);
+int get_current_item_index_eMenu(eMenu const * menu);
 
 
 /**
@@ -181,7 +181,6 @@ int get_current_item_index_eMenu(eMenu *menu);
  * @param menu: eMenu pointer pointer
  * @param position: New current position
  */
-void set_cursor_position_eMenu(eMenu *menu, int position);
-
+void set_cursor_position_eMenu(eMenu * menu, int position);
 
 #endif

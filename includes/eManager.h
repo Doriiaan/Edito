@@ -70,7 +70,7 @@ eManager *create_eManager();
  *
  * @param manager: eManager pointer pointer
  */
-void delete_eManager(eManager **manager);
+void delete_eManager(eManager ** manager);
 
 
 /**
@@ -79,7 +79,7 @@ void delete_eManager(eManager **manager);
  * @param manager: eManager pointer
  * @param screen: eScreen pointer
  */
-void set_eScreen_eManager(eManager *manager, eScreen *screen);
+void set_eScreen_eManager(eManager * manager, eScreen * screen);
 
 
 /**
@@ -88,7 +88,7 @@ void set_eScreen_eManager(eManager *manager, eScreen *screen);
  * @param manager: eManager pointer
  * @param bar: eBar pointer
  */
-void set_eBar_eManager(eManager *manager, eBar *bar);
+void set_eBar_eManager(eManager * manager, eBar * bar);
 
 
 /**
@@ -99,7 +99,7 @@ void set_eBar_eManager(eManager *manager, eBar *bar);
  *
  * @note This function also print the content of the repository in the screen.
  */
-void set_eDirectory_eManager(eManager *manager, eDirectory *directory);
+void set_eDirectory_eManager(eManager * manager, eDirectory * directory);
 
 
 /**
@@ -111,7 +111,7 @@ void set_eDirectory_eManager(eManager *manager, eDirectory *directory);
  * return 0 on success, -1 in failure 
  * @note This function also print the content of the file in the screen.
  */
-int set_eFile_eManager(eManager *manager, eFile *file);
+int set_eFile_eManager(eManager * manager, eFile * file);
 
 
 /**
@@ -121,7 +121,7 @@ int set_eFile_eManager(eManager *manager, eFile *file);
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool run_eManager(eManager *manager);
+bool run_eManager(eManager * manager);
 
 
 /*
@@ -131,7 +131,7 @@ bool run_eManager(eManager *manager);
  *
  * @return returns x position.
  */
-unsigned int getx_cursor_eManager(eManager *manager);
+unsigned int getx_cursor_eManager(eManager const * manager);
 
 
 /*
@@ -141,7 +141,7 @@ unsigned int getx_cursor_eManager(eManager *manager);
  *
  * @return returns y position.
  */
-unsigned int gety_cursor_eManager(eManager *manager);
+unsigned int gety_cursor_eManager(eManager const * manager);
 
 
 /**
@@ -154,16 +154,17 @@ unsigned int gety_cursor_eManager(eManager *manager);
  * @return 0 on success or -1 in failure.
  * @note This is a recursive function. 
  */
-int fill_directory_menu_eManager(eManager *manager, eDirectory *directory, unsigned int level);
+int fill_directory_menu_eManager(eManager const * manager, eDirectory const * directory, unsigned int level);
 
 
 /**
  * @brief The send_help_msg_to_screen_eManager() function send help message to the screen.
  *
  * @note If no message is set, send default help message.
+ * @note If a message is set, sending it will delete it
  *
  * @param manager: eManager pointer
  */
-void send_help_msg_to_screen_eManager(eManager *manager);
+void send_help_msg_to_screen_eManager(eManager * manager);
 
 #endif

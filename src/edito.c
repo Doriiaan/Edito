@@ -22,7 +22,7 @@ void init_terminal(void);
 void reset_terminal(void);
 void usage(void);
 
-int main(int argc, char *argv[])
+int main(int argc, char * argv[])
 {
 	bool run = true;
 	
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 
 	/* Print every Windows and Menus on the screen */
 	update_all_eScreen(screen);
-	
+
 	/* Set cursor on the current menu item */
 	move_current_item_menu_eScreen(manager->screen, MDIR);
 

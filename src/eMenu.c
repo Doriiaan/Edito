@@ -17,8 +17,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void init_menu(eMenu *menu);
-static void reset_menu(eMenu *menu);
+static void init_menu(eMenu * menu);
+static void reset_menu(eMenu * menu);
 
 
 /**
@@ -32,7 +32,7 @@ static void reset_menu(eMenu *menu);
  *
  * @note delete_eMenu() must be called before exiting.
  */
-eMenu *create_eMenu(WINDOW *win, WINDOW *sub, bool columnar)
+eMenu * create_eMenu(WINDOW * win, WINDOW * sub, bool columnar)
 {
 	eMenu *menu = NULL;
 	
@@ -64,7 +64,7 @@ eMenu *create_eMenu(WINDOW *win, WINDOW *sub, bool columnar)
  *
  * @param menu: eMenu pointer pointer
  */
-void delete_eMenu(eMenu **menu)
+void delete_eMenu(eMenu ** menu)
 {
 	if(*menu != NULL)
 		return;
@@ -93,7 +93,7 @@ void delete_eMenu(eMenu **menu)
  *
  * @return 0 on success, -1 in failure.
  */
-int add_item_eMenu(eMenu *menu, const char *item)
+int add_item_eMenu(eMenu * menu, char const * item)
 {
 	int sub_cols=0, sub_rows=0;
 
@@ -135,7 +135,7 @@ int add_item_eMenu(eMenu *menu, const char *item)
  *
  * @return 0 on success, -1 in failure.
  */
-int delete_item_eMenu(eMenu *menu, int index)
+int delete_item_eMenu(eMenu * menu, int index)
 {
 	if(menu == NULL || index >= menu->n_items)
 		return -1;
@@ -158,7 +158,7 @@ int delete_item_eMenu(eMenu *menu, int index)
  *
  * @param menu: eMenu pointer pointer
  */
-void erase_eMenu(eMenu *menu)
+void erase_eMenu(eMenu * menu)
 {	
 	if(menu==NULL)
 		return;
@@ -184,7 +184,7 @@ void erase_eMenu(eMenu *menu)
  *
  * @param menu: eMenu pointer pointer
  */
-void refresh_eMenu(eMenu *menu)
+void refresh_eMenu(eMenu * menu)
 {
 	int pos = get_current_item_index_eMenu(menu);
 	unpost_menu(menu->menu);
@@ -200,7 +200,7 @@ void refresh_eMenu(eMenu *menu)
  *
  * @param menu: eMenu pointer pointer
  */
-void move_next_item_eMenu(eMenu *menu)
+void move_next_item_eMenu(eMenu * menu)
 {
 	int max_height = 0;
 	int max_width = 0;
@@ -228,7 +228,7 @@ void move_next_item_eMenu(eMenu *menu)
  *
  * @param menu: eMenu pointer pointer
  */
-void move_previous_item_eMenu(eMenu *menu)
+void move_previous_item_eMenu(eMenu * menu)
 {
 	int cur_height = 0;
 	int cur_width = 0;
@@ -251,7 +251,7 @@ void move_previous_item_eMenu(eMenu *menu)
  *
  * @param menu: eMenu pointer pointer
  */
-void move_current_item_eMenu(eMenu *menu)
+void move_current_item_eMenu(eMenu * menu)
 {
 	pos_menu_cursor(menu->menu);
 }
@@ -263,7 +263,7 @@ void move_current_item_eMenu(eMenu *menu)
  * @param menu: eMenu pointer pointer
  * @param pattern: pattern to match 
  */
-void move_pattern_item_eMenu(eMenu *menu, const char *pattern)
+void move_pattern_item_eMenu(eMenu * menu, char const * pattern)
 {
 	set_menu_pattern(menu->menu, pattern);
 }
@@ -276,7 +276,7 @@ void move_pattern_item_eMenu(eMenu *menu, const char *pattern)
  * 
  * @return The current item index.
  */
-int get_current_item_index_eMenu(eMenu *menu)
+int get_current_item_index_eMenu(eMenu const * menu)
 {
 	return item_index(current_item(menu->menu));
 }
@@ -288,7 +288,7 @@ int get_current_item_index_eMenu(eMenu *menu)
  * @param menu: eMenu pointer pointer
  * @param position: New current position
  */
-void set_cursor_position_eMenu(eMenu *menu, int position)
+void set_cursor_position_eMenu(eMenu * menu, int position)
 {
 	for(int i=0; i<menu->n_scroll; i++)
 	{
@@ -307,7 +307,7 @@ void set_cursor_position_eMenu(eMenu *menu, int position)
  *
  * @param menu: eMenu pointer pointer
  */
-void reset_menu(eMenu *menu)
+void reset_menu(eMenu * menu)
 {
 	int i=0;
 	int count = item_count(menu->menu); 
@@ -349,7 +349,7 @@ void reset_menu(eMenu *menu)
  *
  * @param menu: eMenu pointer pointer
  */
-void init_menu(eMenu *menu)
+void init_menu(eMenu * menu)
 {
 	int i=0;
 	menu->physical_items_title = (char **) malloc(sizeof(char *)*menu->n_items);

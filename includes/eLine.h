@@ -30,10 +30,10 @@ typedef struct eLine
 	unsigned int line_number;
 	
 	/** Previous line of NULL */
-	struct eLine *previous; 
+	struct eLine * previous;
 	
 	/** Next line or NULL*/
-	struct eLine *next; 
+	struct eLine * next;
 	
 	/** Characters of the line, including \n character */
 	char *string; 
@@ -54,7 +54,7 @@ typedef struct eLine
  *
  * @note delete_eLine() must be called before exiting.
  */
-eLine *create_eLine(char *string, size_t length, unsigned int line_number, eLine *previous, eLine *next);
+eLine *create_eLine(char const * string, size_t length, unsigned int line_number, eLine * previous, eLine * next);
 
 
 /**
@@ -62,7 +62,7 @@ eLine *create_eLine(char *string, size_t length, unsigned int line_number, eLine
  *
  * @param eline: eLine pointer pointer
  */
-void delete_eLine(eLine **eline);
+void delete_eLine(eLine ** eline);
 
 
 /**
@@ -75,7 +75,7 @@ void delete_eLine(eLine **eline);
  *
  * @return 0 on success, -1 in failure.
  */
-int insert_string_eLine(eLine *eline, const char *string, size_t length, unsigned int pos);
+int insert_string_eLine(eLine * eline, char const * string, size_t length, unsigned int pos);
 
 
 /**
@@ -87,7 +87,7 @@ int insert_string_eLine(eLine *eline, const char *string, size_t length, unsigne
  *
  * @return 0 on success, -1 in failure.
  */
-int remove_string_eLine(eLine *eline, size_t length, unsigned int pos);
+int remove_string_eLine(eLine * eline, size_t length, unsigned int pos);
 
 
 /**
@@ -99,7 +99,7 @@ int remove_string_eLine(eLine *eline, size_t length, unsigned int pos);
  *
  * @return 0 on success, -1 in failure.
  */
-int insert_char_eLine(eLine *eline, const char ch, unsigned int pos);
+int insert_char_eLine(eLine * eline, const char ch, unsigned int pos);
 
 
 /**
@@ -110,7 +110,7 @@ int insert_char_eLine(eLine *eline, const char ch, unsigned int pos);
  *
  * @return 0 on success, -1 in failure.
  */
-int remove_char_eLine(eLine *eline, unsigned int pos);
+int remove_char_eLine(eLine * eline, unsigned int pos);
 
 
 /**
@@ -125,6 +125,6 @@ int remove_char_eLine(eLine *eline, unsigned int pos);
  *
  * @note : This function has security and get the max between strnlen(string, length) and eline->length character.
  */
-int get_string_eLine(eLine *eline, char *string, size_t length, unsigned int pos);
+int get_string_eLine(eLine const * eline, char * string, size_t length, unsigned int pos);
 
 #endif

@@ -73,7 +73,7 @@ PERM file_permissions(const char *realpath)
  *
  * @note delete_eFile() must be called before exiting.
  */
-eFile* create_eFile(char *realpath)
+eFile* create_eFile(char const * realpath)
 {
 	eFile *efile=NULL;
 
@@ -109,7 +109,7 @@ eFile* create_eFile(char *realpath)
  *
  * @param efile: eFile pointer pointer
  */
-void delete_eFile(eFile **efile)
+void delete_eFile(eFile ** efile)
 {
 	if(*efile == NULL)
 		return;
@@ -129,7 +129,7 @@ void delete_eFile(eFile **efile)
  * @note close_eFile() must be called to deallocate lines, delete_eFile also call close_eFile().
  * @note If the file did not exist when calling create_eFile(), open_eFile write a new file.
  */
-int open_eFile(eFile *efile)
+int open_eFile(eFile * efile)
 {
 	eLine *current = NULL, *previous = NULL;
 	FILE *fp = NULL;
@@ -208,7 +208,7 @@ int open_eFile(eFile *efile)
  * @brief The close_eFile() function close the file and delete lines.
  *
  */
-void close_eFile(eFile *efile)
+void close_eFile(eFile * efile)
 {
 	if(efile == NULL)
 		return;
@@ -236,7 +236,7 @@ void close_eFile(eFile *efile)
  *
  * @return 0 on sucess or -1 in failure.
  */
-int write_eFile(eFile *efile)
+int write_eFile(eFile * efile)
 {
 	FILE *fp = NULL;
 	eLine *current = NULL;
@@ -295,7 +295,7 @@ int write_eFile(eFile *efile)
  *
  * @return 0 on success or -1 in failure.
  */
-int add_empty_line_eFile(eFile *efile, unsigned int pos)
+int add_empty_line_eFile(eFile * efile, unsigned int pos)
 {
 	eLine *current = NULL;
 	eLine *new = NULL;
@@ -353,7 +353,7 @@ int add_empty_line_eFile(eFile *efile, unsigned int pos)
  *
  * @return 0 on sucess or -1 in failure.
  */
-int delete_line_eFile(eFile *efile, unsigned int line_number)
+int delete_line_eFile(eFile * efile, unsigned int line_number)
 {
 	eLine *current = NULL;
 	eLine *tmp = NULL;
@@ -434,7 +434,7 @@ int delete_line_eFile(eFile *efile, unsigned int line_number)
  *
  * @return 0 on sucess or -1 in failure.
  */
-int insert_char_eFile(eFile *efile, const char ch)
+int insert_char_eFile(eFile * efile, const char ch)
 {
 	if(efile == NULL)
 		return -1;
@@ -454,7 +454,7 @@ int insert_char_eFile(eFile *efile, const char ch)
  *
  * @return 0 on sucess or -1 in failure.
  */
-int remove_char_eFile(eFile *efile)
+int remove_char_eFile(eFile * efile)
 {
 	if(efile == NULL)
 		return -1;
@@ -476,7 +476,7 @@ int remove_char_eFile(eFile *efile)
  *
  * @return 0 on sucess or -1 in failure.
  */
-int insert_string_eFile(eFile *efile, const char *string, size_t length)
+int insert_string_eFile(eFile * efile, char const * string, size_t length)
 {
 	if(efile == NULL)
 		return -1;
@@ -497,7 +497,7 @@ int insert_string_eFile(eFile *efile, const char *string, size_t length)
  *
  * @return 0 on sucess or -1 in failure.
  */
-int remove_string_eFile(eFile *efile, size_t length)
+int remove_string_eFile(eFile * efile, size_t length)
 {
 	if(efile == NULL)
 		return -1;

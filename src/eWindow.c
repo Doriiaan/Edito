@@ -28,7 +28,7 @@
  *
  * @note delete_eWindow() must be called before exiting.
  */
-eWindow *create_eWindow(size_t height, size_t width, unsigned int y, unsigned int x)
+eWindow * create_eWindow(size_t height, size_t width, unsigned int y, unsigned int x)
 {
 	eWindow *window = 0;
 
@@ -65,7 +65,7 @@ eWindow *create_eWindow(size_t height, size_t width, unsigned int y, unsigned in
  * @note y and x are relative to the origin of the eWindow orig.
  * @note delete_eWindow() must be called before exiting.
  */
-eWindow *create_der_eWindow(eWindow *orig, size_t height, size_t width, unsigned int y, unsigned int x)
+eWindow * create_der_eWindow(eWindow * orig, size_t height, size_t width, unsigned int y, unsigned int x)
 {
 	if(orig == NULL)
 		return NULL;
@@ -94,7 +94,7 @@ eWindow *create_der_eWindow(eWindow *orig, size_t height, size_t width, unsigned
  *
  * @param window eWindow pointer pointer
  */
-void delete_eWindow(eWindow **window)
+void delete_eWindow(eWindow ** window)
 {
 	if(*window == NULL)
 		return;

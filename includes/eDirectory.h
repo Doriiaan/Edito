@@ -64,7 +64,7 @@ typedef struct eDirectory {
  *
  * @note delete_eDirectory() must be called before exiting.
  */
-eDirectory *create_eDirectory(char *realpath);
+eDirectory * create_eDirectory(char const * realpath);
 
 
 /**
@@ -72,7 +72,7 @@ eDirectory *create_eDirectory(char *realpath);
  *
  * @param directory: eDirectory pointer pointer
  */
-void delete_eDirectory(eDirectory **directory);
+void delete_eDirectory(eDirectory ** directory);
 
 
 /** 
@@ -85,6 +85,6 @@ void delete_eDirectory(eDirectory **directory);
  *
  * @return 0 on success or -1 in failure or a positive number indicating the index overflow in comparison with the number of files/folders.
  */
-int get_item_at_index_eDirectory(eDirectory *directory, unsigned int item_index, eDirectory **out_directory, eFile **out_file);
+int get_item_at_index_eDirectory(eDirectory const * directory, unsigned int item_index, eDirectory ** out_directory, eFile ** out_file);
 
 #endif

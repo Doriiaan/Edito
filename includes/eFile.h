@@ -60,7 +60,7 @@ typedef struct efile_s
  *
  * @note delete_eFile() must be called before exiting.
  */
-eFile* create_eFile(char *filename);
+eFile* create_eFile(char const * filename);
 
 
 /**

@@ -24,7 +24,7 @@ typedef struct {
 	size_t alloc_size;
 
 	/** List of eFile */
-	eFile **files;
+	eFile const **files;
 
 	/** File count */
 	unsigned int n_files;
@@ -39,7 +39,7 @@ typedef struct {
  *
  * @note delete_eBar() must be called before exiting.
  */
-eBar *create_eBar(void);
+eBar * create_eBar(void);
 
 
 /**
@@ -47,7 +47,7 @@ eBar *create_eBar(void);
  *
  * @param bar: eBar pointer pointer
  */
-void delete_eBar(eBar **bar);
+void delete_eBar(eBar ** bar);
 
 
 /**
@@ -58,7 +58,7 @@ void delete_eBar(eBar **bar);
  *
  * @return 0 on success or -1 in failure.
  */
-int add_file_eBar(eBar *bar, eFile *file);
+int add_file_eBar(eBar * bar, eFile const * file);
 
 
 /**
@@ -69,7 +69,7 @@ int add_file_eBar(eBar *bar, eFile *file);
  *
  * @return 0 on success or -1 in failure.
  */
-int remove_file_eBar(eBar *bar, unsigned int index);
+int remove_file_eBar(eBar * bar, unsigned int index);
 
 
 /**
@@ -80,7 +80,7 @@ int remove_file_eBar(eBar *bar, unsigned int index);
  *
  * @return eFile pointer on sucess or NULL in failure.
  */
-eFile *get_file_eBar(eBar *bar, unsigned int index);
+eFile const * get_file_eBar(eBar const * bar, unsigned int index);
 
 
 /**
@@ -90,7 +90,7 @@ eFile *get_file_eBar(eBar *bar, unsigned int index);
  *
  * @return number of eFile stored in eBar.
  */
-unsigned int count_eBar(eBar *bar);
+unsigned int count_eBar(eBar const * bar);
 
 
 /**
@@ -101,6 +101,6 @@ unsigned int count_eBar(eBar *bar);
  *
  * @return true if the file is in the bar, false otherwise.
  */
-bool is_file_in_eBar(eBar *bar, eFile *file);
+bool is_file_in_eBar(eBar const * bar, eFile const * file);
 
 #endif
