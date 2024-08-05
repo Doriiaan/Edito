@@ -28,7 +28,7 @@ typedef struct {
 
 	/** File count */
 	unsigned int n_files;
-	
+
 } eBar;
 
 
@@ -76,7 +76,7 @@ int remove_file_eBar(eBar * bar, unsigned int index);
  * @brief The get_file_eBar() function return the eFile pointer at the specified index.
  *
  * @param bar: eBar pointer
- * @param index: index of eFile to remove 
+ * @param index: index of eFile to remove
  *
  * @return eFile pointer on sucess or NULL in failure.
  */

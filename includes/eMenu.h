@@ -41,10 +41,10 @@ typedef struct {
 
 	/** Menu */
 	MENU *menu;
-	
+
 	/** Menu items */
 	ITEM **items;
-	
+
 	/** Menu virtual items title. Virtual items become physical items after calling refresh_eMenu() */
 	char **virtual_items_title;
 
@@ -53,13 +53,13 @@ typedef struct {
 
 	/** Number of rows of menu */
 	int rows;
-	
+
 	/** Number of columns of menu */
 	int columns;
 
 	/** Number of items in virtual menu */
 	int n_items; /* int because index curses parameter are integer */
-	
+
 	/** Menu virtual items allocation size */
 	int alloc_size;
 
@@ -67,7 +67,7 @@ typedef struct {
 	int n_scroll;
 
 	/** Do the menu displays items in column or in row */
-	bool columnar; /* 1 in column, 0 in row */ 
+	bool columnar; /* 1 in column, 0 in row */
 
 } eMenu;
 
@@ -109,7 +109,7 @@ int add_item_eMenu(eMenu * menu, char const * item);
  * @brief The delete_item_eMenu() delete the item to the virtual menu.
  *
  * @param menu: eMenu pointer pointer
- * @param item: Item deleted 
+ * @param item: Item deleted
  *
  * @return 0 on success, -1 in failure.
  */
@@ -148,7 +148,7 @@ void move_next_item_eMenu(eMenu * menu);
 void move_previous_item_eMenu(eMenu * menu);
 
 
-/** 
+/**
  * @brief The move_current_item_eMenu(eMenu *menu) move the cursor to the current item.
  *
  * @param menu: eMenu pointer pointer
@@ -160,7 +160,7 @@ void move_current_item_eMenu(eMenu * menu);
  * @brief The move_pattern_item_eMenu() function move the cursor to the next item with pattern matching.
  *
  * @param menu: eMenu pointer pointer
- * @param pattern: pattern to match 
+ * @param pattern: pattern to match
  */
 void move_pattern_item_eMenu(eMenu * menu, char const * pattern);
 
@@ -169,7 +169,7 @@ void move_pattern_item_eMenu(eMenu * menu, char const * pattern);
  * @bried The get_current_item_index_eMenu() function return the current item index.
  *
  * @param menu: eMenu pointer pointer
- * 
+ *
  * @return The current item index.
  */
 int get_current_item_index_eMenu(eMenu const * menu);

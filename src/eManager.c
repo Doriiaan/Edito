@@ -7,7 +7,7 @@
  * @date 21/07/2024
  * @copyright GNU Public License.
  *
- * @details This file contain every functions and variable relative to the eManager structure. 
+ * @details This file contain every functions and variable relative to the eManager structure.
  *          The functions manage the View (eScreen) and the model (eFile, eMenu, eBar)
  * ===================================================
  */
@@ -97,7 +97,7 @@ eManager * create_eManager()
 	}
 
 	manager->lastmode = DIR;
-	manager->mode = DIR;	
+	manager->mode = DIR;
 	manager->screen = NULL;
 	manager->file = NULL;
 	manager->directory = NULL;
@@ -167,12 +167,12 @@ void set_eDirectory_eManager(eManager *manager, eDirectory * directory)
  * @param manager: eManager pointer
  * @param file: eFile pointer
  *
- * return 0 on success, -1 in failure 
+ * return 0 on success, -1 in failure
  */
 int set_eFile_eManager(eManager *manager, eFile * file)
 {
 	manager->file = file;
-	
+
 	return 0;
 }
 
@@ -272,7 +272,7 @@ bool process_input_eManager(eManager * manager, int input)
 		case KEY_UP:
 			return process_KEY_UP_eManager(manager);
 
-			
+
 		case KEY_DOWN:
 			return process_KEY_DOWN_eManager(manager);
 
@@ -284,14 +284,14 @@ bool process_input_eManager(eManager * manager, int input)
 		case KEY_RIGHT:
 			return process_KEY_RIGHT_eManager(manager);
 
-		
+
 		case KEY_BACKSPACE:
 			return process_BACKSPACE_eManager(manager);
-		
-		
+
+
 		case KEY_DC:
 			return process_DELETE_eManager(manager);
-		
+
 
 		/* ESCAPE */
 		case 27:
@@ -326,7 +326,7 @@ bool process_DEFAULT_eManager(eManager * manager, int input)
 }
 
 /*
- * @brief the process_ctrlq_input_eManager() function process a CTRLE input. 
+ * @brief the process_ctrlq_input_eManager() function process a CTRLE input.
  *
  * @param manager: eManager pointer
  *
@@ -340,7 +340,7 @@ bool process_ctrlq_eManager(eManager * manager)
 
 
 /*
- * @brief the process_ctrls_input_eManager() function process a CTRLS input. 
+ * @brief the process_ctrls_input_eManager() function process a CTRLS input.
  *
  * @param manager: eManager pointer
  *
@@ -366,7 +366,7 @@ bool process_ctrls_eManager(eManager * manager)
 
 
 /*
- * @brief the process_ctrld_input_eManager() function process a CTRLD input. 
+ * @brief the process_ctrld_input_eManager() function process a CTRLD input.
  *
  * @param manager: eManager pointer
  *
@@ -381,7 +381,7 @@ bool process_ctrld_eManager(eManager * manager)
 
 
 /*
- * @brief the process_ctrlb_input_eManager() function process a CTRLB input. 
+ * @brief the process_ctrlb_input_eManager() function process a CTRLB input.
  *
  * @param manager: eManager pointer
  *
@@ -399,7 +399,7 @@ bool process_ctrlb_eManager(eManager * manager)
 
 
 /*
- * @brief the process_ctrlf_input_eManager() function process a CTRLF input. 
+ * @brief the process_ctrlf_input_eManager() function process a CTRLF input.
  *
  * @param manager: eManager pointer
  *
@@ -417,7 +417,7 @@ bool process_ctrlf_eManager(eManager * manager)
 
 
 /*
- * @brief the process_ESCAPE_input_eManager() function process an ESCAPE input. 
+ * @brief the process_ESCAPE_input_eManager() function process an ESCAPE input.
  *
  * @param manager: eManager pointer
  *
@@ -459,15 +459,15 @@ bool process_ENTER_eManager(eManager * manager)
 		add_empty_line_eFile(manager->file, manager->file->current_line->line_number+1);
 		manager->file->current_pos = 0;
 		process_KEY_DOWN_eManager(manager);
-		insert_string_eFile(manager->file, buffer, buffer_length);	
-	
-		free(buffer);	
+		insert_string_eFile(manager->file, buffer, buffer_length);
+
+		free(buffer);
 		buffer = NULL;
 
 	}
 	else if(manager->mode == DIR)
 	{
-		item_index = get_current_item_index_menu_eScreen(manager->screen, MDIR);	
+		item_index = get_current_item_index_menu_eScreen(manager->screen, MDIR);
 		get_item_at_index_eDirectory(manager->directory, item_index, &directory, &file);
 		if(directory != NULL)
 		{
@@ -487,7 +487,7 @@ bool process_ENTER_eManager(eManager * manager)
 		{
 			/* If file isn't in the bar */
 			if(!is_file_in_eBar(manager->bar, file))
-			{	
+			{
 				/* Try to open the file */
 				if(open_eFile(file) == -1)
 				{
@@ -496,7 +496,7 @@ bool process_ENTER_eManager(eManager * manager)
 				}
 				if(file->permissions == p_READONLY)
 					add_help_msg_eManager(manager, "Readonly file.");
-				
+
 
 				/* Add file to eBar or quit, adding file to eBar */
 				if(add_file_eBar(manager->bar, file) == -1)
@@ -533,7 +533,7 @@ bool process_ENTER_eManager(eManager * manager)
 				move_pattern_item_menu_eScreen(manager->screen, MBAR, file->filename);
 				update_bar_eScreen(manager->screen);
 				resize_file_eScreen(manager->screen, file->n_elines);
-				
+
 				/* Enter write mode */
 				set_eFile_eManager(manager, file);
 				change_mode_eManager(manager, WRITE);
@@ -581,7 +581,7 @@ bool process_BACKSPACE_eManager(eManager * manager)
 			buffer_length = sizeof(char)*(manager->file->current_line->length-manager->file->current_pos);
 			buffer = malloc(buffer_length+1);
 			memset(buffer, 0, buffer_length+1);
-			
+
 			buffer_length = get_string_eLine(manager->file->current_line, buffer, buffer_length, manager->file->current_pos);
 			line_number = manager->file->current_line->line_number;
 			process_KEY_LEFT_eManager(manager);
@@ -622,11 +622,11 @@ bool process_DELETE_eManager(eManager * manager)
 			buffer_length = sizeof(char)*(manager->file->current_line->next->length);
 			buffer = malloc(buffer_length+1);
 			memset(buffer, 0, buffer_length+1);
-			
+
 			buffer_length = get_string_eLine(manager->file->current_line->next, buffer, buffer_length, 0);
 			insert_string_eFile(manager->file, buffer, buffer_length);
 			delete_line_eFile(manager->file, manager->file->current_line->next->line_number);
-			
+
 			free(buffer);
 			buffer = NULL;
 		}
@@ -635,7 +635,7 @@ bool process_DELETE_eManager(eManager * manager)
 }
 
 /*
- * @brief the process_KEY_RIGHT_input_eManager() function process a KEY_RIGHT input 
+ * @brief the process_KEY_RIGHT_input_eManager() function process a KEY_RIGHT input
  *
  * @param manager eManager pointer
  *
@@ -667,7 +667,7 @@ bool process_KEY_RIGHT_eManager(eManager * manager)
 
 
 /*
- * @brief the process_KEY_LEFT_input_eManager() function process a KEY_LEFT input 
+ * @brief the process_KEY_LEFT_input_eManager() function process a KEY_LEFT input
  *
  * @param manager eManager pointer
  *
@@ -698,7 +698,7 @@ bool process_KEY_LEFT_eManager(eManager * manager)
 
 
 /*
- * @brief the process_KEY_DOWN_input_eManager() function process a KEY_DOWN input 
+ * @brief the process_KEY_DOWN_input_eManager() function process a KEY_DOWN input
  *
  * @param manager eManager pointer
  *
@@ -713,8 +713,8 @@ bool process_KEY_DOWN_eManager(eManager * manager)
 		{
 			/* Do not get out of line with cursor  */
 			if(manager->file->current_pos > manager->file->current_line->next->length)
-				manager->file->current_pos = manager->file->current_line->next->length;				
-			
+				manager->file->current_pos = manager->file->current_line->next->length;
+
 			manager->file->current_line = manager->file->current_line->next;
 
 			/* While cursor is out of screen (line to big), pull down the screen */
@@ -731,7 +731,7 @@ bool process_KEY_DOWN_eManager(eManager * manager)
 
 
 /*
- * @brief the process_KEY_UP_input_eManager() function process a KEY_UP input 
+ * @brief the process_KEY_UP_input_eManager() function process a KEY_UP input
  *
  * @param manager eManager pointer
  *
@@ -750,7 +750,7 @@ bool process_KEY_UP_eManager(eManager * manager)
 			/* If current == first_line, pull up the screen */
 			if(manager->file->current_line->line_number-5 < manager->file->first_screen_line->line_number && manager->file->first_screen_line->previous)
 				manager->file->first_screen_line = manager->file->first_screen_line->previous;
-				
+
 			manager->file->current_line = manager->file->current_line->previous;
 		}
 	}
@@ -773,11 +773,11 @@ bool process_KEY_UP_eManager(eManager * manager)
 unsigned int getx_cursor_eManager(eManager const * manager)
 {
 	unsigned int pos = 0;
-	size_t width = get_width_eScreen(manager->screen, WFILE_CNT); 
-	
+	size_t width = get_width_eScreen(manager->screen, WFILE_CNT);
+
 	pos = screen_width_of_string(manager->file->current_line->string, manager->file->current_pos)%width;
-	
-	return pos; 
+
+	return pos;
 }
 
 
@@ -795,7 +795,7 @@ unsigned int gety_cursor_eManager(eManager const * manager)
 	eLine *current = NULL;
 
 	width = get_width_eScreen(manager->screen, WFILE_CNT);
-	
+
 	y=0;
 	current = manager->file->first_screen_line;
 	while(current && current != manager->file->current_line)
@@ -809,7 +809,7 @@ unsigned int gety_cursor_eManager(eManager const * manager)
 		}
 		current = current->next;
 	}
-	
+
 	y += screen_width_of_string(manager->file->current_line->string, manager->file->current_pos)/width;
 
 	return y;
@@ -836,7 +836,7 @@ unsigned int screen_width_of_string(char const * s, size_t length)
 			width += TABSIZE - width%TABSIZE;
 
 		else
-			width++; 
+			width++;
 		i++;
 	}
 	return width;
@@ -851,7 +851,7 @@ unsigned int screen_width_of_string(char const * s, size_t length)
  * @param level: level of the directory. The first must be 0
  *
  * @return 0 on success or -1 in failure.
- * @note This is a recursive function. 
+ * @note This is a recursive function.
  */
 int fill_directory_menu_eManager(eManager const * manager, eDirectory const * directory, unsigned int level)
 {
@@ -879,7 +879,7 @@ int fill_directory_menu_eManager(eManager const * manager, eDirectory const * di
 	memset(item, ' ', level*2);
 	if(directory->is_open)
 		strcat(item, "v ");
-	else	
+	else
 		strcat(item, "> ");
 	strncat(item, dirname, strlen(dirname));
 	add_item_menu_eScreen(manager->screen, MDIR, item);
@@ -894,7 +894,7 @@ int fill_directory_menu_eManager(eManager const * manager, eDirectory const * di
 		{
 			fill_directory_menu_eManager(manager, directory->dirs[i], level);
 		}
-	
+
 		/* Display directory files */
 		for(i=0; i<directory->n_files; i++)
 		{
@@ -911,7 +911,7 @@ int fill_directory_menu_eManager(eManager const * manager, eDirectory const * di
 			strncat(item, directory->files[i]->filename, strlen(directory->files[i]->filename));
 			add_item_menu_eScreen(manager->screen, MDIR, item);
 		}
-	}	
+	}
 	free(item);
 	return 0;
 }

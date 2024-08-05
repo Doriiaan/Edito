@@ -24,19 +24,19 @@ typedef struct eLine
 	size_t length;
 
 	/** Allocated size */
-	size_t alloc_size;	
-	
+	size_t alloc_size;
+
 	/** Line number */
 	unsigned int line_number;
-	
+
 	/** Previous line of NULL */
 	struct eLine * previous;
-	
+
 	/** Next line or NULL*/
 	struct eLine * next;
-	
+
 	/** Characters of the line, including \n character */
-	char *string; 
+	char *string;
 
 } eLine;
 
@@ -46,7 +46,7 @@ typedef struct eLine
  *
  * @param string: String of line
  * @param length: Length of the string (excluding null terminator)
- * @param line_number: Line number	
+ * @param line_number: Line number
  * @param next: Next line in file
  * @param previous: Previous line in file
  *
@@ -68,7 +68,7 @@ void delete_eLine(eLine ** eline);
 /**
  * @brief The insert_string_eLine() function insert length character of the string in the line at position pos.
  *
- * @param eline: eLine 
+ * @param eline: eLine
  * @param string: The string to insert
  * @param length: Number of character to insert from string into the eLine
  * @param pos: Position where to insert the string
@@ -81,7 +81,7 @@ int insert_string_eLine(eLine * eline, char const * string, size_t length, unsig
 /**
  * @brief The remove_string_eLine() function remove length character of the line at position pos.
  *
- * @param eline: eLine 
+ * @param eline: eLine
  * @param length: Number of character to remove from the eLine
  * @param pos: Position where to delete the string
  *
@@ -106,7 +106,7 @@ int insert_char_eLine(eLine * eline, const char ch, unsigned int pos);
  * @brief The remove_char_eLine() function remove a character in the line at position pos.
  *
  * @param eline: eLine
- * @param pos: Position where to delete the remove 
+ * @param pos: Position where to delete the remove
  *
  * @return 0 on success, -1 in failure.
  */

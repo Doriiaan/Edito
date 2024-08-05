@@ -27,7 +27,7 @@ typedef enum {
 } MODE;
 
 /**
- * @struct eManager structure to play the Controler role in MVC 
+ * @struct eManager structure to play the Controler role in MVC
  */
 typedef struct {
 
@@ -45,7 +45,7 @@ typedef struct {
 
 	/** Current mode */
 	MODE mode;
-	
+
 	/** Last mode */
 	MODE lastmode;
 
@@ -108,7 +108,7 @@ void set_eDirectory_eManager(eManager * manager, eDirectory * directory);
  * @param manager: eManager pointer
  * @param file: eFile pointer
  *
- * return 0 on success, -1 in failure 
+ * return 0 on success, -1 in failure
  * @note This function also print the content of the file in the screen.
  */
 int set_eFile_eManager(eManager * manager, eFile * file);
@@ -125,7 +125,7 @@ bool run_eManager(eManager * manager);
 
 
 /*
- * @brief The getx_cursor_eManager() return the position x of the cursor in the file window depending on the current file. 
+ * @brief The getx_cursor_eManager() return the position x of the cursor in the file window depending on the current file.
  *
  * @param manager: eManager pointer
  *
@@ -135,7 +135,7 @@ unsigned int getx_cursor_eManager(eManager const * manager);
 
 
 /*
- * @brief The gety_cursor_eManager() return the position y of the cursor in the file window depending on the current file. 
+ * @brief The gety_cursor_eManager() return the position y of the cursor in the file window depending on the current file.
  *
  * @param manager: eManager pointer
  *
@@ -152,7 +152,7 @@ unsigned int gety_cursor_eManager(eManager const * manager);
  * @param level: level of the directory. The first must be 0
  *
  * @return 0 on success or -1 in failure.
- * @note This is a recursive function. 
+ * @note This is a recursive function.
  */
 int fill_directory_menu_eManager(eManager const * manager, eDirectory const * directory, unsigned int level);
 

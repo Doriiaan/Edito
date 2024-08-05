@@ -17,7 +17,7 @@
 
 
 /**
- * @struct eFile structure to reprensent a file in memory 
+ * @struct eFile structure to reprensent a file in memory
  */
 typedef struct efile_s
 {
@@ -26,7 +26,7 @@ typedef struct efile_s
 
 	/** Number of line */
 	unsigned int n_elines;
-	
+
 	/** Current pos in current line */
 	unsigned int current_pos;
 
@@ -47,7 +47,7 @@ typedef struct efile_s
 
 	/** boolean to track status of file */
 	bool is_saved;
-	
+
 } eFile;
 
 
@@ -135,7 +135,7 @@ int insert_char_eFile(eFile *efile, const char ch);
 /**
  * @brief the remove_char_eFile() remove a character to the current position in the current_line.
  *
- * @param efile: eFile pointer 
+ * @param efile: eFile pointer
  *
  * @return 0 on sucess or -1 in failure.
  */

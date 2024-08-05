@@ -18,7 +18,7 @@ $(PROJECT_EXEC) : $(PROJECT_OBJ)
 
 # %.o : %.c decomposose each .o in a target
 $(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
-	$(CC) -c $< -o $@ $(PROJECT_CFLAGS) 
+	$(CC) -c $< -o $@ $(PROJECT_CFLAGS)
 
 # TODO declare .h include for each c file
 

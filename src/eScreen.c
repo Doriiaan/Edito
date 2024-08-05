@@ -7,7 +7,7 @@
  * @date 21/07/2024
  * @copyright GNU Public License.
  *
- * @details This file contains all the structures, variables and functions used to manage the screen and its windows. 
+ * @details This file contains all the structures, variables and functions used to manage the screen and its windows.
  *          The methods allow you to :
  *              - initialize and allocate eScreen from the width and height of the screen,
  *              - manage content of the screen.
@@ -39,7 +39,7 @@ eScreen * create_eScreen(int lines, int columns)
 	int width_bar = 0, height_bar = 0;
 	int width_file_box = 0, height_file_box = 0;
 	int width_help = 0, height_help = 0;
-	
+
 	screen = (eScreen *) malloc(sizeof(eScreen));
 	if(screen == NULL)
 	{
@@ -49,7 +49,7 @@ eScreen * create_eScreen(int lines, int columns)
 	/* Set eScreen dimension */
 	screen->width = columns;
 	screen->height = lines;
-	
+
 	/* Set WINDOWs dimension */
 	width_help = columns;
 	height_help = 4;
@@ -69,16 +69,16 @@ eScreen * create_eScreen(int lines, int columns)
 
 	/* Create WINDOWs */
 	screen->windows[WDIR_BOX] = create_eWindow(height_repository, width_repository, 0, 0);
-	
+
 	screen->windows[WDIR_ITEMS] = create_der_eWindow(screen->windows[WDIR_BOX], height_repository-2, width_repository-3, 1, 2);
 
 	screen->windows[WBAR_BOX] = create_eWindow(height_bar, width_bar,0 , width_repository);
-	
+
 	screen->windows[WBAR_ITEMS] = create_der_eWindow(screen->windows[WBAR_BOX], 2, width_bar-2 , height_bar/2, 1);
 
 	screen->windows[WFILE_BOX] = create_eWindow(height_file_box, width_file_box, height_bar, width_repository);
 
-	screen->windows[WFILE_LNUM] = NULL; 
+	screen->windows[WFILE_LNUM] = NULL;
 
 	screen->windows[WFILE_CNT] = NULL;
 
@@ -184,7 +184,7 @@ void update_all_eScreen(eScreen * screen)
 		if(screen->windows[i] != NULL)
 			wnoutrefresh(screen->windows[i]->window);
 	}
-	
+
 	doupdate();
 }
 
@@ -210,8 +210,8 @@ void create_file_window_eScreen(eScreen * screen, unsigned int number_length)
 
 	width_file_linesnumber = number_length + 3;
 	height_file_linesnumber= screen->windows[WFILE_BOX]->height - 2;
-	
-	width_file_content = screen->windows[WFILE_BOX]->width - width_file_linesnumber - 2; 
+
+	width_file_content = screen->windows[WFILE_BOX]->width - width_file_linesnumber - 2;
 	height_file_content = screen->windows[WFILE_BOX]->height - 2;
 
 	x_file_linesnumber = screen->windows[WFILE_BOX]->x + 1;
@@ -222,7 +222,7 @@ void create_file_window_eScreen(eScreen * screen, unsigned int number_length)
 
 	screen->windows[WFILE_LNUM] = create_eWindow(height_file_linesnumber, width_file_linesnumber, y_file_linesnumber, x_file_linesnumber);
 	screen->windows[WFILE_CNT] = create_eWindow(height_file_content, width_file_content, y_file_content, x_file_content);
-}	
+}
 
 
 /**
@@ -234,18 +234,18 @@ void create_file_window_eScreen(eScreen * screen, unsigned int number_length)
 void resize_file_eScreen(eScreen * screen, unsigned int number_length)
 {
 	if(number_length+3 != screen->windows[WFILE_LNUM]->width)
-	{	
+	{
 		int width_file_linesnumber = 0;
 		int width_file_content = 0;
 		int x_file_content = 0;
 
 		width_file_linesnumber = number_length + 3;
-		
-		width_file_content = screen->windows[WFILE_BOX]->width - width_file_linesnumber - 2; 
+
+		width_file_content = screen->windows[WFILE_BOX]->width - width_file_linesnumber - 2;
 
 		x_file_content = screen->windows[WFILE_LNUM]->x + width_file_linesnumber;
 
-		
+
 		screen->windows[WFILE_LNUM]->width = width_file_linesnumber;
 		screen->windows[WFILE_CNT]->width = width_file_content;
 		screen->windows[WFILE_CNT]->x = x_file_content;
@@ -276,7 +276,7 @@ void print_content_eScreen(eScreen * screen, eLine const * first_line)
 	werase(screen->windows[WFILE_LNUM]->window);
 
 	wborder(screen->windows[WFILE_LNUM]->window, ' ', 0, ' ', ' ', ' ', ACS_VLINE, ' ', ACS_VLINE);
-	
+
 	while(screen_pos < screen->windows[WFILE_CNT]->height)
 	{
 		/* If there is at least one line left */

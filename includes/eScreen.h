@@ -12,7 +12,7 @@
 #define __ESCREEN_H__
 
 #include "eLine.h"
-#include "eWindow.h" 
+#include "eWindow.h"
 #include "eMenu.h"
 
 
@@ -23,10 +23,10 @@ typedef struct {
 
 	/** Number of lines */
 	size_t height;
-	
+
 	/** Array of every window */
-	eWindow *windows[WINDOWS_NUMBER]; 
-	
+	eWindow *windows[WINDOWS_NUMBER];
+
 	/** Array of every menu */
 	eMenu *menus[MENU_NUMBER];
 
@@ -93,7 +93,7 @@ void update_help_eScreen(eScreen * screen);
  */
 void update_all_eScreen(eScreen * screen);
 
- 
+
 
 /* ==========================================================
  * eWindow functions
@@ -119,7 +119,7 @@ void create_file_window_eScreen(eScreen * screen, unsigned int number_length);
 void resize_file_eScreen(eScreen * screen, unsigned int number_length);
 
 
-// TODO: A faire sauter -> remplacer par print_line_eWindow(eWindow *window, unsigned int x, unsigned int y, const char fmt, ...); 
+// TODO: A faire sauter -> remplacer par print_line_eWindow(eWindow *window, unsigned int x, unsigned int y, const char fmt, ...);
 /**
  * @brief The print_content_eScreen() function print the content of the file in the window, do not change the cursor position
  *

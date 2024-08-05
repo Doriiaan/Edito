@@ -7,7 +7,7 @@
  * @date 21/07/2024
  * @copyright GNU Public License.
  *
- * @details This file contain every functions and variable relative to the eMenu structure. 
+ * @details This file contain every functions and variable relative to the eMenu structure.
  *          The structure contain every information of a menu.
  * ===================================================
  */
@@ -35,7 +35,7 @@ static void reset_menu(eMenu * menu);
 eMenu * create_eMenu(WINDOW * win, WINDOW * sub, bool columnar)
 {
 	eMenu *menu = NULL;
-	
+
 	menu = (eMenu *) malloc(sizeof(eMenu));
 	if(menu == NULL)
 		return NULL;
@@ -74,7 +74,7 @@ void delete_eMenu(eMenu ** menu)
 
 	for(int i=0; i<(*menu)->n_items; i++)
 	{
-		free((*menu)->virtual_items_title[i]);	
+		free((*menu)->virtual_items_title[i]);
 	}
 
 	if((*menu)->virtual_items_title != NULL)
@@ -99,7 +99,7 @@ int add_item_eMenu(eMenu * menu, char const * item)
 
 	if(menu == NULL)
 		return -1;
-	
+
 	/* Alloc_size must be equal to n_items+1. */
 	if(menu->n_items+1 > menu->alloc_size)
 	{
@@ -131,7 +131,7 @@ int add_item_eMenu(eMenu * menu, char const * item)
  * @brief The delete_item_eMenu() delete the item to the virtual menu.
  *
  * @param menu: eMenu pointer pointer
- * @param item: Item deleted 
+ * @param item: Item deleted
  *
  * @return 0 on success, -1 in failure.
  */
@@ -159,7 +159,7 @@ int delete_item_eMenu(eMenu * menu, int index)
  * @param menu: eMenu pointer pointer
  */
 void erase_eMenu(eMenu * menu)
-{	
+{
 	if(menu==NULL)
 		return;
 
@@ -170,7 +170,7 @@ void erase_eMenu(eMenu * menu)
 	{
 		if(menu->virtual_items_title[i] != NULL)
 		{
-			free(menu->virtual_items_title[i]);	
+			free(menu->virtual_items_title[i]);
 			menu->virtual_items_title[i] = NULL;
 		}
 	}
@@ -246,8 +246,8 @@ void move_previous_item_eMenu(eMenu * menu)
 }
 
 
-/** 
- * @brief The move_current_item_eMenu(eMenu *menu) move the cursor to the current item. 
+/**
+ * @brief The move_current_item_eMenu(eMenu *menu) move the cursor to the current item.
  *
  * @param menu: eMenu pointer pointer
  */
@@ -261,7 +261,7 @@ void move_current_item_eMenu(eMenu * menu)
  * @brief The move_pattern_item_eMenu() function move the cursor to the next item with pattern matching.
  *
  * @param menu: eMenu pointer pointer
- * @param pattern: pattern to match 
+ * @param pattern: pattern to match
  */
 void move_pattern_item_eMenu(eMenu * menu, char const * pattern)
 {
@@ -273,7 +273,7 @@ void move_pattern_item_eMenu(eMenu * menu, char const * pattern)
  * @bried The get_current_item_index_eMenu() function return the current item index.
  *
  * @param menu: eMenu pointer pointer
- * 
+ *
  * @return The current item index.
  */
 int get_current_item_index_eMenu(eMenu const * menu)
@@ -295,10 +295,10 @@ void set_cursor_position_eMenu(eMenu * menu, int position)
 		menu_driver(menu->menu, REQ_SCR_DLINE);
 	}
 
-	for(int i=0; i < position-menu->n_scroll; i++) 
+	for(int i=0; i < position-menu->n_scroll; i++)
 	{
 		menu_driver(menu->menu, REQ_DOWN_ITEM);
-	}	
+	}
 }
 
 
@@ -310,7 +310,7 @@ void set_cursor_position_eMenu(eMenu * menu, int position)
 void reset_menu(eMenu * menu)
 {
 	int i=0;
-	int count = item_count(menu->menu); 
+	int count = item_count(menu->menu);
 
 	if(menu->menu != NULL)
 		free_menu(menu->menu);
@@ -367,7 +367,7 @@ void init_menu(eMenu * menu)
 		item_opts_off(menu->items[i], O_NONCYCLIC | O_SHOWDESC);
 	}
 	menu->items[menu->n_items] = NULL;
-	
+
 	menu->menu = new_menu(menu->items);
 	set_menu_format(menu->menu, menu->rows, menu->columns);
 	set_menu_mark(menu->menu, "");

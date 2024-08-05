@@ -24,10 +24,10 @@ typedef struct eDirectory {
 
 	/** Child files allocation memory*/
 	size_t alloc_files_size;
-	
+
 	/** Child directories allocation memory */
 	size_t alloc_dirs_size;
-	
+
 	/** List of child files */
 	eFile **files;
 
@@ -36,13 +36,13 @@ typedef struct eDirectory {
 
 	/** Number of child files */
 	unsigned int n_files;
-	
+
 	/** Number of child directories */
 	unsigned int n_dirs;
 
 	/** Directory permissions */
 	PERM permissions;
-	
+
 	/** Directory name */
 	char *dirname;
 
@@ -75,7 +75,7 @@ eDirectory * create_eDirectory(char const * realpath);
 void delete_eDirectory(eDirectory ** directory);
 
 
-/** 
+/**
  * @brief The get_item_at_index_eDirectory() function returns either a directory or a file.
  *
  * @param directory: eDirectory pointer

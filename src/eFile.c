@@ -7,7 +7,7 @@
  * @date 21/07/2024
  * @copyright GNU Public License.
  *
- * @details This file contains all the structures, variables and functions used to manage the file and its contents. 
+ * @details This file contains all the structures, variables and functions used to manage the file and its contents.
  *          The methods allow you to :
  *              - initialize and allocate eFile from the name of a file,
  *              - modify the contents of eFile and
@@ -83,14 +83,14 @@ eFile* create_eFile(char const * realpath)
 	{
 		return NULL;
 	}
-	
+
 	efile->permissions = file_permissions(realpath);
 
 	efile->realpath = strdup(realpath);
 
-	if(efile->realpath[strlen(efile->realpath)-1] == '/')	
+	if(efile->realpath[strlen(efile->realpath)-1] == '/')
 		efile->realpath[strlen(efile->realpath)-1] = 0;
-	
+
 	efile->filename = ((efile->filename = strrchr(efile->realpath, '/')) != NULL) ? efile->filename+1 : efile->realpath;
 
 	efile->n_elines = 0;
@@ -134,7 +134,7 @@ int open_eFile(eFile * efile)
 	eLine *current = NULL, *previous = NULL;
 	FILE *fp = NULL;
 	char buffer[BUFFER_LENGTH];
-	memset(buffer, 0, BUFFER_LENGTH);	
+	memset(buffer, 0, BUFFER_LENGTH);
 
 	if(efile == NULL || efile->permissions == p_NOPERM)
 		return -1;
@@ -148,7 +148,7 @@ int open_eFile(eFile * efile)
 		}
 
 		add_empty_line_eFile(efile, 1);
-		return 0; 
+		return 0;
 	}
 
 	/* Open file to read it */
@@ -163,7 +163,7 @@ int open_eFile(eFile * efile)
 	{
 		if((current = create_eLine(buffer, BUFFER_LENGTH, efile->n_elines+1, previous, NULL)) == NULL)
 		{
-			close_eFile(efile);	
+			close_eFile(efile);
 			fclose(fp);
 			return -1;
 		}
@@ -256,7 +256,7 @@ int write_eFile(eFile * efile)
 		return -1;
 
 	current = efile->first_file_line;
-	
+
 	while(current)
 	{
 		/* Realloc buffer if necessary, first time realloc is equal to malloc */
@@ -265,7 +265,7 @@ int write_eFile(eFile * efile)
 			buffer_length = sizeof(char)*(current->length+2);
 			buffer = (char *) realloc(buffer, buffer_length);
 		}
-		
+
 		memset(buffer, 0, buffer_length);
 		memcpy(buffer, current->string, current->length);
 		buffer[current->length] = '\n';
@@ -282,7 +282,7 @@ int write_eFile(eFile * efile)
 	fclose(fp);
 
 	efile->is_saved = true;
-	
+
 	return 0;
 }
 
@@ -312,11 +312,11 @@ int add_empty_line_eFile(eFile * efile, unsigned int pos)
 		{
 			return -1;
 		}
-		
+
 		efile->n_elines = 1;
 		efile->is_saved = false;
 		return 0;
-		
+
 	}
 
 	while(i < pos-1 && current->next)
@@ -324,7 +324,7 @@ int add_empty_line_eFile(eFile * efile, unsigned int pos)
 		current=current->next;
 		i++;
 	}
-	
+
 	/* Current is previous*/
 	if((new = create_eLine("", 0, pos, current, current->next)) == NULL)
 	{
@@ -339,11 +339,11 @@ int add_empty_line_eFile(eFile * efile, unsigned int pos)
 		current->line_number++;
 		current = current->next;
 	}
-	
+
 	efile->is_saved = false;
 	return 0;
 }
-			
+
 
 /**
  * @brief the delete_line_eFile() delete a line to the position pos in the file.
@@ -375,7 +375,7 @@ int delete_line_eFile(eFile * efile, unsigned int line_number)
 		else
 			last_line = true;
 	}
-	
+
 	if(line_number == efile->first_screen_line->line_number)
 	{
 		if(efile->first_screen_line->next)
@@ -386,11 +386,11 @@ int delete_line_eFile(eFile * efile, unsigned int line_number)
 		else
 			last_line = true;
 	}
-	
+
 	if(last_line)
 		add_empty_line_eFile(efile, line_number+1);
 
-	
+
 	if(line_number == efile->first_file_line->line_number)
 		efile->first_file_line = efile->first_file_line->next;
 
@@ -450,7 +450,7 @@ int insert_char_eFile(eFile * efile, const char ch)
 /**
  * @brief the remove_char_eFile() remove a character to the current position in the current_line.
  *
- * @param efile: eFile pointer 
+ * @param efile: eFile pointer
  *
  * @return 0 on sucess or -1 in failure.
  */
@@ -503,7 +503,7 @@ int remove_string_eFile(eFile * efile, size_t length)
 		return -1;
 
 	if(remove_string_eLine(efile->current_line, length, efile->current_pos))
-		return -1;	
+		return -1;
 
 	efile->is_saved = false;
 	return 0;

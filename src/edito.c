@@ -13,7 +13,7 @@
 #include "eFile.h"
 #include "eManager.h"
 
-#include <stdlib.h> 
+#include <stdlib.h>
 #include <stdbool.h>
 #include <locale.h>
 
@@ -25,12 +25,12 @@ void usage(void);
 int main(int argc, char * argv[])
 {
 	bool run = true;
-	
+
 	eManager *manager = NULL;
 	eScreen *screen = NULL;
 	eBar *bar = NULL;
 	eDirectory *project_repo = NULL;
-	char *reponame = 0; 
+	char *reponame = 0;
 
 	if(argc == 1)
 	{
@@ -45,10 +45,10 @@ int main(int argc, char * argv[])
 		usage();
 		exit(EXIT_FAILURE);
 	}
-		
+
 
 	/* Terminal initialization */
-	init_terminal();	
+	init_terminal();
 
 	/* Screen structure initialization */
 	if((screen = create_eScreen(LINES, COLS)) == NULL)
@@ -56,7 +56,7 @@ int main(int argc, char * argv[])
 		reset_terminal();
 		exit(EXIT_FAILURE);
 	}
-	
+
 	/* Bar structure creation */
 	if((bar = create_eBar()) == NULL)
 	{
@@ -107,7 +107,7 @@ int main(int argc, char * argv[])
 	delete_eManager(&manager);
 
 	reset_terminal();
-	
+
 	return 0;
 }
 

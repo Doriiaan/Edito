@@ -34,7 +34,7 @@ typedef enum {
 
 
 /**
- * @struct Window structure to keep all information about a window 
+ * @struct Window structure to keep all information about a window
  */
 typedef struct eWindow {
 
@@ -76,7 +76,7 @@ eWindow *create_eWindow(size_t height, size_t width, unsigned int y, unsigned in
  * @param width: Window width (in columns)
  * @param y: y position of the window in the Screen
  * @param x: x position of the winwow in the Screen
- * 
+ *
  * @return eWindow pointer or NULL if it was an error, see logs.
  *
  * @note y and x are relative to the origin of the eWindow orig.

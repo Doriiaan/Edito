@@ -7,7 +7,7 @@
  * @date 21/07/2024
  * @copyright GNU Public License.
  *
- * @details This file contain every functions and variable relative to the eWindow structure. 
+ * @details This file contain every functions and variable relative to the eWindow structure.
  *          The structure contain every information of a window.
  * ===================================================
  */
@@ -44,7 +44,7 @@ eWindow * create_eWindow(size_t height, size_t width, unsigned int y, unsigned i
 	window->height = height;
 	window->x = x;
 	window->y = y;
-	
+
 	keypad(window->window, TRUE); /* activate KEY_UP, KEY_RIGHT, ... */
 
 	return window;
@@ -59,7 +59,7 @@ eWindow * create_eWindow(size_t height, size_t width, unsigned int y, unsigned i
  * @param width: Window width (in columns)
  * @param y: y position of the window in the Screen
  * @param x: x position of the winwow in the Screen
- * 
+ *
  * @return eWindow pointer or NULL if it was an error, see logs.
  *
  * @note y and x are relative to the origin of the eWindow orig.
@@ -82,7 +82,7 @@ eWindow * create_der_eWindow(eWindow * orig, size_t height, size_t width, unsign
 	window->height = height;
 	window->x = orig->x + x;
 	window->y = orig->y + y;
-	
+
 	keypad(window->window, TRUE); /* activate KEY_UP, KEY_RIGHT, ... */
 
 	return window;

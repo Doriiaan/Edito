@@ -7,7 +7,7 @@
  * @date 21/07/2024
  * @copyright GNU Public License.
  *
- * @details This file contains all the structures, variables and functions used to manage the bar structure. 
+ * @details This file contains all the structures, variables and functions used to manage the bar structure.
  * 			eBar is used to store open efile. This structure do not manage any screen function.
  * ===================================================
  */
@@ -32,7 +32,7 @@ eBar * create_eBar()
 	eBar *bar = NULL;
 
 	bar = (eBar *) malloc(sizeof(eBar));
-	
+
 	bar->files = NULL;
 	bar->n_files = 0;
 	bar->alloc_size = 0;
@@ -113,7 +113,7 @@ int remove_file_eBar(eBar * bar, unsigned int index)
  * @brief The get_file_eBar() function return the eFile pointer at the specified index.
  *
  * @param bar: eBar pointer
- * @param index: index of eFile to remove 
+ * @param index: index of eFile to remove
  *
  * @return eFile pointer on sucess or NULL in failure.
  */

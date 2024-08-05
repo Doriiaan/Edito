@@ -12,7 +12,7 @@
 /**
  * @brief The dir_permissions() function return the permission of the directory designed by realpath.
  *
- * @param realpath: path (absolute of relative) of the directory 
+ * @param realpath: path (absolute of relative) of the directory
  * @return PERM value defining the permission of the directory.
  */
 PERM dir_permissions(const char *realpath)
@@ -53,7 +53,7 @@ PERM dir_permissions(const char *realpath)
 eDirectory * create_eDirectory(char const * realpath)
 {
 	eDirectory *directory = NULL;
-	PERM permissions; 
+	PERM permissions;
 	DIR *dir = NULL;
     struct dirent *elem = NULL;
 	struct stat elem_info;
@@ -75,17 +75,17 @@ eDirectory * create_eDirectory(char const * realpath)
 	if(directory == NULL)
 		return NULL;
 
-	directory->permissions = permissions;	
+	directory->permissions = permissions;
 	directory->realpath = strdup(realpath);
 
 
 	/* Delete the '/' at the end */
-	if(directory->realpath[strlen(directory->realpath)-1] == '/')	
+	if(directory->realpath[strlen(directory->realpath)-1] == '/')
 		directory->realpath[strlen(directory->realpath)-1] = 0;
-	
-	/* Dirname is equal to pointer on the last occurence of '/'+1 (last part) or realpath if there is no '/' */ 
+
+	/* Dirname is equal to pointer on the last occurence of '/'+1 (last part) or realpath if there is no '/' */
 	directory->dirname = ((directory->dirname = strrchr(directory->realpath, '/')) != NULL) ? directory->dirname+1 : directory->realpath;
-	
+
 	directory->n_files = 0;
 	directory->alloc_files_size = 0;
 	directory->n_dirs = 0;
@@ -108,13 +108,13 @@ eDirectory * create_eDirectory(char const * realpath)
 
 		/* Allocate string to contain path of elem */
 		if(elem_real_path_length < sizeof(char)*(strlen(directory->realpath)+strlen(elem->d_name)+2))
-		{	
+		{
 			/* Path + '/' + Name + 0 */
 			elem_real_path_length = sizeof(char)*(strlen(directory->realpath)+strlen(elem->d_name)+2);
 			elem_real_path = realloc(elem_real_path, elem_real_path_length);
 			memset(elem_real_path, 0, elem_real_path_length);
 		}
-		
+
 		strcpy(elem_real_path, directory->realpath);
 		strcat(elem_real_path, "/");
 		strcat(elem_real_path, elem->d_name);
@@ -142,7 +142,7 @@ eDirectory * create_eDirectory(char const * realpath)
 			directory->files[directory->n_files] = create_eFile(elem_real_path);
 			directory->n_files++;
 		}
-		/* If elem is a directory */	
+		/* If elem is a directory */
 		else if(S_ISDIR(elem_info.st_mode))
 		{
 			/* Allocate memory to store dirs */
@@ -165,7 +165,7 @@ eDirectory * create_eDirectory(char const * realpath)
 	free(elem_real_path);
 	closedir(dir);
 
-	return directory;	
+	return directory;
 }
 
 
@@ -186,7 +186,7 @@ void delete_eDirectory(eDirectory ** directory)
 
 	for(i=0; i<(*directory)->n_files; i++)
 		delete_eFile(&(*directory)->files[i]);
-	
+
 	free((*directory)->dirs);
 	free((*directory)->files);
 	free((*directory)->realpath);
@@ -194,7 +194,7 @@ void delete_eDirectory(eDirectory ** directory)
 }
 
 
-/** 
+/**
  * @brief The get_item_at_index_eDirectory() function returns either a directory or a file at the index. Search is recursive.
  *
  * @param directory: eDirectory pointer
