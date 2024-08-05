@@ -46,9 +46,9 @@ typedef struct eWindow {
 
 	unsigned int y;
 
-	WINDOW *window;
+	WINDOW * window;
 
-	struct eWindow *orig;
+	struct eWindow * orig;
 
 } eWindow;
 
@@ -65,7 +65,7 @@ typedef struct eWindow {
  *
  * @note delete_eWindow() must be called before exiting.
  */
-eWindow *create_eWindow(size_t height, size_t width, unsigned int y, unsigned int x);
+eWindow * create_eWindow(size_t height, size_t width, unsigned int y, unsigned int x);
 
 
 /**
@@ -82,7 +82,7 @@ eWindow *create_eWindow(size_t height, size_t width, unsigned int y, unsigned in
  * @note y and x are relative to the origin of the eWindow orig.
  * @note delete_eWindow() must be called before exiting.
  */
-eWindow *create_der_eWindow(eWindow * orig, size_t height, size_t width, unsigned int y, unsigned int x);
+eWindow * create_der_eWindow(eWindow * orig, size_t height, size_t width, unsigned int y, unsigned int x);
 
 
 /**

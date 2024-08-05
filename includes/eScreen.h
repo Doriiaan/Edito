@@ -25,10 +25,10 @@ typedef struct {
 	size_t height;
 
 	/** Array of every window */
-	eWindow *windows[WINDOWS_NUMBER];
+	eWindow * windows[WINDOWS_NUMBER];
 
 	/** Array of every menu */
-	eMenu *menus[MENU_NUMBER];
+	eMenu * menus[MENU_NUMBER];
 
 } eScreen;
 
@@ -104,7 +104,6 @@ void update_all_eScreen(eScreen * screen);
  *
  * @param screen: eScreen pointer
  * @param number_length: number of digit in the lines number
- *
  */
 void create_file_window_eScreen(eScreen * screen, unsigned int number_length);
 

@@ -15,7 +15,7 @@
  * @param realpath: path (absolute of relative) of the directory
  * @return PERM value defining the permission of the directory.
  */
-PERM dir_permissions(const char *realpath)
+PERM dir_permissions(char const * realpath)
 {
 	errno=0;
 	if(access(realpath, X_OK|R_OK) == -1)

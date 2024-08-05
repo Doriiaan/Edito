@@ -86,7 +86,7 @@ char const * const DEFAULT_HELP_MESSAGE[sizeof(MODE)][6] =
  *
  * @note delete_eManager() must be called before exiting.
  */
-eManager * create_eManager()
+eManager * create_eManager(void)
 {
 	eManager *manager = NULL;
 
@@ -155,7 +155,7 @@ void set_eBar_eManager(eManager *manager, eBar * bar)
  *
  * @note This function also print the content of the repository in the screen.
  */
-void set_eDirectory_eManager(eManager *manager, eDirectory * directory)
+void set_eDirectory_eManager(eManager * manager, eDirectory * directory)
 {
 	manager->directory = directory;
 }
@@ -166,14 +166,10 @@ void set_eDirectory_eManager(eManager *manager, eDirectory * directory)
  *
  * @param manager: eManager pointer
  * @param file: eFile pointer
- *
- * return 0 on success, -1 in failure
  */
-int set_eFile_eManager(eManager *manager, eFile * file)
+void set_eFile_eManager(eManager * manager, eFile * file)
 {
 	manager->file = file;
-
-	return 0;
 }
 
 

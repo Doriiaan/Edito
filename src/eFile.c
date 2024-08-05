@@ -36,7 +36,7 @@
  * @param realpath: Name of the file
  * @return PERM value defining the permission of the file.
  */
-PERM file_permissions(const char *realpath)
+PERM file_permissions(char const * realpath)
 {
 	errno=0;
 	if(access(realpath, R_OK) == -1)
@@ -73,7 +73,7 @@ PERM file_permissions(const char *realpath)
  *
  * @note delete_eFile() must be called before exiting.
  */
-eFile* create_eFile(char const * realpath)
+eFile * create_eFile(char const * realpath)
 {
 	eFile *efile=NULL;
 

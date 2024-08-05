@@ -31,19 +31,19 @@ typedef struct efile_s
 	unsigned int current_pos;
 
 	/** First line of eLine linked list */
-	eLine *first_file_line;
+	eLine * first_file_line;
 
 	/** First line of screen */
-	eLine *first_screen_line;
+	eLine * first_screen_line;
 
 	/** Current line */
-	eLine *current_line;
+	eLine * current_line;
 
 	/** Filename */
-	char *filename;
+	char * filename;
 
 	/** Path + '/' + filename */
-	char *realpath;
+	char * realpath;
 
 	/** boolean to track status of file */
 	bool is_saved;
@@ -60,7 +60,7 @@ typedef struct efile_s
  *
  * @note delete_eFile() must be called before exiting.
  */
-eFile* create_eFile(char const * filename);
+eFile * create_eFile(char const * filename);
 
 
 /**
@@ -68,7 +68,7 @@ eFile* create_eFile(char const * filename);
  *
  * @param efile: eFile pointer pointer
  */
-void delete_eFile(eFile **efile);
+void delete_eFile(eFile ** efile);
 
 
 /**
@@ -79,7 +79,7 @@ void delete_eFile(eFile **efile);
  * @note close_eFile() must be called to deallocate lines, delete_eFile also call close_eFile().
  * @note If the file did not exist when calling create_eFile(), open_eFile write a new file.
  */
-int open_eFile(eFile *efile);
+int open_eFile(eFile * efile);
 
 
 /**
@@ -107,7 +107,7 @@ int write_eFile(eFile *efile);
  *
  * @return 0 on success or -1 in failure.
  */
-int add_empty_line_eFile(eFile *efile, unsigned int pos);
+int add_empty_line_eFile(eFile * efile, unsigned int pos);
 
 
 /**
@@ -118,7 +118,7 @@ int add_empty_line_eFile(eFile *efile, unsigned int pos);
  *
  * @return 0 on sucess or -1 in failure.
  */
-int delete_line_eFile(eFile *efile, unsigned int pos);
+int delete_line_eFile(eFile * efile, unsigned int pos);
 
 
 /**
@@ -129,7 +129,7 @@ int delete_line_eFile(eFile *efile, unsigned int pos);
  *
  * @return 0 on sucess or -1 in failure.
  */
-int insert_char_eFile(eFile *efile, const char ch);
+int insert_char_eFile(eFile * efile, const char ch);
 
 
 /**
@@ -139,7 +139,7 @@ int insert_char_eFile(eFile *efile, const char ch);
  *
  * @return 0 on sucess or -1 in failure.
  */
-int remove_char_eFile(eFile *efile);
+int remove_char_eFile(eFile * efile);
 
 
 /**
@@ -151,7 +151,7 @@ int remove_char_eFile(eFile *efile);
  *
  * @return 0 on sucess or -1 in failure.
  */
-int insert_string_eFile(eFile *efile, const char *string, size_t length);
+int insert_string_eFile(eFile * efile, char const * string, size_t length);
 
 
 /**

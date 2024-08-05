@@ -32,16 +32,16 @@ typedef enum {
 typedef struct {
 
 	/** Screen */
-	eScreen *screen;
+	eScreen * screen;
 
 	/** Current opened file */
-	eFile *file;
+	eFile * file;
 
 	/** File bar */
-	eBar *bar;
+	eBar * bar;
 
 	/** Directory */
-	eDirectory *directory;
+	eDirectory * directory;
 
 	/** Current mode */
 	MODE mode;
@@ -50,7 +50,7 @@ typedef struct {
 	MODE lastmode;
 
 	/** Help message */
-	char *help_msg;
+	char * help_msg;
 
 } eManager;
 
@@ -62,7 +62,7 @@ typedef struct {
  *
  * @note delete_eManager() must be called before exiting.
  */
-eManager *create_eManager();
+eManager * create_eManager(void);
 
 
 /**
@@ -107,11 +107,8 @@ void set_eDirectory_eManager(eManager * manager, eDirectory * directory);
  *
  * @param manager: eManager pointer
  * @param file: eFile pointer
- *
- * return 0 on success, -1 in failure
- * @note This function also print the content of the file in the screen.
  */
-int set_eFile_eManager(eManager * manager, eFile * file);
+void set_eFile_eManager(eManager * manager, eFile * file);
 
 
 /**

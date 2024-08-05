@@ -24,7 +24,7 @@ typedef struct {
 	size_t alloc_size;
 
 	/** List of eFile */
-	eFile const **files;
+	eFile const ** files;
 
 	/** File count */
 	unsigned int n_files;

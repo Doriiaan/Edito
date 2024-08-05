@@ -27,7 +27,7 @@
  *
  * @note delete_eBar() must be called before exiting.
  */
-eBar * create_eBar()
+eBar * create_eBar(void)
 {
 	eBar *bar = NULL;
 

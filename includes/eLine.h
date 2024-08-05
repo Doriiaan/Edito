@@ -54,7 +54,7 @@ typedef struct eLine
  *
  * @note delete_eLine() must be called before exiting.
  */
-eLine *create_eLine(char const * string, size_t length, unsigned int line_number, eLine * previous, eLine * next);
+eLine * create_eLine(char const * string, size_t length, unsigned int line_number, eLine * previous, eLine * next);
 
 
 /**

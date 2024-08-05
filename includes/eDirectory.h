@@ -29,10 +29,10 @@ typedef struct eDirectory {
 	size_t alloc_dirs_size;
 
 	/** List of child files */
-	eFile **files;
+	eFile ** files;
 
 	/** List of child directories */
-	struct eDirectory **dirs;
+	struct eDirectory ** dirs;
 
 	/** Number of child files */
 	unsigned int n_files;
@@ -44,10 +44,10 @@ typedef struct eDirectory {
 	PERM permissions;
 
 	/** Directory name */
-	char *dirname;
+	char * dirname;
 
 	/** Directory path + '/' + name */
-	char *realpath;
+	char * realpath;
 
 	/** Do the directory is open (on screen) */
 	bool is_open;

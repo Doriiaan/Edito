@@ -34,22 +34,22 @@ typedef enum {
 typedef struct {
 
 	/** Menu window */
-	WINDOW *win;
+	WINDOW * win;
 
 	/** Menu sub window */
-	WINDOW *sub;
+	WINDOW * sub;
 
 	/** Menu */
-	MENU *menu;
+	MENU * menu;
 
 	/** Menu items */
-	ITEM **items;
+	ITEM ** items;
 
 	/** Menu virtual items title. Virtual items become physical items after calling refresh_eMenu() */
-	char **virtual_items_title;
+	char ** virtual_items_title;
 
 	/** Menu physical items title */
-	char **physical_items_title;
+	char ** physical_items_title;
 
 	/** Number of rows of menu */
 	int rows;
