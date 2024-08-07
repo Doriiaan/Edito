@@ -19,6 +19,7 @@
 #include "util.h"
 
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 
 
@@ -152,9 +153,12 @@ void update_bar_eScreen(eScreen * screen)
  */
 void update_file_eScreen(eScreen * screen)
 {
-	wnoutrefresh(screen->windows[WFILE_LNUM]->window);
-	wnoutrefresh(screen->windows[WFILE_CNT]->window);
-	doupdate();
+	int width = get_width_eScreen(screen, WFILE_LNUM);
+	int height = get_height_eScreen(screen, WFILE_LNUM);
+
+	mvwvline(screen->windows[WFILE_LNUM]->window, 0, width-1, ACS_VLINE, height);
+	wrefresh(screen->windows[WFILE_LNUM]->window);
+	wrefresh(screen->windows[WFILE_CNT]->window);
 }
 
 
@@ -192,6 +196,58 @@ void update_all_eScreen(eScreen * screen)
 /* ==========================================================
  * eWindow functions
  * ========================================================== */
+
+/**
+ * @brief the move_cursor_eScreen() function move the cursor on the window designed by type.
+ *
+ * @param screen: eScreen pointer
+ * @param y: y position
+ * @param x: x position
+ * @param type: Window type
+ */
+void move_cursor_eScreen(eScreen * screen, unsigned int y, unsigned int x, WINDOW_TYPE type)
+{
+	wmove(screen->windows[type]->window, y, x);
+}
+
+
+/**
+ * @brief the get_width_eSreen() return the width of the window pointed by type.
+ *
+ * @param screen: eScreen pointer
+ * @param type: Window type
+ */
+unsigned int get_width_eScreen(eScreen const * screen, WINDOW_TYPE type)
+{
+	return screen->windows[type]->width;
+}
+
+
+/**
+ * @brief the get_height_eSreen() return the height of the window pointed by type.
+ *
+ * @param screen: eScreen pointer
+ * @param type: Window type
+ */
+unsigned int get_height_eScreen(eScreen const * screen, WINDOW_TYPE type)
+{
+	return screen->windows[type]->height;
+}
+
+
+/**
+ * @brief The get_input_eScreen() function request an input to the user.
+ *
+ * @param screen: eScreen pointer
+ * @param type: Window type
+ *
+ * @return User input
+ */
+int get_input_eScreen(eScreen * screen, WINDOW_TYPE type)
+{
+	return wgetch(screen->windows[type]->window);
+}
+
 
 /**
  * @brief The create_file_window_eScreen() function allocate and initialize file windows.
@@ -257,101 +313,29 @@ void resize_file_eScreen(eScreen * screen, unsigned int number_length)
 
 
 /**
- * @brief The print_content_eScreen() function print the content of the file in the window, do not change the cursor position
+ * @brief The print_line_eScreen() print a line on the screen.
  *
  * @param screen: eScreen pointer
- * @param first_line: First line to print
- * @param number_length: Number of digit of the higher line of the file
+ * @param type: Window type
+ * @param y: y position of the line
+ * @param x: x position of the line
+ * @param line: line to print
  */
-void print_content_eScreen(eScreen * screen, eLine const * first_line)
+void print_line_eScreen(eScreen *screen, WINDOW_TYPE type, int y, int x, char const * line)
 {
-	eLine const *current_line = first_line;
-	size_t screen_pos = 0; /* y pos */
-	int line_number = first_line->line_number;
-	int number_length = screen->windows[WFILE_LNUM]->width - 3;
-	size_t width = screen->windows[WFILE_CNT]->width;
-
-	werase(screen->windows[WFILE_CNT]->window);
-	werase(screen->windows[WFILE_LNUM]->window);
-
-	wborder(screen->windows[WFILE_LNUM]->window, ' ', 0, ' ', ' ', ' ', ACS_VLINE, ' ', ACS_VLINE);
-
-	while(screen_pos < screen->windows[WFILE_CNT]->height)
-	{
-		/* If there is at least one line left */
-		if(current_line)
-		{
-			/* print line number */
-			mvwprintw(screen->windows[WFILE_LNUM]->window, screen_pos, 1, "%*d ", number_length, line_number);
-
-			/* print line */
-			mvwaddstr(screen->windows[WFILE_CNT]->window, screen_pos, 0, current_line->string);
-
-			/* +1 because when end of line, put next file line two screen line after to let cursor go on next screen line*/
-			screen_pos += current_line->length/width + 1;
-			current_line = current_line->next;
-		}
-
-		/* If there are no lines left */
-		else
-		{
-			mvwprintw(screen->windows[WFILE_LNUM]->window, screen_pos, 1, "%*c ", number_length, '~');
-			screen_pos++;
-		}
-		line_number++;
-	}
+	mvwprintw(screen->windows[type]->window, y, x, line);
 }
 
 
 /**
- * @brief the move_cursor_eScreen() function move the cursor on the window designed by type.
- *
- * @param screen: eScreen pointer
- * @param y: y position
- * @param x: x position
- * @param type: Window type
- */
-void move_cursor_eScreen(eScreen * screen, unsigned int y, unsigned int x, WINDOW_TYPE type)
-{
-	wmove(screen->windows[type]->window, y, x);
-}
-
-
-/**
- * @brief the get_width_eSreen() return the width of the window pointed by type.
+ * @brief The erase_window() function erase the window designed by type.
  *
  * @param screen: eScreen pointer
  * @param type: Window type
  */
-unsigned int get_width_eScreen(eScreen const * screen, WINDOW_TYPE type)
+void erase_window(eScreen *screen, WINDOW_TYPE type)
 {
-	return screen->windows[type]->width;
-}
-
-
-/**
- * @brief the get_height_eSreen() return the height of the window pointed by type.
- *
- * @param screen: eScreen pointer
- * @param type: Window type
- */
-unsigned int get_height_eScreen(eScreen const * screen, WINDOW_TYPE type)
-{
-	return screen->windows[type]->height;
-}
-
-
-/**
- * @brief The get_input_eScreen() function request an input to the user.
- *
- * @param screen: eScreen pointer
- * @param type: Window type
- *
- * @return User input
- */
-int get_input_eScreen(eScreen * screen, WINDOW_TYPE type)
-{
-	return wgetch(screen->windows[type]->window);
+	werase(screen->windows[type]->window);
 }
 
 

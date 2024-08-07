@@ -100,36 +100,6 @@ void update_all_eScreen(eScreen * screen);
  * ========================================================== */
 
 /**
- * @brief The create_file_window_eScreen() function allocate and initialize file windows.
- *
- * @param screen: eScreen pointer
- * @param number_length: number of digit in the lines number
- */
-void create_file_window_eScreen(eScreen * screen, unsigned int number_length);
-
-
-// TODO: a faire sauter -> remplacer par resize_eWindow
-/**
- * @brief The resize_file_window_eScreen() function resize file windows.
- *
- * @param screen: eScreen pointer
- * @param number_length: number of digit in the lines number
- */
-void resize_file_eScreen(eScreen * screen, unsigned int number_length);
-
-
-// TODO: A faire sauter -> remplacer par print_line_eWindow(eWindow *window, unsigned int x, unsigned int y, const char fmt, ...);
-/**
- * @brief The print_content_eScreen() function print the content of the file in the window, do not change the cursor position
- *
- * @param screen: eScreen pointer
- * @param first_line: First line to print
- * @param number_length: Number of digit of the higher line of the file
- */
-void print_content_eScreen(eScreen * screen, eLine const * first_line);
-
-
-/**
  * @brief the move_cursor_eScreen() function move the cursor on the window designed by type.
  *
  * @param screen: eScreen pointer
@@ -167,6 +137,45 @@ unsigned int get_height_eScreen(eScreen const * screen, WINDOW_TYPE type);
  * @return User input
  */
 int get_input_eScreen(eScreen * screen, WINDOW_TYPE type);
+
+
+/**
+ * @brief The create_file_window_eScreen() function allocate and initialize file windows.
+ *
+ * @param screen: eScreen pointer
+ * @param number_length: number of digit in the lines number
+ */
+void create_file_window_eScreen(eScreen * screen, unsigned int number_length);
+
+
+/**
+ * @brief The resize_file_window_eScreen() function resize file windows.
+ *
+ * @param screen: eScreen pointer
+ * @param number_length: number of digit in the lines number
+ */
+void resize_file_eScreen(eScreen * screen, unsigned int number_length);
+
+
+/**
+ * @brief The print_line_eScreen() print a line on the screen.
+ *
+ * @param screen: eScreen pointer
+ * @param type: Window type
+ * @param y: y position of the line
+ * @param x: x position of the line
+ * @param line: line to print
+ */
+void print_line_eScreen(eScreen *screen, WINDOW_TYPE type, int y, int x, char const * line);
+
+
+/**
+ * @brief The erase_window() function erase the window designed by type.
+ *
+ * @param screen: eScreen pointer
+ * @param type: Window type
+ */
+void erase_window(eScreen *screen, WINDOW_TYPE type);
 
 
 /**

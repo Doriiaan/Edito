@@ -155,6 +155,16 @@ int fill_directory_menu_eManager(eManager const * manager, eDirectory const * di
 
 
 /**
+ * @brief The print_file_eManager() functin print the content of the current file on the screen.
+ *
+ * @param manager: eManager pointer
+ *
+ * return 0 on success or -1 in failure.
+ */
+int print_file_eManager(eManager const * manager);
+
+
+/**
  * @brief The send_help_msg_to_screen_eManager() function send help message to the screen.
  *
  * @note If no message is set, send default help message.

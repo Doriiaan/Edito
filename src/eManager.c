@@ -208,7 +208,7 @@ bool run_eManager(eManager * manager)
 	if(manager->mode == WRITE)
 	{
 		resize_file_eScreen(manager->screen, digit_number(manager->file->n_elines));
-		print_content_eScreen(manager->screen, manager->file->first_screen_line);
+		print_file_eManager(manager);
 		move_cursor_eScreen(manager->screen, gety_cursor_eManager(manager), getx_cursor_eManager(manager), WFILE_CNT);
 		update_file_eScreen(manager->screen);
 	}
@@ -514,9 +514,9 @@ bool process_ENTER_eManager(eManager * manager)
 
 				/* Create or resize file Window for the file (resize for lines number) */
 				if(manager->screen->windows[WFILE_CNT] == NULL)
-					create_file_window_eScreen(manager->screen, file->n_elines);
+					create_file_window_eScreen(manager->screen, digit_number(file->n_elines));
 				else
-					resize_file_eScreen(manager->screen, file->n_elines);
+					resize_file_eScreen(manager->screen, digit_number(file->n_elines));
 
 				/* Enter write mode */
 				set_eFile_eManager(manager, file);
@@ -909,6 +909,84 @@ int fill_directory_menu_eManager(eManager const * manager, eDirectory const * di
 		}
 	}
 	free(item);
+	return 0;
+}
+
+
+/**
+ * @brief The print_file_eManager() functin print the content of the current file on the screen.
+ *
+ * @param manager: eManager pointer
+ *
+ * return 0 on success or -1 in failure.
+ */
+int print_file_eManager(eManager const * manager)
+{
+	/* y pos on the screen */
+	int y_pos = 0;
+
+	/* Current line to print */
+	eLine const *current_line = manager->file->first_screen_line;
+
+	/* Current line number to print*/
+	int line_number = current_line->line_number;
+
+	/* With of maximum line number of file */
+	int line_number_width = digit_number(manager->file->n_elines);
+
+	/* Width of file window */
+	int width_w_cnt = get_width_eScreen(manager->screen, WFILE_CNT);
+
+	/* Height of file window */
+	int height_w_cnt = get_height_eScreen(manager->screen, WFILE_CNT);
+
+	/* Line number to print */
+	char * number = NULL;
+
+	number = malloc(sizeof(char)*line_number_width);
+	if(number == NULL)
+		return -1;
+
+	erase_window(manager->screen, WFILE_CNT);
+	erase_window(manager->screen, WFILE_LNUM);
+
+	while(y_pos < height_w_cnt)
+	{
+		/* If there is at least one line left */
+		if(current_line)
+		{
+			sprintf(number, "%*d ", line_number_width, line_number);
+
+			/* print line number */
+			print_line_eScreen(manager->screen,
+					WFILE_LNUM,
+					y_pos, 1,
+					number);
+
+			/* print line */
+			print_line_eScreen(manager->screen,
+					WFILE_CNT,
+					y_pos, 0,
+					current_line->string);
+
+			/* +1 because when end of line, put next file line two screen
+			   line after to let cursor go on next screen line */
+			y_pos += current_line->length/width_w_cnt + 1;
+			current_line = current_line->next;
+			line_number++;
+		}
+
+		/* If there are no lines left */
+		else
+		{
+			sprintf(number, "%*c ", line_number_width, '~');
+			print_line_eScreen(manager->screen,
+					WFILE_LNUM,
+					y_pos, 1,
+					number);
+			y_pos++;
+		}
+	}
 	return 0;
 }
 
