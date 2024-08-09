@@ -1,5 +1,4 @@
 /**
- * ===================================================
  * @file eWindow.c
  * @brief eWindow is a View part of the MVC design
  * @author ALARY Dorian
@@ -7,9 +6,9 @@
  * @date 21/07/2024
  * @copyright GNU Public License.
  *
- * @details This file contain every functions and variable relative to the eWindow structure.
- *          The structure contain every information of a window.
- * ===================================================
+ * @details This file contain every functions and variable relative to the
+ *          eWindow structure. The structure contain every information of a
+ *          window.
  */
 
 #include "eWindow.h"
@@ -17,7 +16,8 @@
 
 
 /**
- * @brief The create_eWindow() function allocate and initialize an eWindow structure.
+ * @brief The create_eWindow() function allocate and initialize an eWindow
+ *        structure.
  *
  * @param height: Window height (in lines)
  * @param width: Window width (in columns)
@@ -28,7 +28,10 @@
  *
  * @note delete_eWindow() must be called before exiting.
  */
-eWindow * create_eWindow(size_t height, size_t width, unsigned int y, unsigned int x)
+eWindow * create_eWindow(size_t height,
+		                 size_t width,
+						 unsigned int y,
+						 unsigned int x)
 {
 	eWindow *window = 0;
 
@@ -52,7 +55,8 @@ eWindow * create_eWindow(size_t height, size_t width, unsigned int y, unsigned i
 
 
 /**
- * @brief The create_der_eWindow() function allocate and initialize an eWindow structure.
+ * @brief The create_der_eWindow() function allocate and initialize an eWindow
+ *        structure.
  *
  * @param orig: Window parent
  * @param height: Window height (in lines)
@@ -65,7 +69,11 @@ eWindow * create_eWindow(size_t height, size_t width, unsigned int y, unsigned i
  * @note y and x are relative to the origin of the eWindow orig.
  * @note delete_eWindow() must be called before exiting.
  */
-eWindow * create_der_eWindow(eWindow * orig, size_t height, size_t width, unsigned int y, unsigned int x)
+eWindow * create_der_eWindow(eWindow * orig,
+		                     size_t height,
+							 size_t width,
+							 unsigned int y,
+							 unsigned int x)
 {
 	if(orig == NULL)
 		return NULL;
@@ -90,7 +98,8 @@ eWindow * create_der_eWindow(eWindow * orig, size_t height, size_t width, unsign
 
 
 /**
- * @brief The delete_eWindow() function deallocate the eWindow structure and set the pointer to the structure to NULL.
+ * @brief The delete_eWindow() function deallocate the eWindow structure and
+ *        set the pointer to the structure to NULL.
  *
  * @param window eWindow pointer pointer
  */

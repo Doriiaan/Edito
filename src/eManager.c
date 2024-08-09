@@ -1,5 +1,4 @@
 /**
- * ===================================================
  * @file eManager.c
  * @brief Manager is the Controller of the MVC design
  * @author ALARY Dorian
@@ -7,9 +6,9 @@
  * @date 21/07/2024
  * @copyright GNU Public License.
  *
- * @details This file contain every functions and variable relative to the eManager structure.
- *          The functions manage the View (eScreen) and the model (eFile, eMenu, eBar)
- * ===================================================
+ * @details This file contain every functions and variable relative to the
+ *          eManager structure. The functions manage the View (eScreen, eMenu,
+ *          eWindow) and the model (eFile, eLine, eDirectory, eBar)
  */
 
 #include "eManager.h"
@@ -23,9 +22,11 @@
 #define CTRL(x) (x & 0x1F)
 
 /* Internal functions */
-static bool process_input_eManager(eManager * manager, int input);
+static bool process_input_eManager(eManager * manager,
+		                           int input);
 
-static bool process_DEFAULT_eManager(eManager * manager, int input);
+static bool process_DEFAULT_eManager(eManager * manager,
+		                             int input);
 static bool process_ctrlq_eManager(eManager * manager);
 static bool process_ctrls_eManager(eManager * manager);
 static bool process_ctrlf_eManager(eManager * manager);
@@ -40,10 +41,12 @@ static bool process_KEY_LEFT_eManager(eManager *manager);
 static bool process_KEY_DOWN_eManager(eManager *manager);
 static bool process_KEY_UP_eManager(eManager *manager);
 
-static void change_mode_eManager(eManager * manager, MODE mode);
-static unsigned int screen_width_of_string(char const * s, size_t length);
-static void add_help_msg_eManager(eManager * manager, char const * message);
-
+static void change_mode_eManager(eManager * manager,
+		                         MODE mode);
+static unsigned int screen_width_of_string(char const * s,
+		                                   size_t length);
+static void add_help_msg_eManager(eManager * manager,
+		                          char const * message);
 
 /* CONSTANTS */
 char const * const DEFAULT_HELP_MESSAGE[sizeof(MODE)][6] =
@@ -80,7 +83,8 @@ char const * const DEFAULT_HELP_MESSAGE[sizeof(MODE)][6] =
 
 
 /**
- * @brief The create_eManager() function allocate and initialize an eManager structure.
+ * @brief The create_eManager() function allocate and initialize an
+ *        eManager structure.
  *
  * @return eManager pointer or NULL if it was an error, see logs.
  *
@@ -109,7 +113,8 @@ eManager * create_eManager(void)
 
 
 /**
- * @brief The delete_eManager() function deallocate and set the pointer to eManager structure to NULL.
+ * @brief The delete_eManager() function deallocate and set the pointer
+ *        to eManager structure to NULL.
  *
  * @param manager: eManager pointer pointer
  */
@@ -129,7 +134,8 @@ void delete_eManager(eManager ** manager)
  * @param manager: eManager pointer
  * @param screen: eScreen pointer
  */
-void set_eScreen_eManager(eManager * manager, eScreen * screen)
+void set_eScreen_eManager(eManager * manager,
+		                  eScreen * screen)
 {
 	manager->screen = screen;
 }
@@ -141,21 +147,22 @@ void set_eScreen_eManager(eManager * manager, eScreen * screen)
  * @param manager: eManager pointer
  * @param bar: eBar pointer
  */
-void set_eBar_eManager(eManager *manager, eBar * bar)
+void set_eBar_eManager(eManager * manager,
+		               eBar * bar)
 {
 	manager->bar = bar;
 }
 
 
 /**
- * @brief The set_eDirectory_eManager() function set an eDirectory to eManager.
+ * @brief The set_eDirectory_eManager() function set an eDirectory to
+ *        eManager.
  *
  * @param manager: eManager pointer
  * @param directory: eDirectory pointer
- *
- * @note This function also print the content of the repository in the screen.
  */
-void set_eDirectory_eManager(eManager * manager, eDirectory * directory)
+void set_eDirectory_eManager(eManager * manager,
+		                     eDirectory * directory)
 {
 	manager->directory = directory;
 }
@@ -167,14 +174,16 @@ void set_eDirectory_eManager(eManager * manager, eDirectory * directory)
  * @param manager: eManager pointer
  * @param file: eFile pointer
  */
-void set_eFile_eManager(eManager * manager, eFile * file)
+void set_eFile_eManager(eManager * manager,
+		                eFile * file)
 {
 	manager->file = file;
 }
 
 
 /**
- * @brief The run_eManager() function is the main function of eManager, this function call screen to get an input and process the input.
+ * @brief The run_eManager() function is the main function of eManager,
+ *        this function call screen to get an input and process the input.
  *
  * @param manager: eManager pointer
  *
@@ -207,9 +216,13 @@ bool run_eManager(eManager * manager)
 
 	if(manager->mode == WRITE)
 	{
-		resize_file_eScreen(manager->screen, digit_number(manager->file->n_elines));
+		resize_file_eScreen(manager->screen,
+				            digit_number(manager->file->n_elines));
 		print_file_eManager(manager);
-		move_cursor_eScreen(manager->screen, gety_cursor_eManager(manager), getx_cursor_eManager(manager), WFILE_CNT);
+		move_cursor_eScreen(manager->screen,
+				            gety_cursor_eManager(manager),
+							getx_cursor_eManager(manager),
+							WFILE_CNT);
 		update_file_eScreen(manager->screen);
 	}
 	else if(manager->mode == BAR)
@@ -228,14 +241,16 @@ bool run_eManager(eManager * manager)
 
 
 /*
- * @brief the process_input_eManager() function process an input if the program is in WRITE mode.
+ * @brief The process_input_eManager() function process an input if the
+ *        program is in WRITE mode.
  *
  * @param manager: eManager pointer
  * @param input: User input to process
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool process_input_eManager(eManager * manager, int input)
+bool process_input_eManager(eManager * manager,
+		                    int input)
 {
 	switch(input)
 	{
@@ -301,14 +316,16 @@ bool process_input_eManager(eManager * manager, int input)
 
 
 /*
- * @brief the process_DEFAULT_input_eManager() function process a default input (character, number, ...).
+ * @brief The process_DEFAULT_input_eManager() function process a default input
+ *        (character, number, ...).
  *
  * @param manager: eManager pointer
  * @param input: Default user input to process
  *
  * @return returns true if the program continues and false otherwise.
  */
-bool process_DEFAULT_eManager(eManager * manager, int input)
+bool process_DEFAULT_eManager(eManager * manager,
+		                      int input)
 {
 	if(manager->mode == WRITE)
 	{
@@ -322,7 +339,7 @@ bool process_DEFAULT_eManager(eManager * manager, int input)
 }
 
 /*
- * @brief the process_ctrlq_input_eManager() function process a CTRLE input.
+ * @brief The process_ctrlq_input_eManager() function process a CTRLE input.
  *
  * @param manager: eManager pointer
  *
@@ -336,7 +353,7 @@ bool process_ctrlq_eManager(eManager * manager)
 
 
 /*
- * @brief the process_ctrls_input_eManager() function process a CTRLS input.
+ * @brief The process_ctrls_input_eManager() function process a CTRLS input.
  *
  * @param manager: eManager pointer
  *
@@ -362,7 +379,7 @@ bool process_ctrls_eManager(eManager * manager)
 
 
 /*
- * @brief the process_ctrld_input_eManager() function process a CTRLD input.
+ * @brief The process_ctrld_input_eManager() function process a CTRLD input.
  *
  * @param manager: eManager pointer
  *
@@ -377,7 +394,7 @@ bool process_ctrld_eManager(eManager * manager)
 
 
 /*
- * @brief the process_ctrlb_input_eManager() function process a CTRLB input.
+ * @brief The process_ctrlb_input_eManager() function process a CTRLB input.
  *
  * @param manager: eManager pointer
  *
@@ -395,7 +412,7 @@ bool process_ctrlb_eManager(eManager * manager)
 
 
 /*
- * @brief the process_ctrlf_input_eManager() function process a CTRLF input.
+ * @brief The process_ctrlf_input_eManager() function process a CTRLF input.
  *
  * @param manager: eManager pointer
  *
@@ -413,7 +430,7 @@ bool process_ctrlf_eManager(eManager * manager)
 
 
 /*
- * @brief the process_ESCAPE_input_eManager() function process an ESCAPE input.
+ * @brief The process_ESCAPE_input_eManager() function process an ESCAPE input.
  *
  * @param manager: eManager pointer
  *
@@ -429,7 +446,7 @@ bool process_ESCAPE_eManager(eManager * manager)
 
 
 /*
- * @brief the process_ENTER_input_eManager() function process a ENTER input.
+ * @brief The process_ENTER_input_eManager() function process a ENTER input.
  *
  * @param manager: eManager pointer
  *
@@ -446,13 +463,19 @@ bool process_ENTER_eManager(eManager * manager)
 	/*  */
 	if(manager->mode == WRITE)
 	{
-		buffer_length = sizeof(char)*(manager->file->current_line->length-manager->file->current_pos);
-		buffer = malloc(buffer_length+1);
-		memset(buffer, 0, buffer_length+1);
 
-		buffer_length = get_string_eLine(manager->file->current_line, buffer, buffer_length, manager->file->current_pos);
+		buffer_length =
+			(manager->file->current_line->length-manager->file->current_pos);
+		buffer = malloc((buffer_length+1)*sizeof(char));
+		memset(buffer, 0, sizeof(char)*(buffer_length+1));
+
+		buffer_length = get_string_eLine(manager->file->current_line,
+				                         buffer,
+										 buffer_length,
+										 manager->file->current_pos);
 		remove_string_eFile(manager->file, buffer_length);
-		add_empty_line_eFile(manager->file, manager->file->current_line->line_number+1);
+		add_empty_line_eFile(manager->file,
+				             manager->file->current_line->line_number+1);
 		manager->file->current_pos = 0;
 		process_KEY_DOWN_eManager(manager);
 		insert_string_eFile(manager->file, buffer, buffer_length);
@@ -463,8 +486,12 @@ bool process_ENTER_eManager(eManager * manager)
 	}
 	else if(manager->mode == DIR)
 	{
-		item_index = get_current_item_index_menu_eScreen(manager->screen, MDIR);
-		get_item_at_index_eDirectory(manager->directory, item_index, &directory, &file);
+		item_index = get_current_item_index_menu_eScreen(manager->screen,
+				                                         MDIR);
+		get_item_at_index_eDirectory(manager->directory,
+				                     item_index,
+									 &directory,
+									 &file);
 		if(directory != NULL)
 		{
 			/* close the directory and delete dirs/files from menu */
@@ -509,14 +536,19 @@ bool process_ENTER_eManager(eManager * manager)
 				refresh_menu_eScreen(manager->screen, MBAR);
 
 				/* Deplace cursor to the file in the menu bar */
-				move_pattern_item_menu_eScreen(manager->screen, MBAR, file->filename);
+				move_pattern_item_menu_eScreen(manager->screen,
+						                       MBAR,
+											   file->filename);
 				update_bar_eScreen(manager->screen);
 
-				/* Create or resize file Window for the file (resize for lines number) */
+				/* Create or resize file Window for the file (resize for lines
+				   number) */
 				if(manager->screen->windows[WFILE_CNT] == NULL)
-					create_file_window_eScreen(manager->screen, digit_number(file->n_elines));
+					create_file_window_eScreen(manager->screen,
+							                   digit_number(file->n_elines));
 				else
-					resize_file_eScreen(manager->screen, digit_number(file->n_elines));
+					resize_file_eScreen(manager->screen,
+							            digit_number(file->n_elines));
 
 				/* Enter write mode */
 				set_eFile_eManager(manager, file);
@@ -526,7 +558,9 @@ bool process_ENTER_eManager(eManager * manager)
 			else
 			{
 				/* Deplace cursor to the file in the menu bar */
-				move_pattern_item_menu_eScreen(manager->screen, MBAR, file->filename);
+				move_pattern_item_menu_eScreen(manager->screen,
+						                       MBAR,
+											   file->filename);
 				update_bar_eScreen(manager->screen);
 				resize_file_eScreen(manager->screen, file->n_elines);
 
@@ -538,7 +572,8 @@ bool process_ENTER_eManager(eManager * manager)
 	}
 	else if(manager->mode == BAR)
 	{
-		item_index = get_current_item_index_menu_eScreen(manager->screen, MBAR);
+		item_index = get_current_item_index_menu_eScreen(manager->screen,
+				                                         MBAR);
 		file = (eFile *) get_file_eBar(manager->bar, item_index);
 
 		/* Enter write mode */
@@ -551,7 +586,8 @@ bool process_ENTER_eManager(eManager * manager)
 
 
 /*
- * @brief the process_BACKSPACE_input_eManager() function process a BACKSPACE input.
+ * @brief The process_BACKSPACE_input_eManager() function process a BACKSPACE
+ *        input.
  *
  * @param manager: eManager pointer
  *
@@ -565,20 +601,28 @@ bool process_BACKSPACE_eManager(eManager * manager)
 
 	if(manager->mode == WRITE)
 	{
-		/* In the middle of a line, process move left and remove current char */
+		/* In the middle of a line, process move left and remove current
+		   char */
 		if(manager->file->current_pos > 0)
 		{
 			process_KEY_LEFT_eManager(manager);
 			remove_char_eFile(manager->file);
 		}
-		/* If cursor at beginning of line, put current_line into previous line  */
-		else if(manager->file->current_pos == 0 && manager->file->current_line->previous != NULL)
+		/* If cursor at beginning of line, put current_line into previous
+		   line */
+		else if(manager->file->current_pos == 0
+				&&
+				manager->file->current_line->previous != NULL)
 		{
-			buffer_length = sizeof(char)*(manager->file->current_line->length-manager->file->current_pos);
-			buffer = malloc(buffer_length+1);
-			memset(buffer, 0, buffer_length+1);
+			buffer_length =
+			  manager->file->current_line->length - manager->file->current_pos;
+			buffer = malloc((buffer_length+1)*sizeof(char));
+			memset(buffer, 0, (buffer_length+1)*sizeof(char));
 
-			buffer_length = get_string_eLine(manager->file->current_line, buffer, buffer_length, manager->file->current_pos);
+			buffer_length = get_string_eLine(manager->file->current_line,
+					                         buffer,
+											 buffer_length,
+											 manager->file->current_pos);
 			line_number = manager->file->current_line->line_number;
 			process_KEY_LEFT_eManager(manager);
 			insert_string_eFile(manager->file, buffer, buffer_length);
@@ -594,7 +638,7 @@ bool process_BACKSPACE_eManager(eManager * manager)
 
 
 /*
- * @brief the process_DELETE_input_eManager() function process a DELETE input.
+ * @brief The process_DELETE_input_eManager() function process a DELETE input.
  *
  * @param manager: eManager pointer
  *
@@ -613,15 +657,20 @@ bool process_DELETE_eManager(eManager * manager)
 			remove_char_eFile(manager->file);
 		}
 		/* If end of line, put next line into current line */
-		else if(manager->file->current_pos >= manager->file->current_line->length && manager->file->current_line->next)
+		else if(manager->file->current_pos==manager->file->current_line->length
+				&&
+				manager->file->current_line->next)
 		{
-			buffer_length = sizeof(char)*(manager->file->current_line->next->length);
-			buffer = malloc(buffer_length+1);
-			memset(buffer, 0, buffer_length+1);
+			buffer_length = manager->file->current_line->next->length;
+			buffer = malloc((buffer_length+1)*sizeof(char));
+			memset(buffer, 0, (buffer_length+1)*sizeof(char));
 
-			buffer_length = get_string_eLine(manager->file->current_line->next, buffer, buffer_length, 0);
+			buffer_length = get_string_eLine(manager->file->current_line->next,
+					                         buffer,
+											 buffer_length, 0);
 			insert_string_eFile(manager->file, buffer, buffer_length);
-			delete_line_eFile(manager->file, manager->file->current_line->next->line_number);
+			delete_line_eFile(manager->file,
+					          manager->file->current_line->next->line_number);
 
 			free(buffer);
 			buffer = NULL;
@@ -631,7 +680,8 @@ bool process_DELETE_eManager(eManager * manager)
 }
 
 /*
- * @brief the process_KEY_RIGHT_input_eManager() function process a KEY_RIGHT input
+ * @brief The process_KEY_RIGHT_input_eManager() function process a KEY_RIGHT
+ *        input.
  *
  * @param manager eManager pointer
  *
@@ -646,7 +696,9 @@ bool process_KEY_RIGHT_eManager(eManager * manager)
 		{
 			manager->file->current_pos++;
 		}
-		else if(manager->file->current_pos >= manager->file->current_line->length && manager->file->current_line->next != NULL)
+		else if(manager->file->current_pos>=manager->file->current_line->length
+				&&
+				manager->file->current_line->next != NULL)
 		{
 			manager->file->current_pos = 0;
 			process_KEY_DOWN_eManager(manager);
@@ -663,7 +715,8 @@ bool process_KEY_RIGHT_eManager(eManager * manager)
 
 
 /*
- * @brief the process_KEY_LEFT_input_eManager() function process a KEY_LEFT input
+ * @brief The process_KEY_LEFT_input_eManager() function process a KEY_LEFT
+ *        input.
  *
  * @param manager eManager pointer
  *
@@ -678,9 +731,12 @@ bool process_KEY_LEFT_eManager(eManager * manager)
 		{
 			manager->file->current_pos--;
 		}
-		else if(manager->file->current_pos == 0 && manager->file->current_line->previous != NULL)
+		else if(manager->file->current_pos == 0
+				&&
+				manager->file->current_line->previous != NULL)
 		{
-			manager->file->current_pos = manager->file->current_line->previous->length;
+			manager->file->current_pos =
+				manager->file->current_line->previous->length;
 			process_KEY_UP_eManager(manager);
 		}
 	}
@@ -694,7 +750,8 @@ bool process_KEY_LEFT_eManager(eManager * manager)
 
 
 /*
- * @brief the process_KEY_DOWN_input_eManager() function process a KEY_DOWN input
+ * @brief The process_KEY_DOWN_input_eManager() function process a KEY_DOWN
+ *        input.
  *
  * @param manager eManager pointer
  *
@@ -705,17 +762,22 @@ bool process_KEY_DOWN_eManager(eManager * manager)
 {
 	if(manager->mode == WRITE)
 	{
-		if(manager->file->current_line->next)
+		eLine *next = manager->file->current_line->next;
+		unsigned int screen_height = get_height_eScreen(manager->screen,
+				                                        WFILE_CNT);
+		if(next)
 		{
 			/* Do not get out of line with cursor  */
-			if(manager->file->current_pos > manager->file->current_line->next->length)
-				manager->file->current_pos = manager->file->current_line->next->length;
+			if(manager->file->current_pos > next->length)
+				manager->file->current_pos = next->length;
 
 			manager->file->current_line = manager->file->current_line->next;
 
-			/* While cursor is out of screen (line to big), pull down the screen */
-			while(gety_cursor_eManager(manager)+5 > get_height_eScreen(manager->screen, WFILE_CNT)-1)
-				manager->file->first_screen_line = manager->file->first_screen_line->next;
+			/* While cursor is out of screen (line to big), pull down the
+			   screen */
+			while(gety_cursor_eManager(manager)+5 > screen_height-1)
+				manager->file->first_screen_line =
+					                 manager->file->first_screen_line->next;
 		}
 	}
 	else if(manager->mode == DIR)
@@ -727,7 +789,8 @@ bool process_KEY_DOWN_eManager(eManager * manager)
 
 
 /*
- * @brief the process_KEY_UP_input_eManager() function process a KEY_UP input
+ * @brief The process_KEY_UP_input_eManager() function process a KEY_UP
+ *        input.
  *
  * @param manager eManager pointer
  *
@@ -737,17 +800,22 @@ bool process_KEY_UP_eManager(eManager * manager)
 {
 	if(manager->mode == WRITE)
 	{
-		if(manager->file->current_line->previous)
+		eFile *f = manager->file;
+		eLine *prev = f->current_line->previous;
+		if(prev)
 		{
 			/* Do not get out of line with cursor  */
-			if(manager->file->current_pos > manager->file->current_line->previous->length)
-				manager->file->current_pos = manager->file->current_line->previous->length;
+			if(f->current_pos > prev->length)
+				f->current_pos = prev->length;
 
-			/* If current == first_line, pull up the screen */
-			if(manager->file->current_line->line_number-5 < manager->file->first_screen_line->line_number && manager->file->first_screen_line->previous)
-				manager->file->first_screen_line = manager->file->first_screen_line->previous;
+			if(f->current_line->line_number-5 < f->first_screen_line->line_number
+			   &&
+			   f->first_screen_line->previous)
+			{
+				f->first_screen_line = f->first_screen_line->previous;
+			}
 
-			manager->file->current_line = manager->file->current_line->previous;
+			f->current_line = f->current_line->previous;
 		}
 	}
 	else if(manager->mode == DIR)
@@ -760,7 +828,8 @@ bool process_KEY_UP_eManager(eManager * manager)
 
 
 /*
- * @brief The getx_cursor_eManager() return the window file x position of cursor in fuction of file.
+ * @brief The getx_cursor_eManager() return the position x of the cursor
+ *        in the file window depending on the current file.
  *
  * @param manager: eManager pointer
  *
@@ -771,14 +840,16 @@ unsigned int getx_cursor_eManager(eManager const * manager)
 	unsigned int pos = 0;
 	size_t width = get_width_eScreen(manager->screen, WFILE_CNT);
 
-	pos = screen_width_of_string(manager->file->current_line->string, manager->file->current_pos)%width;
+	pos = screen_width_of_string(manager->file->current_line->string,
+			                     manager->file->current_pos) % width;
 
 	return pos;
 }
 
 
 /*
- * @brief The gety_cursor_eManager() return the window file y position of cursor in fuction of file.
+ * @brief The gety_cursor_eManager() return the position y of the cursor
+ *        in the file window depending on the current file.
  *
  * @param manager: eManager pointer
  *
@@ -801,26 +872,31 @@ unsigned int gety_cursor_eManager(eManager const * manager)
 		else
 		{
 			y += screen_width_of_string(current->string, current->length)/width;
-			y += (screen_width_of_string(current->string, current->length) % width != 0) ? 1 : 0;
+			int remainder = screen_width_of_string(current->string,
+					                               current->length) % width;
+			y += (remainder != 0) ? 1 : 0;
 		}
 		current = current->next;
 	}
 
-	y += screen_width_of_string(manager->file->current_line->string, manager->file->current_pos)/width;
+	y += screen_width_of_string(manager->file->current_line->string,
+			                    manager->file->current_pos)/width;
 
 	return y;
 }
 
 
 /**
- * @brief The screen_wifth_of_string() function return the size in terminal cell of string.
+ * @brief The screen_wifth_of_string() function return the size in terminal
+ *        cell of string.
  *
  * @param s: string
  * @param length: string length in character
  *
  * @return the size in terminal cell of string.
  */
-unsigned int screen_width_of_string(char const * s, size_t length)
+unsigned int screen_width_of_string(char const * s,
+		                            size_t length)
 {
 	size_t real_length = strnlen(s, length);
 	unsigned int i = 0;
@@ -840,7 +916,8 @@ unsigned int screen_width_of_string(char const * s, size_t length)
 
 
 /**
- * The fill_directory_menu_eManager() function fill the directory screen menu depending on the manager directory.
+ * @brief The fill_directory_menu_eManager() function fill the directory
+ *        screen menu depending on the manager directory.
  *
  * @param manager: eManager pointer
  * @param directory: pointer on the root directory (for recursivity)
@@ -849,11 +926,14 @@ unsigned int screen_width_of_string(char const * s, size_t length)
  * @return 0 on success or -1 in failure.
  * @note This is a recursive function.
  */
-int fill_directory_menu_eManager(eManager const * manager, eDirectory const * directory, unsigned int level)
+int fill_directory_menu_eManager(eManager const * manager,
+		                         eDirectory const * directory,
+								 unsigned int level)
 {
 	unsigned int i=0;
 	char *item = NULL;
 	size_t alloc_item_size = 0;
+	size_t next_size = 0;
 	char *dirname = NULL;
 
 	if(manager == NULL || directory == NULL)
@@ -895,16 +975,19 @@ int fill_directory_menu_eManager(eManager const * manager, eDirectory const * di
 		for(i=0; i<directory->n_files; i++)
 		{
 			/* File title allocation */
-			if(alloc_item_size <= strlen(directory->files[i]->filename)+2*level+1)
+			next_size = strlen(directory->files[i]->filename)+2*level+1;
+			if(alloc_item_size <= next_size)
 			{
-				alloc_item_size = (strlen(directory->files[i]->filename)+level*2+1);
+				alloc_item_size = next_size;
 				item = (char *) realloc(item, alloc_item_size*sizeof(char));
 				if(item==NULL)
 					return -1;
 			}
 			memset(item, 0, alloc_item_size*sizeof(char));
 			memset(item, ' ', level*2);
-			strncat(item, directory->files[i]->filename, strlen(directory->files[i]->filename));
+			strncat(item,
+					directory->files[i]->filename,
+					strlen(directory->files[i]->filename));
 			add_item_menu_eScreen(manager->screen, MDIR, item);
 		}
 	}
@@ -914,7 +997,8 @@ int fill_directory_menu_eManager(eManager const * manager, eDirectory const * di
 
 
 /**
- * @brief The print_file_eManager() functin print the content of the current file on the screen.
+ * @brief The print_file_eManager() functin print the content of the
+ *        current file on the screen.
  *
  * @param manager: eManager pointer
  *
@@ -992,12 +1076,14 @@ int print_file_eManager(eManager const * manager)
 
 
 /**
- * @brief The change_mode_eManager() function change the mode of the manager and save current mode in last mode.
+ * @brief The change_mode_eManager() function change the mode of the manager
+ *        and save current mode in last mode.
  *
  * @param manager: eManager pointer
  * @param mode: eManager mode
  */
-void change_mode_eManager(eManager * manager, MODE mode)
+void change_mode_eManager(eManager * manager,
+		                  MODE mode)
 {
 	manager->lastmode = manager->mode;
 	manager->mode = mode;
@@ -1005,12 +1091,14 @@ void change_mode_eManager(eManager * manager, MODE mode)
 
 
 /**
- * @brief The add_help_msg_eManager() function set the next help message. If there is already a message, the message isn't modified.
+ * @brief The add_help_msg_eManager() function set the next help message. If
+ *        there is already a message, the message isn't modified.
  *
  * @param manager: eManager pointer
  * @param message: Message to set
  */
-static void add_help_msg_eManager(eManager * manager, char const * message)
+static void add_help_msg_eManager(eManager * manager,
+		                          char const * message)
 {
 	/* If manager is NULL or if the manager already has a help message */
 	if(manager == NULL || manager->help_msg != NULL)
@@ -1024,9 +1112,11 @@ static void add_help_msg_eManager(eManager * manager, char const * message)
 
 
 /**
- * @brief The send_help_msg_to_screen_eManager() function send help message to the screen.
+ * @brief The send_help_msg_to_screen_eManager() function send help
+ *        message to the screen.
  *
  * @note If no message is set, send default help message.
+ * @note If a message is set, sending it will delete it
  *
  * @param manager: eManager pointer
  */
@@ -1040,7 +1130,8 @@ void send_help_msg_to_screen_eManager(eManager * manager)
 	/* if there is no message, send default message */
 	if(manager->help_msg == NULL)
 	{
-		print_help_eScreen(manager->screen, DEFAULT_HELP_MESSAGE[manager->mode]);
+		print_help_eScreen(manager->screen,
+				           DEFAULT_HELP_MESSAGE[manager->mode]);
 	}
 	else
 	{

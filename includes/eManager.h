@@ -1,10 +1,10 @@
 /**
- * @file 		eManager.h
- * @brief 		eManager Header
- * @author 		ALARY Dorian
+ * @file eManager.h
+ * @brief eManager Header
+ * @author ALARY Dorian
  * @version 1.0
  * @date 21/07/2024
- * @copyright 	GNU Public License.
+ * @copyright GNU Public License.
  *
  */
 
@@ -56,7 +56,8 @@ typedef struct {
 
 
 /**
- * @brief The create_eManager() function allocate and initialize an eManager structure.
+ * @brief The create_eManager() function allocate and initialize an
+ *        eManager structure.
  *
  * @return eManager pointer or NULL if it was an error, see logs.
  *
@@ -66,7 +67,8 @@ eManager * create_eManager(void);
 
 
 /**
- * @brief The delete_eManager() function deallocate and set the pointer to eManager structure to NULL.
+ * @brief The delete_eManager() function deallocate and set the pointer
+ *        to eManager structure to NULL.
  *
  * @param manager: eManager pointer pointer
  */
@@ -79,7 +81,8 @@ void delete_eManager(eManager ** manager);
  * @param manager: eManager pointer
  * @param screen: eScreen pointer
  */
-void set_eScreen_eManager(eManager * manager, eScreen * screen);
+void set_eScreen_eManager(eManager * manager,
+		                  eScreen * screen);
 
 
 /**
@@ -88,18 +91,19 @@ void set_eScreen_eManager(eManager * manager, eScreen * screen);
  * @param manager: eManager pointer
  * @param bar: eBar pointer
  */
-void set_eBar_eManager(eManager * manager, eBar * bar);
+void set_eBar_eManager(eManager * manager,
+		               eBar * bar);
 
 
 /**
- * @brief The set_eDirectory_eManager() function set an eDirectory to eManager.
+ * @brief The set_eDirectory_eManager() function set an eDirectory to
+ *        eManager.
  *
  * @param manager: eManager pointer
  * @param directory: eDirectory pointer
- *
- * @note This function also print the content of the repository in the screen.
  */
-void set_eDirectory_eManager(eManager * manager, eDirectory * directory);
+void set_eDirectory_eManager(eManager * manager,
+		                     eDirectory * directory);
 
 
 /**
@@ -108,11 +112,13 @@ void set_eDirectory_eManager(eManager * manager, eDirectory * directory);
  * @param manager: eManager pointer
  * @param file: eFile pointer
  */
-void set_eFile_eManager(eManager * manager, eFile * file);
+void set_eFile_eManager(eManager * manager,
+		                eFile * file);
 
 
 /**
- * @brief The run_eManager() function is the main function of eManager, this function call screen to get an input and process the input.
+ * @brief The run_eManager() function is the main function of eManager,
+ *        this function call screen to get an input and process the input.
  *
  * @param manager: eManager pointer
  *
@@ -122,7 +128,8 @@ bool run_eManager(eManager * manager);
 
 
 /*
- * @brief The getx_cursor_eManager() return the position x of the cursor in the file window depending on the current file.
+ * @brief The getx_cursor_eManager() return the position x of the cursor
+ *        in the file window depending on the current file.
  *
  * @param manager: eManager pointer
  *
@@ -132,7 +139,8 @@ unsigned int getx_cursor_eManager(eManager const * manager);
 
 
 /*
- * @brief The gety_cursor_eManager() return the position y of the cursor in the file window depending on the current file.
+ * @brief The gety_cursor_eManager() return the position y of the cursor
+ *        in the file window depending on the current file.
  *
  * @param manager: eManager pointer
  *
@@ -142,7 +150,8 @@ unsigned int gety_cursor_eManager(eManager const * manager);
 
 
 /**
- * The fill_directory_menu_eManager() function fill the directory screen menu depending on the manager directory.
+ * @brief The fill_directory_menu_eManager() function fill the directory
+ *        screen menu depending on the manager directory.
  *
  * @param manager: eManager pointer
  * @param directory: pointer on the root directory (for recursivity)
@@ -151,11 +160,14 @@ unsigned int gety_cursor_eManager(eManager const * manager);
  * @return 0 on success or -1 in failure.
  * @note This is a recursive function.
  */
-int fill_directory_menu_eManager(eManager const * manager, eDirectory const * directory, unsigned int level);
+int fill_directory_menu_eManager(eManager const * manager,
+		                         eDirectory const * directory,
+								 unsigned int level);
 
 
 /**
- * @brief The print_file_eManager() functin print the content of the current file on the screen.
+ * @brief The print_file_eManager() functin print the content of the
+ *        current file on the screen.
  *
  * @param manager: eManager pointer
  *
@@ -165,7 +177,8 @@ int print_file_eManager(eManager const * manager);
 
 
 /**
- * @brief The send_help_msg_to_screen_eManager() function send help message to the screen.
+ * @brief The send_help_msg_to_screen_eManager() function send help
+ *        message to the screen.
  *
  * @note If no message is set, send default help message.
  * @note If a message is set, sending it will delete it

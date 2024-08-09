@@ -1,5 +1,4 @@
 /**
- * ===================================================
  * @file eFile.c
  * @brief Contain eFile structure and functions
  * @author ALARY Dorian
@@ -7,12 +6,8 @@
  * @date 21/07/2024
  * @copyright GNU Public License.
  *
- * @details This file contains all the structures, variables and functions used to manage the file and its contents.
- *          The methods allow you to :
- *              - initialize and allocate eFile from the name of a file,
- *              - modify the contents of eFile and
- *              - write the contents of eFile into the file used for initialization.
- * ===================================================
+ * @details This file contains all the structures, variables and functions
+ *          used to manage the file and its content.
  */
 
 #include "eFile.h"
@@ -31,9 +26,11 @@
 
 
 /**
- * @brief The file_permissions() function return the permission of the file designed by realpath.
+ * @brief The file_permissions() function return the permission of the file
+ *        designed by realpath.
  *
  * @param realpath: Name of the file
+ *
  * @return PERM value defining the permission of the file.
  */
 PERM file_permissions(char const * realpath)
@@ -65,9 +62,10 @@ PERM file_permissions(char const * realpath)
 
 
 /**
- * @brief The create_eFile() function allocate an eFile structure but do not open or allocate lines.
+ * @brief The create_eFile() function allocate an eFile structure but do
+ *        not open or allocate lines.
  *
- * @param filename:	Name of the file
+ * @param realpath: Name of the file
  *
  * @return eFile pointer or NULL if it was an error, see logs.
  *
@@ -91,7 +89,9 @@ eFile * create_eFile(char const * realpath)
 	if(efile->realpath[strlen(efile->realpath)-1] == '/')
 		efile->realpath[strlen(efile->realpath)-1] = 0;
 
-	efile->filename = ((efile->filename = strrchr(efile->realpath, '/')) != NULL) ? efile->filename+1 : efile->realpath;
+	efile->filename = strrchr(efile->realpath, '/');
+	efile->filename = (efile->filename != NULL) ? efile->filename+1
+	                                            : efile->realpath;
 
 	efile->n_elines = 0;
 	efile->first_file_line = NULL;
@@ -105,7 +105,8 @@ eFile * create_eFile(char const * realpath)
 
 
 /**
- * @brief the delete_eFile() delete and deallocate eFile and set the pointer to NULL.
+ * @brief The delete_eFile() delete and deallocate eFile and set the
+ *        pointer to NULL.
  *
  * @param efile: eFile pointer pointer
  */
@@ -126,8 +127,9 @@ void delete_eFile(eFile ** efile)
  *
  * @param efile: eFile pointer
  *
- * @note close_eFile() must be called to deallocate lines, delete_eFile also call close_eFile().
- * @note If the file did not exist when calling create_eFile(), open_eFile write a new file.
+ * @note close_eFile() must be called to deallocate lines. Delete_eFile()
+ *       also call close_eFile(). If the file did not exist when calling
+ *       create_eFile(), open_eFile write a new file.
  */
 int open_eFile(eFile * efile)
 {
@@ -152,9 +154,10 @@ int open_eFile(eFile * efile)
 	}
 
 	/* Open file to read it */
-	else if(efile->permissions != p_CREATE && (fp = fopen(efile->realpath, "r")) == NULL)
+	else if(efile->permissions != p_CREATE)
 	{
-		return -1;
+		if((fp = fopen(efile->realpath, "r")) == NULL)
+			return -1;
 	}
 
 
@@ -205,10 +208,10 @@ int open_eFile(eFile * efile)
 
 
 /**
- * @brief The close_eFile() function close the file and delete lines.
+ * @brief The close_eFile() function close the file and deallocate eLines.
  *
  */
-void close_eFile(eFile * efile)
+void close_eFile(eFile *efile)
 {
 	if(efile == NULL)
 		return;
@@ -230,13 +233,14 @@ void close_eFile(eFile * efile)
 
 
 /**
- * @brief The write_eFile() function write the content of eFile on the file designed by filename stored in the filename attribute.
+ * @brief The write_eFile() function write the content of eFile on the
+ *        file designed by filename stored in the filename attribute.
  *
  * @param efile eFile pointer
  *
  * @return 0 on sucess or -1 in failure.
  */
-int write_eFile(eFile * efile)
+int write_eFile(eFile *efile)
 {
 	FILE *fp = NULL;
 	eLine *current = NULL;
@@ -259,7 +263,8 @@ int write_eFile(eFile * efile)
 
 	while(current)
 	{
-		/* Realloc buffer if necessary, first time realloc is equal to malloc */
+		/* Realloc buffer if necessary, first time realloc is equal
+		   to malloc */
 		if(buffer_length < current->length+2)
 		{
 			buffer_length = sizeof(char)*(current->length+2);
@@ -288,14 +293,16 @@ int write_eFile(eFile * efile)
 
 
 /**
- * @brief the add_empty_line_eFile() add an empty line to the position pos in the file.
+ * @brief The add_empty_line_eFile() add an empty line to the position
+ *        pos in the file.
  *
  * @param efile: eFile pointer pointer
- * @param pos: Position of the new line in the file
+ * @param line number: Line number of the new line in the file
  *
  * @return 0 on success or -1 in failure.
  */
-int add_empty_line_eFile(eFile * efile, unsigned int pos)
+int add_empty_line_eFile(eFile * efile,
+		                 unsigned int line_number)
 {
 	eLine *current = NULL;
 	eLine *new = NULL;
@@ -308,7 +315,8 @@ int add_empty_line_eFile(eFile * efile, unsigned int pos)
 
 	if(efile->first_file_line == NULL)
 	{
-		if((efile->first_file_line = create_eLine("", 0, 1, NULL, NULL)) == NULL)
+		efile->first_file_line = create_eLine("", 0, 1, NULL, NULL);
+		if(efile->first_file_line == NULL)
 		{
 			return -1;
 		}
@@ -319,14 +327,14 @@ int add_empty_line_eFile(eFile * efile, unsigned int pos)
 
 	}
 
-	while(i < pos-1 && current->next)
+	while(i < line_number-1 && current->next)
 	{
 		current=current->next;
 		i++;
 	}
 
 	/* Current is previous*/
-	if((new = create_eLine("", 0, pos, current, current->next)) == NULL)
+	if((new = create_eLine("", 0, line_number, current, current->next)) == NULL)
 	{
 		return -1;
 	}
@@ -346,14 +354,16 @@ int add_empty_line_eFile(eFile * efile, unsigned int pos)
 
 
 /**
- * @brief the delete_line_eFile() delete a line to the position pos in the file.
+ * @brief The delete_line_eFile() delete a line to the position pos in
+ *        the file.
  *
  * @param efile: eFile pointer pointer
- * @param pos: Position of the line that will be deleted
+ * @param line_number: Line number of the line that will be deleted
  *
  * @return 0 on sucess or -1 in failure.
  */
-int delete_line_eFile(eFile * efile, unsigned int line_number)
+int delete_line_eFile(eFile * efile,
+		              unsigned int line_number)
 {
 	eLine *current = NULL;
 	eLine *tmp = NULL;
@@ -427,14 +437,16 @@ int delete_line_eFile(eFile * efile, unsigned int line_number)
 
 
 /**
- * @brief the insert_char_eFile() insert a character to the current position in the current_line.
+ * @brief The insert_char_eFile() insert a character to the current
+ *        position in the current_line.
  *
  * @param efile: eFile pointer
  * @param ch: character to insert
  *
  * @return 0 on sucess or -1 in failure.
  */
-int insert_char_eFile(eFile * efile, const char ch)
+int insert_char_eFile(eFile * efile,
+		              char const ch)
 {
 	if(efile == NULL)
 		return -1;
@@ -448,7 +460,8 @@ int insert_char_eFile(eFile * efile, const char ch)
 
 
 /**
- * @brief the remove_char_eFile() remove a character to the current position in the current_line.
+ * @brief The remove_char_eFile() remove a character to the current
+ *        position in the current_line.
  *
  * @param efile: eFile pointer
  *
@@ -468,7 +481,8 @@ int remove_char_eFile(eFile * efile)
 
 
 /**
- * @brief the insert_string_eFile() insert the string at current_pos in the current line.
+ * @brief The insert_string_eFile() insert the string at current_pos in
+ *        the current line.
  *
  * @param efile: eFile pointer
  * @param string: string to insert
@@ -476,13 +490,22 @@ int remove_char_eFile(eFile * efile)
  *
  * @return 0 on sucess or -1 in failure.
  */
-int insert_string_eFile(eFile * efile, char const * string, size_t length)
+int insert_string_eFile(eFile * efile,
+		                char const * string,
+						size_t length)
 {
+	int result = 0;
 	if(efile == NULL)
 		return -1;
 
-	if(insert_string_eLine(efile->current_line, string, length, efile->current_pos))
+	result = insert_string_eLine(efile->current_line,
+			                     string,
+								 length,
+								 efile->current_pos);
+	if(result == -1)
+	{
 		return -1;
+	}
 
 	efile->is_saved = false;
 	return 0;
@@ -490,20 +513,29 @@ int insert_string_eFile(eFile * efile, char const * string, size_t length)
 
 
 /**
- * @brief the remove_string_eFile() remove the string that start at current_pos and end to current_pos+length in the current line.
+ * @brief The remove_string_eFile() remove the string that start at
+ *        current_pos and end to current_pos+length in the current line.
  *
  * @param efile: eFile pointer
  * @param length: of string to remove
  *
  * @return 0 on sucess or -1 in failure.
  */
-int remove_string_eFile(eFile * efile, size_t length)
+int remove_string_eFile(eFile *efile,
+		                size_t length)
 {
+	int result = 0;
+
 	if(efile == NULL)
 		return -1;
 
-	if(remove_string_eLine(efile->current_line, length, efile->current_pos))
+	result = remove_string_eLine(efile->current_line,
+			                     length,
+								 efile->current_pos);
+	if(result)
+	{
 		return -1;
+	}
 
 	efile->is_saved = false;
 	return 0;

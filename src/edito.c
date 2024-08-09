@@ -1,12 +1,10 @@
 /**
- * ===================================================
  * @file edito.h
  * @brief Contain the main function of edito
  * @author ALARY Dorian
  * @version 1.0
  * @date 21/07/2024
  * @copyright GNU Public License
- * ===================================================
  */
 
 #include "eScreen.h"
@@ -114,24 +112,25 @@ int main(int argc, char * argv[])
 
 /*
  * @brief Initialize the terminal for the applciation
- *
  */
 void init_terminal(void)
 {
 	setlocale(LC_ALL, "");
 
-    initscr(); /* Init window structure */
+	/* Init window structure */
+    initscr();
 
-	noecho(); /* Deactivate echo from getch */
-	raw(); /* Deactivate buffering and disallow signals like Ctrl+C, Ctrl+S */
+	/* Deactivate echo from getch */
+	noecho();
+
+	/* Deactivate buffering and disallow signals like Ctrl+C, Ctrl+S */
+	raw();
 	set_escdelay(50);
 }
 
 
 /*
  * @brief Reset the terminal to quit the application
- *
- *
  */
 void reset_terminal(void)
 {

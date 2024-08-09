@@ -1,5 +1,4 @@
 /**
- * ===================================================
  * @file eMenu.c
  * @brief eMenu is a View part of the MVC design
  * @author ALARY Dorian
@@ -7,9 +6,9 @@
  * @date 21/07/2024
  * @copyright GNU Public License.
  *
- * @details This file contain every functions and variable relative to the eMenu structure.
- *          The structure contain every information of a menu.
- * ===================================================
+ * @details This file contain every functions and variable relative to the
+ *          eMenu structure. The structure contain every information of a
+ *          menu.
  */
 
 #include "eMenu.h"
@@ -22,17 +21,21 @@ static void reset_menu(eMenu * menu);
 
 
 /**
- * @brief The create_eMenu() function allocate and initialize an eMenu structure.
+ * @brief The create_eMenu() function allocate and initialize an eMenu
+ *        structure.
  *
  * @param win: Menu window
  * @param sub: Menu sub window
- * @param columnar: true, if the menu displays items in columns, false if it displays them in rows
+ * @param columnar: true, if the menu displays items in columns, false if
+ *                  it displays them in rows
  *
  * @return eMenu pointer or NULL if it was an error.
  *
  * @note delete_eMenu() must be called before exiting.
  */
-eMenu * create_eMenu(WINDOW * win, WINDOW * sub, bool columnar)
+eMenu * create_eMenu(WINDOW * win,
+		             WINDOW * sub,
+		             bool columnar)
 {
 	eMenu *menu = NULL;
 
@@ -60,7 +63,8 @@ eMenu * create_eMenu(WINDOW * win, WINDOW * sub, bool columnar)
 
 
 /**
- * @brief The delete_eMenu() function deallocate the eMenu structure and set the pointer to the structure to NULL.
+ * @brief The delete_eMenu() function deallocate the eMenu structure and
+ *        set the pointer to the structure to NULL.
  *
  * @param menu: eMenu pointer pointer
  */
@@ -93,7 +97,8 @@ void delete_eMenu(eMenu ** menu)
  *
  * @return 0 on success, -1 in failure.
  */
-int add_item_eMenu(eMenu * menu, char const * item)
+int add_item_eMenu(eMenu * menu,
+		           char const * item)
 {
 	int sub_cols=0, sub_rows=0;
 
@@ -103,7 +108,11 @@ int add_item_eMenu(eMenu * menu, char const * item)
 	/* Alloc_size must be equal to n_items+1. */
 	if(menu->n_items+1 > menu->alloc_size)
 	{
-		menu->virtual_items_title = (char **) realloc(menu->virtual_items_title, get_next_power_of_two(menu->n_items+1)*sizeof(char *));
+		menu->virtual_items_title =
+			(char **) realloc(menu->virtual_items_title,
+					          get_next_power_of_two(menu->n_items+1)
+							  * sizeof(char *));
+
 		if(menu->virtual_items_title == NULL)
 			return -1;
 
@@ -135,7 +144,8 @@ int add_item_eMenu(eMenu * menu, char const * item)
  *
  * @return 0 on success, -1 in failure.
  */
-int delete_item_eMenu(eMenu * menu, int index)
+int delete_item_eMenu(eMenu * menu,
+		              int index)
 {
 	if(menu == NULL || index >= menu->n_items)
 		return -1;
@@ -154,7 +164,8 @@ int delete_item_eMenu(eMenu * menu, int index)
 
 
 /**
- * @brief The erase_eMenu() erase the virtual menu. Useful to rebuild virtual menu.
+ * @brief The erase_eMenu() erase the virtual menu. Useful to refresh the
+ *        menu from a data structure.
  *
  * @param menu: eMenu pointer pointer
  */
@@ -214,7 +225,11 @@ void move_next_item_eMenu(eMenu * menu)
 	(void)cur_width;
 
 	/* calculates the number of scrolls */
-	if(!menu->columnar && max_height-1 == cur_height && get_current_item_index_eMenu(menu) != item_count(menu->menu)-1)
+	if(!menu->columnar
+	   &&
+	   max_height-1 == cur_height
+	   &&
+	   get_current_item_index_eMenu(menu) != item_count(menu->menu)-1)
 	{
 		menu->n_scroll++;
 	}
@@ -224,7 +239,8 @@ void move_next_item_eMenu(eMenu * menu)
 
 
 /**
- * @brief The move_previous_item_eMenu() move the cursor to the previous item.
+ * @brief The move_previous_item_eMenu() move the cursor to the previous
+ *        item.
  *
  * @param menu: eMenu pointer pointer
  */
@@ -237,7 +253,11 @@ void move_previous_item_eMenu(eMenu * menu)
 	(void)cur_width;
 
 	/* calculates the number of scrolls */
-	if(!menu->columnar && cur_height == 0 && get_current_item_index_eMenu(menu) != 0)
+	if(!menu->columnar
+	   &&
+	   cur_height == 0
+	   &&
+	   get_current_item_index_eMenu(menu) != 0)
 	{
 		menu->n_scroll--;
 	}
@@ -247,7 +267,8 @@ void move_previous_item_eMenu(eMenu * menu)
 
 
 /**
- * @brief The move_current_item_eMenu(eMenu *menu) move the cursor to the current item.
+ * @brief The move_current_item_eMenu(eMenu *menu) move the cursor to the
+ *        current item.
  *
  * @param menu: eMenu pointer pointer
  */
@@ -258,19 +279,22 @@ void move_current_item_eMenu(eMenu * menu)
 
 
 /**
- * @brief The move_pattern_item_eMenu() function move the cursor to the next item with pattern matching.
+ * @brief The move_pattern_item_eMenu() function move the cursor to the
+ *        next item with pattern matching.
  *
  * @param menu: eMenu pointer pointer
  * @param pattern: pattern to match
  */
-void move_pattern_item_eMenu(eMenu * menu, char const * pattern)
+void move_pattern_item_eMenu(eMenu * menu,
+		                     char const * pattern)
 {
 	set_menu_pattern(menu->menu, pattern);
 }
 
 
 /**
- * @bried The get_current_item_index_eMenu() function return the current item index.
+ * @bried The get_current_item_index_eMenu() function return the current
+ *        item index.
  *
  * @param menu: eMenu pointer pointer
  *
@@ -283,12 +307,14 @@ int get_current_item_index_eMenu(eMenu const * menu)
 
 
 /**
- * @brief The set_cursor_position_eMenu() set the menu current position to the specified position.
+ * @brief The set_cursor_position_eMenu() set the menu current position to
+ *        the specified position.
  *
  * @param menu: eMenu pointer pointer
  * @param position: New current position
  */
-void set_cursor_position_eMenu(eMenu * menu, int position)
+void set_cursor_position_eMenu(eMenu * menu,
+		                       int position)
 {
 	for(int i=0; i<menu->n_scroll; i++)
 	{
@@ -345,7 +371,8 @@ void reset_menu(eMenu * menu)
 
 
 /**
- * @brief the init_menu() function, create the ncurses items and menu with menu->virtual_items_title.
+ * @brief the init_menu() function, create the ncurses items and menu with
+ *        menu->virtual_items_title.
  *
  * @param menu: eMenu pointer pointer
  */
