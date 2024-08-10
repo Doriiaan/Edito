@@ -31,88 +31,88 @@
  * @note delete_eScreen() must be called before exiting.
  */
 eScreen * create_eScreen(int lines,
-		                 int columns)
+                         int columns)
 {
-	eScreen *screen = NULL;
-	int width_repository = 0, height_repository = 0;
-	int width_bar = 0, height_bar = 0;
-	int width_file_box = 0, height_file_box = 0;
-	int width_help = 0, height_help = 0;
+    eScreen *screen = NULL;
+    int width_repository = 0, height_repository = 0;
+    int width_bar = 0, height_bar = 0;
+    int width_file_box = 0, height_file_box = 0;
+    int width_help = 0, height_help = 0;
 
-	screen = (eScreen *) malloc(sizeof(eScreen));
-	if(screen == NULL)
-	{
-		return NULL;
-	}
+    screen = (eScreen *) malloc(sizeof(eScreen));
+    if(screen == NULL)
+    {
+        return NULL;
+    }
 
-	/* Set eScreen dimension */
-	screen->width = columns;
-	screen->height = lines;
+    /* Set eScreen dimension */
+    screen->width = columns;
+    screen->height = lines;
 
-	/* Set WINDOWs dimension */
-	width_help = columns;
-	height_help = 4;
+    /* Set WINDOWs dimension */
+    width_help = columns;
+    height_help = 4;
 
-	width_repository = columns/5;
-	height_repository = lines - height_help;
+    width_repository = columns/5;
+    height_repository = lines - height_help;
 
-	width_bar = columns - width_repository;
-	height_bar = lines/10;
-	if(height_bar%2 ==0)
-		height_bar++;
-	if(height_bar < 3)
-		height_bar = 3;
+    width_bar = columns - width_repository;
+    height_bar = lines/10;
+    if(height_bar%2 ==0)
+        height_bar++;
+    if(height_bar < 3)
+        height_bar = 3;
 
-	width_file_box = width_bar;
-	height_file_box = lines - height_bar - height_help;
+    width_file_box = width_bar;
+    height_file_box = lines - height_bar - height_help;
 
-	/* Create WINDOWs */
-	screen->windows[WDIR_BOX] = create_eWindow(height_repository,
-			                                   width_repository,
-											   0,
-											   0);
+    /* Create WINDOWs */
+    screen->windows[WDIR_BOX] = create_eWindow(height_repository,
+                                               width_repository,
+                                               0,
+                                               0);
 
-	screen->windows[WDIR_ITEMS] = create_der_eWindow(screen->windows[WDIR_BOX],
-			                                         height_repository-2,
-													 width_repository-3,
-													 1,
-													 2);
+    screen->windows[WDIR_ITEMS] = create_der_eWindow(screen->windows[WDIR_BOX],
+                                                     height_repository-2,
+                                                     width_repository-3,
+                                                     1,
+                                                     2);
 
-	screen->windows[WBAR_BOX] = create_eWindow(height_bar,
-			                                   width_bar,
-											   0,
-											   width_repository);
+    screen->windows[WBAR_BOX] = create_eWindow(height_bar,
+                                               width_bar,
+                                               0,
+                                               width_repository);
 
-	screen->windows[WBAR_ITEMS] = create_der_eWindow(screen->windows[WBAR_BOX],
-			                                         2,
-													 width_bar-2,
-													 height_bar/2,
-													 1);
+    screen->windows[WBAR_ITEMS] = create_der_eWindow(screen->windows[WBAR_BOX],
+                                                     2,
+                                                     width_bar-2,
+                                                     height_bar/2,
+                                                     1);
 
-	screen->windows[WFILE_BOX] = create_eWindow(height_file_box,
-			                                    width_file_box,
-												height_bar,
-												width_repository);
+    screen->windows[WFILE_BOX] = create_eWindow(height_file_box,
+                                                width_file_box,
+                                                height_bar,
+                                                width_repository);
 
-	screen->windows[WFILE_LNUM] = NULL;
+    screen->windows[WFILE_LNUM] = NULL;
 
-	screen->windows[WFILE_CNT] = NULL;
+    screen->windows[WFILE_CNT] = NULL;
 
-	screen->windows[WHELP] = create_eWindow(height_help,
-			                                width_help,
-											height_file_box + height_bar,
-											0);
+    screen->windows[WHELP] = create_eWindow(height_help,
+                                            width_help,
+                                            height_file_box + height_bar,
+                                            0);
 
-	/* Create MENUs */
-	screen->menus[MBAR] = create_eMenu(screen->windows[WBAR_BOX]->window,
-			                           screen->windows[WBAR_ITEMS]->window,
-									   1);
+    /* Create MENUs */
+    screen->menus[MBAR] = create_eMenu(screen->windows[WBAR_BOX]->window,
+                                       screen->windows[WBAR_ITEMS]->window,
+                                       1);
 
-	screen->menus[MDIR] = create_eMenu(screen->windows[WDIR_BOX]->window,
-			                           screen->windows[WDIR_ITEMS]->window,
-									   0);
+    screen->menus[MDIR] = create_eMenu(screen->windows[WDIR_BOX]->window,
+                                       screen->windows[WDIR_ITEMS]->window,
+                                       0);
 
-	return screen;
+    return screen;
 }
 
 
@@ -124,23 +124,23 @@ eScreen * create_eScreen(int lines,
  */
 void delete_eScreen(eScreen ** screen)
 {
-	if(*screen == NULL)
-		return;
+    if(*screen == NULL)
+        return;
 
-	for(int i=0; i<WINDOWS_NUMBER; i++)
-	{
-		if((*screen)->windows[i] != NULL)
-			delete_eWindow(&(*screen)->windows[i]);
-	}
+    for(int i=0; i<WINDOWS_NUMBER; i++)
+    {
+        if((*screen)->windows[i] != NULL)
+            delete_eWindow(&(*screen)->windows[i]);
+    }
 
-	for(int i=0; i<MENU_NUMBER; i++)
-	{
-		if((*screen)->menus[i] != NULL)
-		delete_eMenu(&(*screen)->menus[i]);
-	}
+    for(int i=0; i<MENU_NUMBER; i++)
+    {
+        if((*screen)->menus[i] != NULL)
+        delete_eMenu(&(*screen)->menus[i]);
+    }
 
-	free(*screen);
-	*screen = NULL;
+    free(*screen);
+    *screen = NULL;
 }
 
 
@@ -151,9 +151,9 @@ void delete_eScreen(eScreen ** screen)
  */
 void update_directory_eScreen(eScreen * screen)
 {
-	box(screen->windows[WDIR_BOX]->window, 0, 0);
-	wrefresh(screen->windows[WDIR_BOX]->window);
-	wrefresh(screen->windows[WDIR_ITEMS]->window);
+    box(screen->windows[WDIR_BOX]->window, 0, 0);
+    wrefresh(screen->windows[WDIR_BOX]->window);
+    wrefresh(screen->windows[WDIR_ITEMS]->window);
 }
 
 
@@ -164,9 +164,9 @@ void update_directory_eScreen(eScreen * screen)
  */
 void update_bar_eScreen(eScreen * screen)
 {
-	box(screen->windows[WBAR_BOX]->window, 0, 0);
-	wrefresh(screen->windows[WBAR_BOX]->window);
-	wrefresh(screen->windows[WBAR_ITEMS]->window);
+    box(screen->windows[WBAR_BOX]->window, 0, 0);
+    wrefresh(screen->windows[WBAR_BOX]->window);
+    wrefresh(screen->windows[WBAR_ITEMS]->window);
 }
 
 
@@ -178,16 +178,16 @@ void update_bar_eScreen(eScreen * screen)
  */
 void update_file_eScreen(eScreen * screen)
 {
-	int width = get_width_eScreen(screen, WFILE_LNUM);
-	int height = get_height_eScreen(screen, WFILE_LNUM);
+    int width = get_width_eScreen(screen, WFILE_LNUM);
+    int height = get_height_eScreen(screen, WFILE_LNUM);
 
-	mvwvline(screen->windows[WFILE_LNUM]->window,
-			 0,
-			 width-1,
-			 ACS_VLINE,
-			 height);
-	wrefresh(screen->windows[WFILE_LNUM]->window);
-	wrefresh(screen->windows[WFILE_CNT]->window);
+    mvwvline(screen->windows[WFILE_LNUM]->window,
+             0,
+             width-1,
+             ACS_VLINE,
+             height);
+    wrefresh(screen->windows[WFILE_LNUM]->window);
+    wrefresh(screen->windows[WFILE_CNT]->window);
 }
 
 
@@ -198,7 +198,7 @@ void update_file_eScreen(eScreen * screen)
  */
 void update_help_eScreen(eScreen * screen)
 {
-	wrefresh(screen->windows[WHELP]->window);
+    wrefresh(screen->windows[WHELP]->window);
 }
 
 
@@ -210,16 +210,16 @@ void update_help_eScreen(eScreen * screen)
  */
 void update_all_eScreen(eScreen * screen)
 {
-	box(screen->windows[WDIR_BOX]->window, 0, 0);
-	box(screen->windows[WBAR_BOX]->window, 0, 0);
-	box(screen->windows[WFILE_BOX]->window, 0, 0);
-	for(int i=0 ; i<WINDOWS_NUMBER ; i++)
-	{
-		if(screen->windows[i] != NULL)
-			wnoutrefresh(screen->windows[i]->window);
-	}
+    box(screen->windows[WDIR_BOX]->window, 0, 0);
+    box(screen->windows[WBAR_BOX]->window, 0, 0);
+    box(screen->windows[WFILE_BOX]->window, 0, 0);
+    for(int i=0 ; i<WINDOWS_NUMBER ; i++)
+    {
+        if(screen->windows[i] != NULL)
+            wnoutrefresh(screen->windows[i]->window);
+    }
 
-	doupdate();
+    doupdate();
 }
 
 
@@ -237,11 +237,11 @@ void update_all_eScreen(eScreen * screen)
  * @param type: Window type
  */
 void move_cursor_eScreen(eScreen * screen,
-		                 unsigned int y,
-						 unsigned int x,
-						 WINDOW_TYPE type)
+                         unsigned int y,
+                         unsigned int x,
+                         WINDOW_TYPE type)
 {
-	wmove(screen->windows[type]->window, y, x);
+    wmove(screen->windows[type]->window, y, x);
 }
 
 
@@ -253,9 +253,9 @@ void move_cursor_eScreen(eScreen * screen,
  * @param type: Window type
  */
 unsigned int get_width_eScreen(eScreen const * screen,
-		                       WINDOW_TYPE type)
+                               WINDOW_TYPE type)
 {
-	return screen->windows[type]->width;
+    return screen->windows[type]->width;
 }
 
 
@@ -267,9 +267,9 @@ unsigned int get_width_eScreen(eScreen const * screen,
  * @param type: Window type
  */
 unsigned int get_height_eScreen(eScreen const * screen,
-		                        WINDOW_TYPE type)
+                                WINDOW_TYPE type)
 {
-	return screen->windows[type]->height;
+    return screen->windows[type]->height;
 }
 
 
@@ -282,9 +282,9 @@ unsigned int get_height_eScreen(eScreen const * screen,
  * @return User input
  */
 int get_input_eScreen(eScreen * screen,
-		              WINDOW_TYPE type)
+                      WINDOW_TYPE type)
 {
-	return wgetch(screen->windows[type]->window);
+    return wgetch(screen->windows[type]->window);
 }
 
 
@@ -296,36 +296,36 @@ int get_input_eScreen(eScreen * screen,
  * @param number_length: number of digit in the lines number
  */
 void create_file_window_eScreen(eScreen * screen,
-		                        unsigned int number_length)
+                                unsigned int number_length)
 {
 
-	int width_file_linesnumber = 0, height_file_linesnumber = 0;
-	int width_file_content = 0, height_file_content = 0;
-	int x_file_linesnumber = 0, y_file_linesnumber = 0;
-	int x_file_content = 0, y_file_content = 0;
+    int width_file_linesnumber = 0, height_file_linesnumber = 0;
+    int width_file_content = 0, height_file_content = 0;
+    int x_file_linesnumber = 0, y_file_linesnumber = 0;
+    int x_file_content = 0, y_file_content = 0;
 
-	width_file_linesnumber = number_length + 3;
-	height_file_linesnumber = screen->windows[WFILE_BOX]->height - 2;
+    width_file_linesnumber = number_length + 3;
+    height_file_linesnumber = screen->windows[WFILE_BOX]->height - 2;
 
-	width_file_content =
-		screen->windows[WFILE_BOX]->width - width_file_linesnumber - 2;
-	height_file_content = screen->windows[WFILE_BOX]->height - 2;
+    width_file_content =
+        screen->windows[WFILE_BOX]->width - width_file_linesnumber - 2;
+    height_file_content = screen->windows[WFILE_BOX]->height - 2;
 
-	x_file_linesnumber = screen->windows[WFILE_BOX]->x + 1;
-	y_file_linesnumber = screen->windows[WFILE_BOX]->y + 1;
+    x_file_linesnumber = screen->windows[WFILE_BOX]->x + 1;
+    y_file_linesnumber = screen->windows[WFILE_BOX]->y + 1;
 
-	x_file_content = x_file_linesnumber + width_file_linesnumber;
-	y_file_content = screen->windows[WFILE_BOX]->y + 1;
+    x_file_content = x_file_linesnumber + width_file_linesnumber;
+    y_file_content = screen->windows[WFILE_BOX]->y + 1;
 
-	screen->windows[WFILE_LNUM] = create_eWindow(height_file_linesnumber,
-			                                     width_file_linesnumber,
-												 y_file_linesnumber,
-												 x_file_linesnumber);
+    screen->windows[WFILE_LNUM] = create_eWindow(height_file_linesnumber,
+                                                 width_file_linesnumber,
+                                                 y_file_linesnumber,
+                                                 x_file_linesnumber);
 
-	screen->windows[WFILE_CNT] = create_eWindow(height_file_content,
-			                                    width_file_content,
-												y_file_content,
-												x_file_content);
+    screen->windows[WFILE_CNT] = create_eWindow(height_file_content,
+                                                width_file_content,
+                                                y_file_content,
+                                                x_file_content);
 }
 
 
@@ -336,39 +336,39 @@ void create_file_window_eScreen(eScreen * screen,
  * @param number_length: number of digit in the lines number
  */
 void resize_file_eScreen(eScreen * screen,
-		                 unsigned int number_length)
+                         unsigned int number_length)
 {
-	if(number_length+3 != screen->windows[WFILE_LNUM]->width)
-	{
-		int width_file_linesnumber = 0;
-		int width_file_content = 0;
-		int x_file_content = 0;
+    if(number_length+3 != screen->windows[WFILE_LNUM]->width)
+    {
+        int width_file_linesnumber = 0;
+        int width_file_content = 0;
+        int x_file_content = 0;
 
-		width_file_linesnumber = number_length + 3;
+        width_file_linesnumber = number_length + 3;
 
-		width_file_content =
-			screen->windows[WFILE_BOX]->width - width_file_linesnumber - 2;
+        width_file_content =
+            screen->windows[WFILE_BOX]->width - width_file_linesnumber - 2;
 
-		x_file_content =
-			screen->windows[WFILE_LNUM]->x + width_file_linesnumber;
+        x_file_content =
+            screen->windows[WFILE_LNUM]->x + width_file_linesnumber;
 
 
-		screen->windows[WFILE_LNUM]->width = width_file_linesnumber;
-		screen->windows[WFILE_CNT]->width = width_file_content;
-		screen->windows[WFILE_CNT]->x = x_file_content;
+        screen->windows[WFILE_LNUM]->width = width_file_linesnumber;
+        screen->windows[WFILE_CNT]->width = width_file_content;
+        screen->windows[WFILE_CNT]->x = x_file_content;
 
-		wresize(screen->windows[WFILE_LNUM]->window,
-				screen->windows[WFILE_LNUM]->height,
-				width_file_linesnumber);
+        wresize(screen->windows[WFILE_LNUM]->window,
+                screen->windows[WFILE_LNUM]->height,
+                width_file_linesnumber);
 
-		mvwin(screen->windows[WFILE_CNT]->window,
-		      screen->windows[WFILE_CNT]->y,
-			  x_file_content);
+        mvwin(screen->windows[WFILE_CNT]->window,
+              screen->windows[WFILE_CNT]->y,
+              x_file_content);
 
-		wresize(screen->windows[WFILE_CNT]->window,
-				screen->windows[WFILE_CNT]->height,
-				width_file_content);
-	}
+        wresize(screen->windows[WFILE_CNT]->window,
+                screen->windows[WFILE_CNT]->height,
+                width_file_content);
+    }
 }
 
 
@@ -382,12 +382,12 @@ void resize_file_eScreen(eScreen * screen,
  * @param line: line to print
  */
 void print_line_eScreen(eScreen *screen,
-		                WINDOW_TYPE type,
-						int y,
-						int x,
-						char const * line)
+                        WINDOW_TYPE type,
+                        int y,
+                        int x,
+                        char const * line)
 {
-	mvwprintw(screen->windows[type]->window, y, x, line);
+    mvwprintw(screen->windows[type]->window, y, x, line);
 }
 
 
@@ -398,9 +398,9 @@ void print_line_eScreen(eScreen *screen,
  * @param type: Window type
  */
 void erase_window(eScreen *screen,
-		          WINDOW_TYPE type)
+                  WINDOW_TYPE type)
 {
-	werase(screen->windows[type]->window);
+    werase(screen->windows[type]->window);
 }
 
 
@@ -414,53 +414,53 @@ void erase_window(eScreen *screen,
  * @note update_help_eScreen must be called.
  */
 void print_help_eScreen(eScreen * screen,
-		                char const * const * string_array)
+                        char const * const * string_array)
 {
-	if(screen == NULL)
-		return;
+    if(screen == NULL)
+        return;
 
-	/* Position of current elem in string arrray */
-	int i_elem = 0;
+    /* Position of current elem in string arrray */
+    int i_elem = 0;
 
-	/* In which line is the next element */
-	int next_line = 1;
+    /* In which line is the next element */
+    int next_line = 1;
 
-	/* In which col is the next element */
-	int next_col = 1;
+    /* In which col is the next element */
+    int next_col = 1;
 
-	/* Max size taken by an element in the column */
-	size_t max_width_size_elem = 0;
+    /* Max size taken by an element in the column */
+    size_t max_width_size_elem = 0;
 
-	/* Remaining size in lines */
-	size_t remaining_size = screen->width - next_col - 1;
+    /* Remaining size in lines */
+    size_t remaining_size = screen->width - next_col - 1;
 
-	int n_line = screen->windows[WHELP]->height-2;
+    int n_line = screen->windows[WHELP]->height-2;
 
-	werase(screen->windows[WHELP]->window);
+    werase(screen->windows[WHELP]->window);
 
-	while(string_array[i_elem] != NULL)
-	{
-		if(max_width_size_elem < strlen(string_array[i_elem]))
-			max_width_size_elem = strlen(string_array[i_elem]);
+    while(string_array[i_elem] != NULL)
+    {
+        if(max_width_size_elem < strlen(string_array[i_elem]))
+            max_width_size_elem = strlen(string_array[i_elem]);
 
-		if(max_width_size_elem > remaining_size)
-			break;
+        if(max_width_size_elem > remaining_size)
+            break;
 
-		mvwaddstr(screen->windows[WHELP]->window,
-				  next_line,
-				  next_col,
-				  string_array[i_elem]);
+        mvwaddstr(screen->windows[WHELP]->window,
+                  next_line,
+                  next_col,
+                  string_array[i_elem]);
 
-		next_line++;
-		if(next_line > n_line)
-		{
-			next_line = 1;
-			next_col += max_width_size_elem+8;
-			max_width_size_elem = 0;
-		}
-		i_elem++;
-		remaining_size = screen->width - next_col - 1;
-	}
+        next_line++;
+        if(next_line > n_line)
+        {
+            next_line = 1;
+            next_col += max_width_size_elem+8;
+            max_width_size_elem = 0;
+        }
+        i_elem++;
+        remaining_size = screen->width - next_col - 1;
+    }
 }
 
 
@@ -479,10 +479,10 @@ void print_help_eScreen(eScreen * screen,
  * @return 0 in success or -1 in failure.
  */
 int add_item_menu_eScreen(eScreen * screen,
-		                  MENU_TYPE type,
-						  char const * item)
+                          MENU_TYPE type,
+                          char const * item)
 {
-	return add_item_eMenu(screen->menus[type], item);
+    return add_item_eMenu(screen->menus[type], item);
 }
 
 
@@ -493,9 +493,9 @@ int add_item_menu_eScreen(eScreen * screen,
  * @param type: Menu type
  */
 void erase_menu_eScreen(eScreen * screen,
-		                MENU_TYPE type)
+                        MENU_TYPE type)
 {
-	erase_eMenu(screen->menus[type]);
+    erase_eMenu(screen->menus[type]);
 }
 
 
@@ -507,9 +507,9 @@ void erase_menu_eScreen(eScreen * screen,
  * @param type: Menu type
  */
 void refresh_menu_eScreen(eScreen * screen,
-		                  MENU_TYPE type)
+                          MENU_TYPE type)
 {
-	refresh_eMenu(screen->menus[type]);
+    refresh_eMenu(screen->menus[type]);
 }
 
 
@@ -521,9 +521,9 @@ void refresh_menu_eScreen(eScreen * screen,
  * @param type: Menu type
  */
 void move_next_item_menu_eScreen(eScreen * screen,
-		                         MENU_TYPE type)
+                                 MENU_TYPE type)
 {
-	move_next_item_eMenu(screen->menus[type]);
+    move_next_item_eMenu(screen->menus[type]);
 }
 
 
@@ -535,9 +535,9 @@ void move_next_item_menu_eScreen(eScreen * screen,
  * @param type: Menu type
  */
 void move_previous_item_menu_eScreen(eScreen * screen,
-		                             MENU_TYPE type)
+                                     MENU_TYPE type)
 {
-	move_previous_item_eMenu(screen->menus[type]);
+    move_previous_item_eMenu(screen->menus[type]);
 }
 
 
@@ -549,9 +549,9 @@ void move_previous_item_menu_eScreen(eScreen * screen,
  * @param type: Menu type
  */
 void move_current_item_menu_eScreen(eScreen * screen,
-		                            MENU_TYPE type)
+                                    MENU_TYPE type)
 {
-	move_current_item_eMenu(screen->menus[type]);
+    move_current_item_eMenu(screen->menus[type]);
 }
 
 
@@ -564,10 +564,10 @@ void move_current_item_menu_eScreen(eScreen * screen,
  * @param pattern: pattern to match
  */
 void move_pattern_item_menu_eScreen(eScreen * screen,
-		                            MENU_TYPE type,
-									char const * pattern)
+                                    MENU_TYPE type,
+                                    char const * pattern)
 {
-	move_pattern_item_eMenu(screen->menus[type], pattern);
+    move_pattern_item_eMenu(screen->menus[type], pattern);
 }
 
 
@@ -579,7 +579,7 @@ void move_pattern_item_menu_eScreen(eScreen * screen,
  * @param type: Menu type
  */
 int get_current_item_index_menu_eScreen(eScreen const * screen,
-		                                MENU_TYPE type)
+                                        MENU_TYPE type)
 {
-	return get_current_item_index_eMenu(screen->menus[type]);
+    return get_current_item_index_eMenu(screen->menus[type]);
 }

@@ -32,48 +32,48 @@
  * @note delete_eLine() must be called before exiting.
  */
 eLine * create_eLine(char const * string,
-		             size_t length,
-					 unsigned int line_number,
-					 eLine * previous,
-					 eLine * next)
+                     size_t length,
+                     unsigned int line_number,
+                     eLine * previous,
+                     eLine * next)
 {
-	eLine *eline = (eLine *) malloc(sizeof(eLine));
-	if(eline == NULL)
-	{
-		return NULL;
-	}
+    eLine *eline = (eLine *) malloc(sizeof(eLine));
+    if(eline == NULL)
+    {
+        return NULL;
+    }
 
-	/* Remove '\n' */
-	if(string[strnlen(string, length)-1] == '\n')
-	{
-		length = strnlen(string, length)-1;
-	}
+    /* Remove '\n' */
+    if(string[strnlen(string, length)-1] == '\n')
+    {
+        length = strnlen(string, length)-1;
+    }
 
-	eline->length = strnlen(string, length);
-	eline->alloc_size = get_next_power_of_two(eline->length)*sizeof(char);
+    eline->length = strnlen(string, length);
+    eline->alloc_size = get_next_power_of_two(eline->length)*sizeof(char);
 
-	eline->string = (char *) malloc(eline->alloc_size);
-	if(eline->string == NULL)
-	{
-		free(eline);
-		return NULL;
-	}
+    eline->string = (char *) malloc(eline->alloc_size);
+    if(eline->string == NULL)
+    {
+        free(eline);
+        return NULL;
+    }
 
 
-	memset(eline->string, 0, eline->alloc_size);
-	memcpy(eline->string, string, eline->length);
+    memset(eline->string, 0, eline->alloc_size);
+    memcpy(eline->string, string, eline->length);
 
-	eline->line_number = line_number;
+    eline->line_number = line_number;
 
-	eline->next = next;
-	if(eline->next)
-		eline->next->previous = eline;
+    eline->next = next;
+    if(eline->next)
+        eline->next->previous = eline;
 
-	eline->previous = previous;
-	if(eline->previous)
-		eline->previous->next = eline;
+    eline->previous = previous;
+    if(eline->previous)
+        eline->previous->next = eline;
 
-	return eline;
+    return eline;
 }
 
 
@@ -85,14 +85,14 @@ eLine * create_eLine(char const * string,
  */
 void delete_eLine(eLine ** eline)
 {
-	if(*eline == NULL)
-		return;
+    if(*eline == NULL)
+        return;
 
-	if((*eline)->string != NULL)
-		free((*eline)->string);
+    if((*eline)->string != NULL)
+        free((*eline)->string);
 
-	free(*eline);
-	*eline = NULL;
+    free(*eline);
+    *eline = NULL;
 }
 
 
@@ -108,48 +108,48 @@ void delete_eLine(eLine ** eline)
  * @return 0 on success, -1 in failure.
  */
 int insert_string_eLine(eLine * eline,
-		                char const * string,
-						size_t length,
-						unsigned int pos)
+                        char const * string,
+                        size_t length,
+                        unsigned int pos)
 {
-	size_t string_length = 0;
-	size_t new_length = 0;
+    size_t string_length = 0;
+    size_t new_length = 0;
 
-	if(eline == NULL)
-		return -1;
+    if(eline == NULL)
+        return -1;
 
-	/* del terminating \n character */
-	if(string[strnlen(string, length)-1] == '\n')
-	{
-		length = strnlen(string, length)-1;
-	}
+    /* del terminating \n character */
+    if(string[strnlen(string, length)-1] == '\n')
+    {
+        length = strnlen(string, length)-1;
+    }
 
-	string_length = strnlen(string, length);
-	new_length = eline->length + string_length;
+    string_length = strnlen(string, length);
+    new_length = eline->length + string_length;
 
-	if(pos > eline->length)
-	{
-		return -1;
-	}
+    if(pos > eline->length)
+    {
+        return -1;
+    }
 
 
-	if(new_length+1 > eline->alloc_size)
-	{
-		eline->alloc_size = sizeof(char)*get_next_power_of_two(new_length);
-		eline->string = (char *) realloc(eline->string, eline->alloc_size);
-		memset(eline->string + eline->length,
-			   0,
-			   eline->alloc_size - eline->length);
-	}
+    if(new_length+1 > eline->alloc_size)
+    {
+        eline->alloc_size = sizeof(char)*get_next_power_of_two(new_length);
+        eline->string = (char *) realloc(eline->string, eline->alloc_size);
+        memset(eline->string + eline->length,
+               0,
+               eline->alloc_size - eline->length);
+    }
 
-	memmove(eline->string + pos + string_length,
-			eline->string + pos,
-			eline->length - pos);
-	memcpy(eline->string+pos, string, string_length);
+    memmove(eline->string + pos + string_length,
+            eline->string + pos,
+            eline->length - pos);
+    memcpy(eline->string+pos, string, string_length);
 
-	eline->length = new_length;
+    eline->length = new_length;
 
-	return 0;
+    return 0;
 }
 
 
@@ -164,26 +164,26 @@ int insert_string_eLine(eLine * eline,
  * @return 0 on success, -1 in failure.
  */
 int remove_string_eLine(eLine * eline,
-		                size_t length,
-						unsigned int pos)
+                        size_t length,
+                        unsigned int pos)
 {
-	int real_length = 0;
+    int real_length = 0;
 
-	if(eline ==NULL)
-		return -1;
+    if(eline ==NULL)
+        return -1;
 
-	if(pos > eline->length)
-		return -1;
+    if(pos > eline->length)
+        return -1;
 
-	/* If pos + length > eline->length*/
-	real_length = strnlen(eline->string+pos, length);
+    /* If pos + length > eline->length*/
+    real_length = strnlen(eline->string+pos, length);
 
-	/* This move final 0 */
-	memmove(eline->string+pos,
-			eline->string + pos + real_length,
-			eline->length-real_length-pos+1);
-	eline->length -= real_length;
-	return 0;
+    /* This move final 0 */
+    memmove(eline->string+pos,
+            eline->string + pos + real_length,
+            eline->length-real_length-pos+1);
+    eline->length -= real_length;
+    return 0;
 }
 
 
@@ -198,33 +198,33 @@ int remove_string_eLine(eLine * eline,
  * @return 0 on success, -1 in failure.
  */
 int insert_char_eLine(eLine * eline,
-		              const char ch,
-					  unsigned int pos)
+                      const char ch,
+                      unsigned int pos)
 {
-	if(eline == NULL)
-		return -1;
+    if(eline == NULL)
+        return -1;
 
-	if(ch == '\n')
-		return -1;
+    if(ch == '\n')
+        return -1;
 
-	if(pos > eline->length)
-	{
-		return -1;
-	}
+    if(pos > eline->length)
+    {
+        return -1;
+    }
 
-	eline->length ++;
-	if(eline->length+1 > eline->alloc_size)
-	{
-		eline->alloc_size = sizeof(char)*get_next_power_of_two(eline->length);
-		eline->string = (char *) realloc(eline->string, eline->alloc_size);
-		memset(eline->string + eline->length,
-			   0,
-			   eline->alloc_size - eline->length);
-	}
+    eline->length ++;
+    if(eline->length+1 > eline->alloc_size)
+    {
+        eline->alloc_size = sizeof(char)*get_next_power_of_two(eline->length);
+        eline->string = (char *) realloc(eline->string, eline->alloc_size);
+        memset(eline->string + eline->length,
+               0,
+               eline->alloc_size - eline->length);
+    }
 
-	memmove(eline->string + pos + 1, eline->string + pos, eline->length - pos);
-	eline->string[pos] = ch;
-	return 0;
+    memmove(eline->string + pos + 1, eline->string + pos, eline->length - pos);
+    eline->string[pos] = ch;
+    return 0;
 }
 
 
@@ -238,23 +238,23 @@ int insert_char_eLine(eLine * eline,
  * @return 0 on success, -1 in failure.
  */
 int remove_char_eLine(eLine * eline,
-		              unsigned int pos)
+                      unsigned int pos)
 {
-	if(eline == NULL)
-		return -1;
+    if(eline == NULL)
+        return -1;
 
-	if(pos > eline->length)
-	{
-		return -1;
-	}
+    if(pos > eline->length)
+    {
+        return -1;
+    }
 
-	if(eline->length == 0)
-		return 0;
+    if(eline->length == 0)
+        return 0;
 
-	/* This move final 0 */
-	memmove(eline->string+pos, eline->string + pos + 1, eline->length - pos);
-	eline->length--;
-	return 0;
+    /* This move final 0 */
+    memmove(eline->string+pos, eline->string + pos + 1, eline->length - pos);
+    eline->length--;
+    return 0;
 }
 
 
@@ -273,18 +273,18 @@ int remove_char_eLine(eLine * eline,
  *         strnlen(string, length) and eline->length character.
  */
 int get_string_eLine(eLine const * eline,
-		             char * buffer,
-					 size_t length,
-					 unsigned int pos)
+                     char * buffer,
+                     size_t length,
+                     unsigned int pos)
 {
-	size_t min = 0;
+    size_t min = 0;
 
-	if(eline == NULL)
-		return -1;
+    if(eline == NULL)
+        return -1;
 
-	min = (length < eline->length-pos) ? length : eline->length-pos;
-	memcpy(buffer, eline->string+pos, min);
-	buffer[min] = 0;
+    min = (length < eline->length-pos) ? length : eline->length-pos;
+    memcpy(buffer, eline->string+pos, min);
+    buffer[min] = 0;
 
-	return min;
+    return min;
 }

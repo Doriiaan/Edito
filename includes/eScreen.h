@@ -18,17 +18,17 @@
 
 typedef struct {
 
-	/** Number of columns */
-	size_t width;
+    /** Number of columns */
+    size_t width;
 
-	/** Number of lines */
-	size_t height;
+    /** Number of lines */
+    size_t height;
 
-	/** Array of every window */
-	eWindow * windows[WINDOWS_NUMBER];
+    /** Array of every window */
+    eWindow * windows[WINDOWS_NUMBER];
 
-	/** Array of every menu */
-	eMenu * menus[MENU_NUMBER];
+    /** Array of every menu */
+    eMenu * menus[MENU_NUMBER];
 
 } eScreen;
 
@@ -45,7 +45,7 @@ typedef struct {
  * @note delete_eScreen() must be called before exiting.
  */
 eScreen * create_eScreen(int n_lines,
-		                 int n_cols);
+                         int n_cols);
 
 
 /**
@@ -114,9 +114,9 @@ void update_all_eScreen(eScreen * screen);
  * @param type: Window type
  */
 void move_cursor_eScreen(eScreen * screen,
-		                 unsigned int y,
-						 unsigned int x,
-						 WINDOW_TYPE type);
+                         unsigned int y,
+                         unsigned int x,
+                         WINDOW_TYPE type);
 
 
 /**
@@ -127,7 +127,7 @@ void move_cursor_eScreen(eScreen * screen,
  * @param type: Window type
  */
 unsigned int get_width_eScreen(eScreen const * screen,
-		                       WINDOW_TYPE type);
+                               WINDOW_TYPE type);
 
 
 /**
@@ -138,7 +138,7 @@ unsigned int get_width_eScreen(eScreen const * screen,
  * @param type: Window type
  */
 unsigned int get_height_eScreen(eScreen const * screen,
-		                        WINDOW_TYPE type);
+                                WINDOW_TYPE type);
 
 
 /**
@@ -150,7 +150,7 @@ unsigned int get_height_eScreen(eScreen const * screen,
  * @return User input
  */
 int get_input_eScreen(eScreen * screen,
-		              WINDOW_TYPE type);
+                      WINDOW_TYPE type);
 
 
 /**
@@ -161,7 +161,7 @@ int get_input_eScreen(eScreen * screen,
  * @param number_length: number of digit in the lines number
  */
 void create_file_window_eScreen(eScreen * screen,
-		                        unsigned int number_length);
+                                unsigned int number_length);
 
 
 /**
@@ -171,7 +171,7 @@ void create_file_window_eScreen(eScreen * screen,
  * @param number_length: number of digit in the lines number
  */
 void resize_file_eScreen(eScreen * screen,
-		                 unsigned int number_length);
+                         unsigned int number_length);
 
 
 /**
@@ -184,10 +184,10 @@ void resize_file_eScreen(eScreen * screen,
  * @param line: line to print
  */
 void print_line_eScreen(eScreen *screen,
-		                WINDOW_TYPE type,
-						int y,
-						int x,
-						char const * line);
+                        WINDOW_TYPE type,
+                        int y,
+                        int x,
+                        char const * line);
 
 
 /**
@@ -197,7 +197,7 @@ void print_line_eScreen(eScreen *screen,
  * @param type: Window type
  */
 void erase_window(eScreen *screen,
-		          WINDOW_TYPE type);
+                  WINDOW_TYPE type);
 
 
 /**
@@ -210,7 +210,7 @@ void erase_window(eScreen *screen,
  * @note update_help_eScreen must be called.
  */
 void print_help_eScreen(eScreen * screen,
-		                char const * const * string_array);
+                        char const * const * string_array);
 
 
 /* ============================================================================
@@ -228,8 +228,8 @@ void print_help_eScreen(eScreen * screen,
  * @return 0 in success or -1 in failure.
  */
 int add_item_menu_eScreen(eScreen * screen,
-		                  MENU_TYPE type,
-						  char const * item);
+                          MENU_TYPE type,
+                          char const * item);
 
 
 /**
@@ -239,7 +239,7 @@ int add_item_menu_eScreen(eScreen * screen,
  * @param type: Menu type
  */
 void erase_menu_eScreen(eScreen * screen,
-		                MENU_TYPE type);
+                        MENU_TYPE type);
 
 
 /**
@@ -250,7 +250,7 @@ void erase_menu_eScreen(eScreen * screen,
  * @param type: Menu type
  */
 void refresh_menu_eScreen(eScreen * screen,
-		                  MENU_TYPE type);
+                          MENU_TYPE type);
 
 
 /**
@@ -261,7 +261,7 @@ void refresh_menu_eScreen(eScreen * screen,
  * @param type: Menu type
  */
 void move_next_item_menu_eScreen(eScreen * screen,
-		                         MENU_TYPE type);
+                                 MENU_TYPE type);
 
 
 /**
@@ -272,7 +272,7 @@ void move_next_item_menu_eScreen(eScreen * screen,
  * @param type: Menu type
  */
 void move_previous_item_menu_eScreen(eScreen * screen,
-		                             MENU_TYPE type);
+                                     MENU_TYPE type);
 
 
 /**
@@ -283,7 +283,7 @@ void move_previous_item_menu_eScreen(eScreen * screen,
  * @param type: Menu type
  */
 void move_current_item_menu_eScreen(eScreen * screen,
-		                            MENU_TYPE type);
+                                    MENU_TYPE type);
 
 
 /**
@@ -295,8 +295,8 @@ void move_current_item_menu_eScreen(eScreen * screen,
  * @param pattern: pattern to match
  */
 void move_pattern_item_menu_eScreen(eScreen * screen,
-		                            MENU_TYPE type,
-									char const * pattern);
+                                    MENU_TYPE type,
+                                    char const * pattern);
 
 
 /**
@@ -307,7 +307,7 @@ void move_pattern_item_menu_eScreen(eScreen * screen,
  * @param type: Menu type
  */
 int get_current_item_index_menu_eScreen(eScreen const * screen,
-		                                MENU_TYPE type);
+                                        MENU_TYPE type);
 
 
 #endif

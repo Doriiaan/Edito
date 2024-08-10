@@ -22,8 +22,8 @@
  */
 typedef enum {
 
-	MDIR=0,
-	MBAR
+    MDIR=0,
+    MBAR
 
 } MENU_TYPE;
 
@@ -33,44 +33,44 @@ typedef enum {
  */
 typedef struct {
 
-	/** Menu window */
-	WINDOW * win;
+    /** Menu window */
+    WINDOW * win;
 
-	/** Menu sub window */
-	WINDOW * sub;
+    /** Menu sub window */
+    WINDOW * sub;
 
-	/** Menu */
-	MENU * menu;
+    /** Menu */
+    MENU * menu;
 
-	/** Menu items */
-	ITEM ** items;
+    /** Menu items */
+    ITEM ** items;
 
-	/** Menu virtual items title. Virtual items become physical items
-	    after calling refresh_eMenu() */
-	char ** virtual_items_title;
+    /** Menu virtual items title. Virtual items become physical items
+        after calling refresh_eMenu() */
+    char ** virtual_items_title;
 
-	/** Menu physical items title */
-	char ** physical_items_title;
+    /** Menu physical items title */
+    char ** physical_items_title;
 
-	/** Number of rows of menu */
-	int rows;
+    /** Number of rows of menu */
+    int rows;
 
-	/** Number of columns of menu */
-	int columns;
+    /** Number of columns of menu */
+    int columns;
 
-	/** Number of items in virtual menu int because index curses parameter
-	    are integer */
-	int n_items;
+    /** Number of items in virtual menu int because index curses parameter
+        are integer */
+    int n_items;
 
-	/** Menu virtual items allocation size */
-	int alloc_size;
+    /** Menu virtual items allocation size */
+    int alloc_size;
 
-	/** Number of scroll, useful after refresh the menu */
-	int n_scroll;
+    /** Number of scroll, useful after refresh the menu */
+    int n_scroll;
 
-	/** Do the menu displays items in column or in row.
-	    1 in column, 0 in row. */
-	bool columnar;
+    /** Do the menu displays items in column or in row.
+        1 in column, 0 in row. */
+    bool columnar;
 
 } eMenu;
 
@@ -89,8 +89,8 @@ typedef struct {
  * @note delete_eMenu() must be called before exiting.
  */
 eMenu * create_eMenu(WINDOW * win,
-		             WINDOW * sub,
-		             bool columnar);
+                     WINDOW * sub,
+                     bool columnar);
 
 
 /**
@@ -111,7 +111,7 @@ void delete_eMenu(eMenu ** menu);
  * @return 0 on success, -1 in failure.
  */
 int add_item_eMenu(eMenu * menu,
-		           char const * item);
+                   char const * item);
 
 
 /**
@@ -123,7 +123,7 @@ int add_item_eMenu(eMenu * menu,
  * @return 0 on success, -1 in failure.
  */
 int delete_item_eMenu(eMenu * menu,
-		              int index);
+                      int index);
 
 
 /**
@@ -177,7 +177,7 @@ void move_current_item_eMenu(eMenu * menu);
  * @param pattern: pattern to match
  */
 void move_pattern_item_eMenu(eMenu * menu,
-		                     char const * pattern);
+                             char const * pattern);
 
 
 /**
@@ -199,6 +199,6 @@ int get_current_item_index_eMenu(eMenu const * menu);
  * @param position: New current position
  */
 void set_cursor_position_eMenu(eMenu * menu,
-		                       int position);
+                               int position);
 
 #endif

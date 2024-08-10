@@ -17,10 +17,10 @@
  */
 typedef enum
 {
-	p_NOPERM,
-	p_READONLY,
-	p_READWRITE,
-	p_CREATE
+    p_NOPERM,
+    p_READONLY,
+    p_READWRITE,
+    p_CREATE
 } PERM;
 
 

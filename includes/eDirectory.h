@@ -23,35 +23,35 @@
  */
 typedef struct eDirectory {
 
-	/** Child files allocation memory*/
-	size_t alloc_files_size;
+    /** Child files allocation memory*/
+    size_t alloc_files_size;
 
-	/** Child directories allocation memory */
-	size_t alloc_dirs_size;
+    /** Child directories allocation memory */
+    size_t alloc_dirs_size;
 
-	/** List of child files */
-	eFile ** files;
+    /** List of child files */
+    eFile ** files;
 
-	/** List of child directories */
-	struct eDirectory ** dirs;
+    /** List of child directories */
+    struct eDirectory ** dirs;
 
-	/** Number of child files */
-	unsigned int n_files;
+    /** Number of child files */
+    unsigned int n_files;
 
-	/** Number of child directories */
-	unsigned int n_dirs;
+    /** Number of child directories */
+    unsigned int n_dirs;
 
-	/** Directory permissions */
-	PERM permissions;
+    /** Directory permissions */
+    PERM permissions;
 
-	/** Directory name */
-	char * dirname;
+    /** Directory name */
+    char * dirname;
 
-	/** Directory path + '/' + name */
-	char * realpath;
+    /** Directory path + '/' + name */
+    char * realpath;
 
-	/** Do the directory is open (on screen) */
-	bool is_open;
+    /** Do the directory is open (on screen) */
+    bool is_open;
 
 } eDirectory;
 
@@ -93,8 +93,8 @@ void delete_eDirectory(eDirectory ** directory);
  *         files/folders.
  */
 int get_item_at_index_eDirectory(eDirectory const * directory,
-		                         unsigned int item_index,
-								 eDirectory ** out_directory,
-								 eFile ** out_file);
+                                 unsigned int item_index,
+                                 eDirectory ** out_directory,
+                                 eFile ** out_file);
 
 #endif

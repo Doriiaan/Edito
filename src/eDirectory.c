@@ -32,27 +32,27 @@
  */
 PERM dir_permissions(char const * realpath)
 {
-	errno=0;
-	if(access(realpath, X_OK|R_OK) == -1)
-	{
-		if(errno==ENOENT)
-		{
-			return p_CREATE;
-		}
-		else
-		{
-			return p_NOPERM;
-		}
-	}
+    errno=0;
+    if(access(realpath, X_OK|R_OK) == -1)
+    {
+        if(errno==ENOENT)
+        {
+            return p_CREATE;
+        }
+        else
+        {
+            return p_NOPERM;
+        }
+    }
 
-	if(access(realpath, W_OK) == -1)
-	{
-		return p_READONLY;
-	}
-	else
-	{
-		return p_READWRITE;
-	}
+    if(access(realpath, W_OK) == -1)
+    {
+        return p_READONLY;
+    }
+    else
+    {
+        return p_READWRITE;
+    }
 }
 
 
@@ -69,132 +69,132 @@ PERM dir_permissions(char const * realpath)
  */
 eDirectory * create_eDirectory(char const * realpath)
 {
-	eDirectory *directory = NULL;
-	PERM permissions;
-	DIR *dir = NULL;
+    eDirectory *directory = NULL;
+    PERM permissions;
+    DIR *dir = NULL;
     struct dirent *elem = NULL;
-	struct stat elem_info;
-	size_t alloc_size = 0;
-	char *elem_real_path = NULL;
-	size_t elem_real_path_length = 0;
+    struct stat elem_info;
+    size_t alloc_size = 0;
+    char *elem_real_path = NULL;
+    size_t elem_real_path_length = 0;
 
-	permissions = dir_permissions(realpath);
-	if(permissions == p_NOPERM)
-		return NULL;
+    permissions = dir_permissions(realpath);
+    if(permissions == p_NOPERM)
+        return NULL;
 
-	if(permissions == p_CREATE)
-	{
-		if(mkdir(realpath, 0x755) == -1)
-			return NULL;
-	}
+    if(permissions == p_CREATE)
+    {
+        if(mkdir(realpath, 0x755) == -1)
+            return NULL;
+    }
 
-	directory = (eDirectory *) malloc(sizeof(eDirectory));
-	if(directory == NULL)
-		return NULL;
+    directory = (eDirectory *) malloc(sizeof(eDirectory));
+    if(directory == NULL)
+        return NULL;
 
-	directory->permissions = permissions;
-	directory->realpath = strdup(realpath);
+    directory->permissions = permissions;
+    directory->realpath = strdup(realpath);
 
-	/* Delete the '/' at the end */
-	if(directory->realpath[strlen(directory->realpath)-1] == '/')
-		directory->realpath[strlen(directory->realpath)-1] = 0;
+    /* Delete the '/' at the end */
+    if(directory->realpath[strlen(directory->realpath)-1] == '/')
+        directory->realpath[strlen(directory->realpath)-1] = 0;
 
-	/* Dirname is equal to pointer on the last occurence of '/'+1 (last part)
-	   or realpath if there is no '/' */
-	directory->dirname = strrchr(directory->realpath, '/');
-	directory->dirname = (directory->dirname != NULL) ? directory->dirname+1
+    /* Dirname is equal to pointer on the last occurence of '/'+1 (last part)
+       or realpath if there is no '/' */
+    directory->dirname = strrchr(directory->realpath, '/');
+    directory->dirname = (directory->dirname != NULL) ? directory->dirname+1
                                                       : directory->realpath;
 
-	directory->n_files = 0;
-	directory->alloc_files_size = 0;
-	directory->n_dirs = 0;
-	directory->alloc_dirs_size = 0;
-	directory->files = NULL;
-	directory->dirs = NULL;
-	directory->is_open = false;
+    directory->n_files = 0;
+    directory->alloc_files_size = 0;
+    directory->n_dirs = 0;
+    directory->alloc_dirs_size = 0;
+    directory->files = NULL;
+    directory->dirs = NULL;
+    directory->is_open = false;
 
-	dir = opendir(directory->realpath);
-	if(dir == NULL)
-	{
-		return NULL;
-	}
+    dir = opendir(directory->realpath);
+    if(dir == NULL)
+    {
+        return NULL;
+    }
 
-	/* For each elem of physical directory */
-	while((elem = readdir(dir)) != NULL)
-	{
-		if(!strcmp(elem->d_name, ".") || !strcmp(elem->d_name, ".."))
-			continue;
+    /* For each elem of physical directory */
+    while((elem = readdir(dir)) != NULL)
+    {
+        if(!strcmp(elem->d_name, ".") || !strcmp(elem->d_name, ".."))
+            continue;
 
-		/* Allocate string to contain path of elem */
-		/* If previous elem length is large enough to store current elem
-		   do not reallocate */
-		if(elem_real_path_length < sizeof(char)*(strlen(directory->realpath) +
-					                             strlen(elem->d_name) +
-												 2))
-		{
-			/* Path + '/' + Name + 0 */
-			elem_real_path_length = sizeof(char)*(strlen(directory->realpath) +
-					                              strlen(elem->d_name) +
-												  2);
-			elem_real_path = realloc(elem_real_path, elem_real_path_length);
-		}
+        /* Allocate string to contain path of elem */
+        /* If previous elem length is large enough to store current elem
+           do not reallocate */
+        if(elem_real_path_length < sizeof(char)*(strlen(directory->realpath) +
+                                                 strlen(elem->d_name) +
+                                                 2))
+        {
+            /* Path + '/' + Name + 0 */
+            elem_real_path_length = sizeof(char)*(strlen(directory->realpath) +
+                                                  strlen(elem->d_name) +
+                                                  2);
+            elem_real_path = realloc(elem_real_path, elem_real_path_length);
+        }
 
-		memset(elem_real_path, 0, elem_real_path_length);
-		strcpy(elem_real_path, directory->realpath);
-		strcat(elem_real_path, "/");
-		strcat(elem_real_path, elem->d_name);
+        memset(elem_real_path, 0, elem_real_path_length);
+        strcpy(elem_real_path, directory->realpath);
+        strcat(elem_real_path, "/");
+        strcat(elem_real_path, elem->d_name);
 
-		/* Get info of elem */
-		if(stat(elem_real_path, &elem_info) != 0)
-			continue;
+        /* Get info of elem */
+        if(stat(elem_real_path, &elem_info) != 0)
+            continue;
 
 
-		/* If elem is a regular file */
-		if(S_ISREG(elem_info.st_mode))
-		{
-			/* Allocate memory to store files */
-			if(directory->n_files+1 > directory->alloc_files_size)
-			{
-				alloc_size = get_next_power_of_two(directory->n_files+1);
-				directory->files = (eFile **) realloc(directory->files,
-						                           sizeof(eFile *)*alloc_size);
-				if(directory->files == NULL)
-				{
-					continue;
-				}
-				directory->alloc_files_size = alloc_size;
-				alloc_size = 0;
-			}
-			directory->files[directory->n_files] = create_eFile(elem_real_path);
-			directory->n_files++;
-		}
-		/* If elem is a directory */
-		else if(S_ISDIR(elem_info.st_mode))
-		{
-			/* Allocate memory to store dirs */
-			if(directory->n_dirs+1 > directory->alloc_dirs_size)
-			{
-				alloc_size = get_next_power_of_two(directory->n_dirs+1);
-				directory->dirs =
-					(eDirectory **) realloc(directory->dirs,
-							                sizeof(eDirectory *)*alloc_size);
-				if(directory->dirs == NULL)
-				{
-					continue;
-				}
-				directory->alloc_dirs_size = alloc_size;
-				alloc_size = 0;
-			}
-			/* Recursive */
-			directory->dirs[directory->n_dirs] =
-				                          create_eDirectory(elem_real_path);
-			directory->n_dirs++;
-		}
-	}
-	free(elem_real_path);
-	closedir(dir);
+        /* If elem is a regular file */
+        if(S_ISREG(elem_info.st_mode))
+        {
+            /* Allocate memory to store files */
+            if(directory->n_files+1 > directory->alloc_files_size)
+            {
+                alloc_size = get_next_power_of_two(directory->n_files+1);
+                directory->files = (eFile **) realloc(directory->files,
+                                                   sizeof(eFile *)*alloc_size);
+                if(directory->files == NULL)
+                {
+                    continue;
+                }
+                directory->alloc_files_size = alloc_size;
+                alloc_size = 0;
+            }
+            directory->files[directory->n_files] = create_eFile(elem_real_path);
+            directory->n_files++;
+        }
+        /* If elem is a directory */
+        else if(S_ISDIR(elem_info.st_mode))
+        {
+            /* Allocate memory to store dirs */
+            if(directory->n_dirs+1 > directory->alloc_dirs_size)
+            {
+                alloc_size = get_next_power_of_two(directory->n_dirs+1);
+                directory->dirs =
+                    (eDirectory **) realloc(directory->dirs,
+                                            sizeof(eDirectory *)*alloc_size);
+                if(directory->dirs == NULL)
+                {
+                    continue;
+                }
+                directory->alloc_dirs_size = alloc_size;
+                alloc_size = 0;
+            }
+            /* Recursive */
+            directory->dirs[directory->n_dirs] =
+                                          create_eDirectory(elem_real_path);
+            directory->n_dirs++;
+        }
+    }
+    free(elem_real_path);
+    closedir(dir);
 
-	return directory;
+    return directory;
 }
 
 
@@ -206,21 +206,21 @@ eDirectory * create_eDirectory(char const * realpath)
  */
 void delete_eDirectory(eDirectory ** directory)
 {
-	unsigned int i = 0;
+    unsigned int i = 0;
 
-	if(*directory == NULL)
-		return;
+    if(*directory == NULL)
+        return;
 
-	for(i=0; i<(*directory)->n_dirs; i++)
-		delete_eDirectory(&(*directory)->dirs[i]);
+    for(i=0; i<(*directory)->n_dirs; i++)
+        delete_eDirectory(&(*directory)->dirs[i]);
 
-	for(i=0; i<(*directory)->n_files; i++)
-		delete_eFile(&(*directory)->files[i]);
+    for(i=0; i<(*directory)->n_files; i++)
+        delete_eFile(&(*directory)->files[i]);
 
-	free((*directory)->dirs);
-	free((*directory)->files);
-	free((*directory)->realpath);
-	free(*directory);
+    free((*directory)->dirs);
+    free((*directory)->files);
+    free((*directory)->realpath);
+    free(*directory);
 }
 
 
@@ -238,55 +238,55 @@ void delete_eDirectory(eDirectory ** directory)
  *         files/folders.
  */
 int get_item_at_index_eDirectory(eDirectory const * directory,
-		                         unsigned int item_index,
-								 eDirectory ** out_directory,
-								 eFile ** out_file)
+                                 unsigned int item_index,
+                                 eDirectory ** out_directory,
+                                 eFile ** out_file)
 {
-	int result = 0;
+    int result = 0;
 
-	if(directory == NULL)
-		return -1;
+    if(directory == NULL)
+        return -1;
 
-	if(item_index == 0)
-	{
-		*out_directory = (eDirectory *) directory;
-		return 0;
-	}
+    if(item_index == 0)
+    {
+        *out_directory = (eDirectory *) directory;
+        return 0;
+    }
 
-	for(unsigned int i=0; i<directory->n_dirs; i++)
-	{
-		item_index--;
-		if(item_index == 0)
-		{
-			*out_directory = directory->dirs[i];
-			return 0;
-		}
+    for(unsigned int i=0; i<directory->n_dirs; i++)
+    {
+        item_index--;
+        if(item_index == 0)
+        {
+            *out_directory = directory->dirs[i];
+            return 0;
+        }
 
-		if(directory->dirs[i]->is_open)
-		{
-			result = get_item_at_index_eDirectory(directory->dirs[i],
-					                              item_index,
-												  out_directory,
-												  out_file);
-			if(result == -1)
-				return -1;
-			else if(result == 0)
-				return 0;
-			else
-				item_index = result;
-		}
-	}
+        if(directory->dirs[i]->is_open)
+        {
+            result = get_item_at_index_eDirectory(directory->dirs[i],
+                                                  item_index,
+                                                  out_directory,
+                                                  out_file);
+            if(result == -1)
+                return -1;
+            else if(result == 0)
+                return 0;
+            else
+                item_index = result;
+        }
+    }
 
-	for(unsigned int i=0; i<directory->n_files; i++)
-	{
-		item_index--;
-		if(item_index == 0)
-		{
-			*out_file = directory->files[i];
-			return 0;
-		}
-	}
+    for(unsigned int i=0; i<directory->n_files; i++)
+    {
+        item_index--;
+        if(item_index == 0)
+        {
+            *out_file = directory->files[i];
+            return 0;
+        }
+    }
 
-	return item_index;
+    return item_index;
 }
 

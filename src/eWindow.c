@@ -29,28 +29,28 @@
  * @note delete_eWindow() must be called before exiting.
  */
 eWindow * create_eWindow(size_t height,
-		                 size_t width,
-						 unsigned int y,
-						 unsigned int x)
+                         size_t width,
+                         unsigned int y,
+                         unsigned int x)
 {
-	eWindow *window = 0;
+    eWindow *window = 0;
 
-	window = (eWindow *) malloc(sizeof(eWindow));
-	if(window == NULL)
-	{
-		return NULL;
-	}
+    window = (eWindow *) malloc(sizeof(eWindow));
+    if(window == NULL)
+    {
+        return NULL;
+    }
 
-	window->orig = NULL;
-	window->window = newwin(height, width, y, x);
-	window->width = width;
-	window->height = height;
-	window->x = x;
-	window->y = y;
+    window->orig = NULL;
+    window->window = newwin(height, width, y, x);
+    window->width = width;
+    window->height = height;
+    window->x = x;
+    window->y = y;
 
-	keypad(window->window, TRUE); /* activate KEY_UP, KEY_RIGHT, ... */
+    keypad(window->window, TRUE); /* activate KEY_UP, KEY_RIGHT, ... */
 
-	return window;
+    return window;
 }
 
 
@@ -70,30 +70,30 @@ eWindow * create_eWindow(size_t height,
  * @note delete_eWindow() must be called before exiting.
  */
 eWindow * create_der_eWindow(eWindow * orig,
-		                     size_t height,
-							 size_t width,
-							 unsigned int y,
-							 unsigned int x)
+                             size_t height,
+                             size_t width,
+                             unsigned int y,
+                             unsigned int x)
 {
-	if(orig == NULL)
-		return NULL;
+    if(orig == NULL)
+        return NULL;
 
-	eWindow *window = 0;
+    eWindow *window = 0;
 
-	window = (eWindow *) malloc(sizeof(eWindow));
-	if(window == NULL)
-		return NULL;
+    window = (eWindow *) malloc(sizeof(eWindow));
+    if(window == NULL)
+        return NULL;
 
-	window->orig = orig;
-	window->window = derwin(orig->window, height, width, y, x);
-	window->width = width;
-	window->height = height;
-	window->x = orig->x + x;
-	window->y = orig->y + y;
+    window->orig = orig;
+    window->window = derwin(orig->window, height, width, y, x);
+    window->width = width;
+    window->height = height;
+    window->x = orig->x + x;
+    window->y = orig->y + y;
 
-	keypad(window->window, TRUE); /* activate KEY_UP, KEY_RIGHT, ... */
+    keypad(window->window, TRUE); /* activate KEY_UP, KEY_RIGHT, ... */
 
-	return window;
+    return window;
 }
 
 
@@ -105,10 +105,10 @@ eWindow * create_der_eWindow(eWindow * orig,
  */
 void delete_eWindow(eWindow ** window)
 {
-	if(*window == NULL)
-		return;
+    if(*window == NULL)
+        return;
 
-	delwin((*window)->window);
-	free(*window);
-	*window = NULL;
+    delwin((*window)->window);
+    free(*window);
+    *window = NULL;
 }

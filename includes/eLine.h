@@ -21,23 +21,23 @@
  */
 typedef struct eLine
 {
-	/** Length of line */
-	size_t length;
+    /** Length of line */
+    size_t length;
 
-	/** Allocated size */
-	size_t alloc_size;
+    /** Allocated size */
+    size_t alloc_size;
 
-	/** Line number */
-	unsigned int line_number;
+    /** Line number */
+    unsigned int line_number;
 
-	/** Previous line of NULL */
-	struct eLine * previous;
+    /** Previous line of NULL */
+    struct eLine * previous;
 
-	/** Next line or NULL*/
-	struct eLine * next;
+    /** Next line or NULL*/
+    struct eLine * next;
 
-	/** Characters of the line, including \n character */
-	char *string;
+    /** Characters of the line, including \n character */
+    char *string;
 
 } eLine;
 
@@ -56,10 +56,10 @@ typedef struct eLine
  * @note delete_eLine() must be called before exiting.
  */
 eLine * create_eLine(char const * string,
-		             size_t length,
-					 unsigned int line_number,
-					 eLine * previous,
-					 eLine * next);
+                     size_t length,
+                     unsigned int line_number,
+                     eLine * previous,
+                     eLine * next);
 
 
 /**
@@ -83,9 +83,9 @@ void delete_eLine(eLine ** eline);
  * @return 0 on success, -1 in failure.
  */
 int insert_string_eLine(eLine * eline,
-		                char const * string,
-						size_t length,
-						unsigned int pos);
+                        char const * string,
+                        size_t length,
+                        unsigned int pos);
 
 
 /**
@@ -99,8 +99,8 @@ int insert_string_eLine(eLine * eline,
  * @return 0 on success, -1 in failure.
  */
 int remove_string_eLine(eLine * eline,
-		                size_t length,
-						unsigned int pos);
+                        size_t length,
+                        unsigned int pos);
 
 
 /**
@@ -114,8 +114,8 @@ int remove_string_eLine(eLine * eline,
  * @return 0 on success, -1 in failure.
  */
 int insert_char_eLine(eLine * eline,
-		              const char ch,
-					  unsigned int pos);
+                      const char ch,
+                      unsigned int pos);
 
 
 /**
@@ -128,7 +128,7 @@ int insert_char_eLine(eLine * eline,
  * @return 0 on success, -1 in failure.
  */
 int remove_char_eLine(eLine * eline,
-		              unsigned int pos);
+                      unsigned int pos);
 
 
 /**
@@ -146,8 +146,8 @@ int remove_char_eLine(eLine * eline,
  *         strnlen(string, length) and eline->length character.
  */
 int get_string_eLine(eLine const * eline,
-		             char * buffer,
-					 size_t length,
-					 unsigned int pos);
+                     char * buffer,
+                     size_t length,
+                     unsigned int pos);
 
 #endif

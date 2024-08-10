@@ -21,32 +21,32 @@
  */
 typedef struct efile_s
 {
-	/** File permissions */
-	PERM permissions;
+    /** File permissions */
+    PERM permissions;
 
-	/** Number of line */
-	unsigned int n_elines;
+    /** Number of line */
+    unsigned int n_elines;
 
-	/** Current pos in current line */
-	unsigned int current_pos;
+    /** Current pos in current line */
+    unsigned int current_pos;
 
-	/** First line of eLine linked list */
-	eLine * first_file_line;
+    /** First line of eLine linked list */
+    eLine * first_file_line;
 
-	/** First line of screen */
-	eLine * first_screen_line;
+    /** First line of screen */
+    eLine * first_screen_line;
 
-	/** Current line */
-	eLine * current_line;
+    /** Current line */
+    eLine * current_line;
 
-	/** Filename */
-	char * filename;
+    /** Filename */
+    char * filename;
 
-	/** Path + '/' + filename */
-	char * realpath;
+    /** Path + '/' + filename */
+    char * realpath;
 
-	/** boolean to track status of file */
-	bool is_saved;
+    /** boolean to track status of file */
+    bool is_saved;
 
 } eFile;
 
@@ -113,7 +113,7 @@ int write_eFile(eFile *efile);
  * @return 0 on success or -1 in failure.
  */
 int add_empty_line_eFile(eFile * efile,
-		                 unsigned int line_number);
+                         unsigned int line_number);
 
 
 /**
@@ -126,7 +126,7 @@ int add_empty_line_eFile(eFile * efile,
  * @return 0 on sucess or -1 in failure.
  */
 int delete_line_eFile(eFile * efile,
-		              unsigned int line_number);
+                      unsigned int line_number);
 
 
 /**
@@ -139,7 +139,7 @@ int delete_line_eFile(eFile * efile,
  * @return 0 on sucess or -1 in failure.
  */
 int insert_char_eFile(eFile * efile,
-		              char const ch);
+                      char const ch);
 
 
 /**
@@ -164,8 +164,8 @@ int remove_char_eFile(eFile * efile);
  * @return 0 on sucess or -1 in failure.
  */
 int insert_string_eFile(eFile * efile,
-		                char const * string,
-						size_t length);
+                        char const * string,
+                        size_t length);
 
 
 /**
@@ -178,6 +178,6 @@ int insert_string_eFile(eFile * efile,
  * @return 0 on sucess or -1 in failure.
  */
 int remove_string_eFile(eFile *efile,
-		                size_t length);
+                        size_t length);
 
 #endif

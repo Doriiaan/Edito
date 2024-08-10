@@ -20,14 +20,14 @@
  */
 typedef struct {
 
-	/** List allocation size */
-	size_t alloc_size;
+    /** List allocation size */
+    size_t alloc_size;
 
-	/** List of eFile */
-	eFile const ** files;
+    /** List of eFile */
+    eFile const ** files;
 
-	/** File count */
-	unsigned int n_files;
+    /** File count */
+    unsigned int n_files;
 
 } eBar;
 
@@ -60,7 +60,7 @@ void delete_eBar(eBar ** bar);
  * @return 0 on success or -1 in failure.
  */
 int add_file_eBar(eBar * bar,
-		          eFile const * file);
+                  eFile const * file);
 
 
 /**
@@ -72,7 +72,7 @@ int add_file_eBar(eBar * bar,
  * @return 0 on success or -1 in failure.
  */
 int remove_file_eBar(eBar * bar,
-		             unsigned int index);
+                     unsigned int index);
 
 
 /**
@@ -85,7 +85,7 @@ int remove_file_eBar(eBar * bar,
  * @return eFile pointer on sucess or NULL in failure.
  */
 eFile const * get_file_eBar(eBar const * bar,
-		                    unsigned int index);
+                            unsigned int index);
 
 
 /**
@@ -109,6 +109,6 @@ unsigned int count_eBar(eBar const * bar);
  * @return true if the file is in the bar, false otherwise.
  */
 bool is_file_in_eBar(eBar const * bar,
-		             eFile const * file);
+                     eFile const * file);
 
 #endif

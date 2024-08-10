@@ -22,91 +22,91 @@ void usage(void);
 
 int main(int argc, char * argv[])
 {
-	bool run = true;
+    bool run = true;
 
-	eManager *manager = NULL;
-	eScreen *screen = NULL;
-	eBar *bar = NULL;
-	eDirectory *project_repo = NULL;
-	char *reponame = 0;
+    eManager *manager = NULL;
+    eScreen *screen = NULL;
+    eBar *bar = NULL;
+    eDirectory *project_repo = NULL;
+    char *reponame = 0;
 
-	if(argc == 1)
-	{
-		reponame = ".";
-	}
-	else if(argc == 2)
-	{
-		reponame = argv[1];
-	}
-	else
-	{
-		usage();
-		exit(EXIT_FAILURE);
-	}
+    if(argc == 1)
+    {
+        reponame = ".";
+    }
+    else if(argc == 2)
+    {
+        reponame = argv[1];
+    }
+    else
+    {
+        usage();
+        exit(EXIT_FAILURE);
+    }
 
 
-	/* Terminal initialization */
-	init_terminal();
+    /* Terminal initialization */
+    init_terminal();
 
-	/* Screen structure initialization */
-	if((screen = create_eScreen(LINES, COLS)) == NULL)
-	{
-		reset_terminal();
-		exit(EXIT_FAILURE);
-	}
+    /* Screen structure initialization */
+    if((screen = create_eScreen(LINES, COLS)) == NULL)
+    {
+        reset_terminal();
+        exit(EXIT_FAILURE);
+    }
 
-	/* Bar structure creation */
-	if((bar = create_eBar()) == NULL)
-	{
-		reset_terminal();
-		exit(EXIT_FAILURE);
-	}
+    /* Bar structure creation */
+    if((bar = create_eBar()) == NULL)
+    {
+        reset_terminal();
+        exit(EXIT_FAILURE);
+    }
 
-	/* Repository structure creation */
-	if((project_repo = create_eDirectory(reponame)) == NULL)
-	{
-		reset_terminal();
-		exit(EXIT_FAILURE);
-	}
+    /* Repository structure creation */
+    if((project_repo = create_eDirectory(reponame)) == NULL)
+    {
+        reset_terminal();
+        exit(EXIT_FAILURE);
+    }
 
-	/* Manager structure initialization */
-	if((manager = create_eManager()) == NULL)
-	{
-		reset_terminal();
-		exit(EXIT_FAILURE);
-	}
+    /* Manager structure initialization */
+    if((manager = create_eManager()) == NULL)
+    {
+        reset_terminal();
+        exit(EXIT_FAILURE);
+    }
 
-	set_eScreen_eManager(manager, screen);
-	set_eBar_eManager(manager, bar);
-	set_eDirectory_eManager(manager, project_repo);
+    set_eScreen_eManager(manager, screen);
+    set_eBar_eManager(manager, bar);
+    set_eDirectory_eManager(manager, project_repo);
 
-	manager->directory->is_open = true;
+    manager->directory->is_open = true;
 
-	fill_directory_menu_eManager(manager, manager->directory, 0);
-	refresh_menu_eScreen(manager->screen, MDIR);
+    fill_directory_menu_eManager(manager, manager->directory, 0);
+    refresh_menu_eScreen(manager->screen, MDIR);
 
-	send_help_msg_to_screen_eManager(manager);
+    send_help_msg_to_screen_eManager(manager);
 
-	/* Print every Windows and Menus on the screen */
-	update_all_eScreen(screen);
+    /* Print every Windows and Menus on the screen */
+    update_all_eScreen(screen);
 
-	/* Set cursor on the current menu item */
-	move_current_item_menu_eScreen(manager->screen, MDIR);
+    /* Set cursor on the current menu item */
+    move_current_item_menu_eScreen(manager->screen, MDIR);
 
-	/* Main loop */
-	while(run)
-	{
-		run = run_eManager(manager);
-	}
+    /* Main loop */
+    while(run)
+    {
+        run = run_eManager(manager);
+    }
 
-	delete_eScreen(&screen);
-	delete_eBar(&bar);
-	delete_eDirectory(&project_repo);
-	delete_eManager(&manager);
+    delete_eScreen(&screen);
+    delete_eBar(&bar);
+    delete_eDirectory(&project_repo);
+    delete_eManager(&manager);
 
-	reset_terminal();
+    reset_terminal();
 
-	return 0;
+    return 0;
 }
 
 
@@ -115,17 +115,17 @@ int main(int argc, char * argv[])
  */
 void init_terminal(void)
 {
-	setlocale(LC_ALL, "");
+    setlocale(LC_ALL, "");
 
-	/* Init window structure */
+    /* Init window structure */
     initscr();
 
-	/* Deactivate echo from getch */
-	noecho();
+    /* Deactivate echo from getch */
+    noecho();
 
-	/* Deactivate buffering and disallow signals like Ctrl+C, Ctrl+S */
-	raw();
-	set_escdelay(50);
+    /* Deactivate buffering and disallow signals like Ctrl+C, Ctrl+S */
+    raw();
+    set_escdelay(50);
 }
 
 
@@ -134,11 +134,11 @@ void init_terminal(void)
  */
 void reset_terminal(void)
 {
-	endwin(); /* Restore terminal */
+    endwin(); /* Restore terminal */
 }
 
 
 void usage(void)
 {
-	printf("edito [directory]");
+    printf("edito [directory]");
 }

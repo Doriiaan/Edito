@@ -35,29 +35,29 @@
  */
 PERM file_permissions(char const * realpath)
 {
-	errno=0;
-	if(access(realpath, R_OK) == -1)
-	{
-		if(errno==ENOENT)
-		{
-			return p_CREATE;
-		}
-		else
-		{
-			return p_NOPERM;
-		}
-	}
-	else
-	{
-		if(access(realpath, W_OK) == -1)
-		{
-			return p_READONLY;
-		}
-		else
-		{
-			return p_READWRITE;
-		}
-	}
+    errno=0;
+    if(access(realpath, R_OK) == -1)
+    {
+        if(errno==ENOENT)
+        {
+            return p_CREATE;
+        }
+        else
+        {
+            return p_NOPERM;
+        }
+    }
+    else
+    {
+        if(access(realpath, W_OK) == -1)
+        {
+            return p_READONLY;
+        }
+        else
+        {
+            return p_READWRITE;
+        }
+    }
 }
 
 
@@ -73,34 +73,34 @@ PERM file_permissions(char const * realpath)
  */
 eFile * create_eFile(char const * realpath)
 {
-	eFile *efile=NULL;
+    eFile *efile=NULL;
 
-	/* Allocate and fill the data structure */
-	efile = (eFile *) malloc(sizeof(eFile));
-	if(efile == NULL)
-	{
-		return NULL;
-	}
+    /* Allocate and fill the data structure */
+    efile = (eFile *) malloc(sizeof(eFile));
+    if(efile == NULL)
+    {
+        return NULL;
+    }
 
-	efile->permissions = file_permissions(realpath);
+    efile->permissions = file_permissions(realpath);
 
-	efile->realpath = strdup(realpath);
+    efile->realpath = strdup(realpath);
 
-	if(efile->realpath[strlen(efile->realpath)-1] == '/')
-		efile->realpath[strlen(efile->realpath)-1] = 0;
+    if(efile->realpath[strlen(efile->realpath)-1] == '/')
+        efile->realpath[strlen(efile->realpath)-1] = 0;
 
-	efile->filename = strrchr(efile->realpath, '/');
-	efile->filename = (efile->filename != NULL) ? efile->filename+1
-	                                            : efile->realpath;
+    efile->filename = strrchr(efile->realpath, '/');
+    efile->filename = (efile->filename != NULL) ? efile->filename+1
+                                                : efile->realpath;
 
-	efile->n_elines = 0;
-	efile->first_file_line = NULL;
-	efile->first_screen_line = NULL;
-	efile->current_line = NULL;
-	efile->current_pos = 0;
-	efile->is_saved = true;
+    efile->n_elines = 0;
+    efile->first_file_line = NULL;
+    efile->first_screen_line = NULL;
+    efile->current_line = NULL;
+    efile->current_pos = 0;
+    efile->is_saved = true;
 
-	return efile;
+    return efile;
 }
 
 
@@ -112,13 +112,13 @@ eFile * create_eFile(char const * realpath)
  */
 void delete_eFile(eFile ** efile)
 {
-	if(*efile == NULL)
-		return;
+    if(*efile == NULL)
+        return;
 
-	close_eFile(*efile);
-	free((*efile)->realpath);
-	free(*efile);
-	*efile = NULL;
+    close_eFile(*efile);
+    free((*efile)->realpath);
+    free(*efile);
+    *efile = NULL;
 }
 
 
@@ -133,77 +133,77 @@ void delete_eFile(eFile ** efile)
  */
 int open_eFile(eFile * efile)
 {
-	eLine *current = NULL, *previous = NULL;
-	FILE *fp = NULL;
-	char buffer[BUFFER_LENGTH];
-	memset(buffer, 0, BUFFER_LENGTH);
+    eLine *current = NULL, *previous = NULL;
+    FILE *fp = NULL;
+    char buffer[BUFFER_LENGTH];
+    memset(buffer, 0, BUFFER_LENGTH);
 
-	if(efile == NULL || efile->permissions == p_NOPERM)
-		return -1;
+    if(efile == NULL || efile->permissions == p_NOPERM)
+        return -1;
 
-	/* If the file did not exist when calling create_eFile() */
-	if(efile->permissions == p_CREATE)
-	{
-		if((fp = fopen(efile->realpath, "w+")) == NULL)
-		{
-			return -1;
-		}
+    /* If the file did not exist when calling create_eFile() */
+    if(efile->permissions == p_CREATE)
+    {
+        if((fp = fopen(efile->realpath, "w+")) == NULL)
+        {
+            return -1;
+        }
 
-		add_empty_line_eFile(efile, 1);
-		return 0;
-	}
+        add_empty_line_eFile(efile, 1);
+        return 0;
+    }
 
-	/* Open file to read it */
-	else if(efile->permissions != p_CREATE)
-	{
-		if((fp = fopen(efile->realpath, "r")) == NULL)
-			return -1;
-	}
+    /* Open file to read it */
+    else if(efile->permissions != p_CREATE)
+    {
+        if((fp = fopen(efile->realpath, "r")) == NULL)
+            return -1;
+    }
 
 
-	/* Loop to read lines of the file*/
-	while(fgets(buffer, BUFFER_LENGTH, fp) != NULL)
-	{
-		if((current = create_eLine(buffer, BUFFER_LENGTH, efile->n_elines+1, previous, NULL)) == NULL)
-		{
-			close_eFile(efile);
-			fclose(fp);
-			return -1;
-		}
+    /* Loop to read lines of the file*/
+    while(fgets(buffer, BUFFER_LENGTH, fp) != NULL)
+    {
+        if((current = create_eLine(buffer, BUFFER_LENGTH, efile->n_elines+1, previous, NULL)) == NULL)
+        {
+            close_eFile(efile);
+            fclose(fp);
+            return -1;
+        }
 
-		/* If it is not the end of line */
-		while(buffer[strlen(buffer)-1] != '\n' && fgets(buffer, BUFFER_LENGTH, fp) != NULL)
-		{
-			if(insert_string_eLine(current, buffer, BUFFER_LENGTH, current->length))
-			{
-				close_eFile(efile);
-				fclose(fp);
-				return -1;
-			}
-		}
+        /* If it is not the end of line */
+        while(buffer[strlen(buffer)-1] != '\n' && fgets(buffer, BUFFER_LENGTH, fp) != NULL)
+        {
+            if(insert_string_eLine(current, buffer, BUFFER_LENGTH, current->length))
+            {
+                close_eFile(efile);
+                fclose(fp);
+                return -1;
+            }
+        }
 
-	   	if(efile->n_elines==0)
-			efile->first_file_line = current;
+           if(efile->n_elines==0)
+            efile->first_file_line = current;
 
-		/* Reinit for future lines */
-		efile->n_elines++;
-		previous = current;
-		current = NULL;
-	}
+        /* Reinit for future lines */
+        efile->n_elines++;
+        previous = current;
+        current = NULL;
+    }
 
-	if(efile->n_elines == 0)
-	{
-		add_empty_line_eFile(efile, 0);
-		efile->n_elines = 1;
-	}
+    if(efile->n_elines == 0)
+    {
+        add_empty_line_eFile(efile, 0);
+        efile->n_elines = 1;
+    }
 
-	efile->current_line = efile->first_file_line;
-	efile->current_pos = 0;
-	efile->first_screen_line = efile->first_file_line;
-	efile->is_saved = true;
+    efile->current_line = efile->first_file_line;
+    efile->current_pos = 0;
+    efile->first_screen_line = efile->first_file_line;
+    efile->is_saved = true;
 
-	fclose(fp);
-	return 0;
+    fclose(fp);
+    return 0;
 }
 
 
@@ -213,22 +213,22 @@ int open_eFile(eFile * efile)
  */
 void close_eFile(eFile *efile)
 {
-	if(efile == NULL)
-		return;
+    if(efile == NULL)
+        return;
 
-	efile->current_line = NULL;
-	efile->current_pos = 0;
-	efile->first_screen_line = NULL;
+    efile->current_line = NULL;
+    efile->current_pos = 0;
+    efile->first_screen_line = NULL;
 
-	eLine *current = efile->first_file_line, *temp=NULL;
+    eLine *current = efile->first_file_line, *temp=NULL;
 
-	while(current)
-	{
-		temp = current->next;
-		delete_eLine(&current);
-		current = temp;
-	}
-	efile->is_saved = true;
+    while(current)
+    {
+        temp = current->next;
+        delete_eLine(&current);
+        current = temp;
+    }
+    efile->is_saved = true;
 }
 
 
@@ -242,53 +242,53 @@ void close_eFile(eFile *efile)
  */
 int write_eFile(eFile *efile)
 {
-	FILE *fp = NULL;
-	eLine *current = NULL;
-	char *buffer = NULL;
-	size_t buffer_length = 0;
+    FILE *fp = NULL;
+    eLine *current = NULL;
+    char *buffer = NULL;
+    size_t buffer_length = 0;
 
-	if(efile == NULL)
-		return -1;
+    if(efile == NULL)
+        return -1;
 
-	if(efile->is_saved)
-		return 0;
+    if(efile->is_saved)
+        return 0;
 
-	if(efile->permissions != p_READWRITE)
-		return -1;
+    if(efile->permissions != p_READWRITE)
+        return -1;
 
-	if((fp = fopen(efile->realpath, "w")) == NULL)
-		return -1;
+    if((fp = fopen(efile->realpath, "w")) == NULL)
+        return -1;
 
-	current = efile->first_file_line;
+    current = efile->first_file_line;
 
-	while(current)
-	{
-		/* Realloc buffer if necessary, first time realloc is equal
-		   to malloc */
-		if(buffer_length < current->length+2)
-		{
-			buffer_length = sizeof(char)*(current->length+2);
-			buffer = (char *) realloc(buffer, buffer_length);
-		}
+    while(current)
+    {
+        /* Realloc buffer if necessary, first time realloc is equal
+           to malloc */
+        if(buffer_length < current->length+2)
+        {
+            buffer_length = sizeof(char)*(current->length+2);
+            buffer = (char *) realloc(buffer, buffer_length);
+        }
 
-		memset(buffer, 0, buffer_length);
-		memcpy(buffer, current->string, current->length);
-		buffer[current->length] = '\n';
+        memset(buffer, 0, buffer_length);
+        memcpy(buffer, current->string, current->length);
+        buffer[current->length] = '\n';
 
-		if(fputs(buffer, fp) == EOF)
-		{
-			fclose(fp);
-			return -1;
-		}
-		current=current->next;
-	}
+        if(fputs(buffer, fp) == EOF)
+        {
+            fclose(fp);
+            return -1;
+        }
+        current=current->next;
+    }
 
-	free(buffer);
-	fclose(fp);
+    free(buffer);
+    fclose(fp);
 
-	efile->is_saved = true;
+    efile->is_saved = true;
 
-	return 0;
+    return 0;
 }
 
 
@@ -302,54 +302,54 @@ int write_eFile(eFile *efile)
  * @return 0 on success or -1 in failure.
  */
 int add_empty_line_eFile(eFile * efile,
-		                 unsigned int line_number)
+                         unsigned int line_number)
 {
-	eLine *current = NULL;
-	eLine *new = NULL;
-	unsigned int i = 1;
+    eLine *current = NULL;
+    eLine *new = NULL;
+    unsigned int i = 1;
 
-	if(efile == NULL)
-		return -1;
+    if(efile == NULL)
+        return -1;
 
-	current = efile->first_file_line;
+    current = efile->first_file_line;
 
-	if(efile->first_file_line == NULL)
-	{
-		efile->first_file_line = create_eLine("", 0, 1, NULL, NULL);
-		if(efile->first_file_line == NULL)
-		{
-			return -1;
-		}
+    if(efile->first_file_line == NULL)
+    {
+        efile->first_file_line = create_eLine("", 0, 1, NULL, NULL);
+        if(efile->first_file_line == NULL)
+        {
+            return -1;
+        }
 
-		efile->n_elines = 1;
-		efile->is_saved = false;
-		return 0;
+        efile->n_elines = 1;
+        efile->is_saved = false;
+        return 0;
 
-	}
+    }
 
-	while(i < line_number-1 && current->next)
-	{
-		current=current->next;
-		i++;
-	}
+    while(i < line_number-1 && current->next)
+    {
+        current=current->next;
+        i++;
+    }
 
-	/* Current is previous*/
-	if((new = create_eLine("", 0, line_number, current, current->next)) == NULL)
-	{
-		return -1;
-	}
-	efile->n_elines++;
+    /* Current is previous*/
+    if((new = create_eLine("", 0, line_number, current, current->next)) == NULL)
+    {
+        return -1;
+    }
+    efile->n_elines++;
 
-	/* Increment line number */
-	current = new->next;
-	while(current)
-	{
-		current->line_number++;
-		current = current->next;
-	}
+    /* Increment line number */
+    current = new->next;
+    while(current)
+    {
+        current->line_number++;
+        current = current->next;
+    }
 
-	efile->is_saved = false;
-	return 0;
+    efile->is_saved = false;
+    return 0;
 }
 
 
@@ -363,76 +363,76 @@ int add_empty_line_eFile(eFile * efile,
  * @return 0 on sucess or -1 in failure.
  */
 int delete_line_eFile(eFile * efile,
-		              unsigned int line_number)
+                      unsigned int line_number)
 {
-	eLine *current = NULL;
-	eLine *tmp = NULL;
-	unsigned int i = 1;
-	bool last_line=false;
+    eLine *current = NULL;
+    eLine *tmp = NULL;
+    unsigned int i = 1;
+    bool last_line=false;
 
-	if(efile == NULL)
-		return -1;
+    if(efile == NULL)
+        return -1;
 
-	current = efile->first_file_line;
+    current = efile->first_file_line;
 
-	if(line_number == efile->current_line->line_number)
-	{
-		if(efile->current_line->next)
-			efile->current_line = efile->current_line->next;
+    if(line_number == efile->current_line->line_number)
+    {
+        if(efile->current_line->next)
+            efile->current_line = efile->current_line->next;
 
-		else if(efile->current_line->previous)
-			efile->current_line = efile->current_line->previous;
-		else
-			last_line = true;
-	}
+        else if(efile->current_line->previous)
+            efile->current_line = efile->current_line->previous;
+        else
+            last_line = true;
+    }
 
-	if(line_number == efile->first_screen_line->line_number)
-	{
-		if(efile->first_screen_line->next)
-			efile->first_screen_line = efile->first_screen_line->next;
+    if(line_number == efile->first_screen_line->line_number)
+    {
+        if(efile->first_screen_line->next)
+            efile->first_screen_line = efile->first_screen_line->next;
 
-		else if(efile->first_screen_line->previous)
-			efile->first_screen_line = efile->first_screen_line->previous;
-		else
-			last_line = true;
-	}
+        else if(efile->first_screen_line->previous)
+            efile->first_screen_line = efile->first_screen_line->previous;
+        else
+            last_line = true;
+    }
 
-	if(last_line)
-		add_empty_line_eFile(efile, line_number+1);
+    if(last_line)
+        add_empty_line_eFile(efile, line_number+1);
 
 
-	if(line_number == efile->first_file_line->line_number)
-		efile->first_file_line = efile->first_file_line->next;
+    if(line_number == efile->first_file_line->line_number)
+        efile->first_file_line = efile->first_file_line->next;
 
-	while(current && i < line_number)
-	{
-		current = current->next;
-		i++;
-	}
+    while(current && i < line_number)
+    {
+        current = current->next;
+        i++;
+    }
 
-	if(current == NULL)
-		return -1;
+    if(current == NULL)
+        return -1;
 
-	if(current->next != NULL)
-		current->next->previous = current->previous;
+    if(current->next != NULL)
+        current->next->previous = current->previous;
 
-	if(current->previous != NULL)
-		current->previous->next = current->next;
+    if(current->previous != NULL)
+        current->previous->next = current->next;
 
-	/* Delete line and decrement line number */
-	tmp=current->next;
-	delete_eLine(&current);
-	efile->n_elines--;
-	current = tmp;
-	while(current)
-	{
-		current->line_number--;
-		current = current->next;
-	}
+    /* Delete line and decrement line number */
+    tmp=current->next;
+    delete_eLine(&current);
+    efile->n_elines--;
+    current = tmp;
+    while(current)
+    {
+        current->line_number--;
+        current = current->next;
+    }
 
-	efile->is_saved = false;
+    efile->is_saved = false;
 
-	return 0;
+    return 0;
 }
 
 
@@ -446,16 +446,16 @@ int delete_line_eFile(eFile * efile,
  * @return 0 on sucess or -1 in failure.
  */
 int insert_char_eFile(eFile * efile,
-		              char const ch)
+                      char const ch)
 {
-	if(efile == NULL)
-		return -1;
+    if(efile == NULL)
+        return -1;
 
-	if(insert_char_eLine(efile->current_line, ch, efile->current_pos))
-		return -1;
+    if(insert_char_eLine(efile->current_line, ch, efile->current_pos))
+        return -1;
 
-	efile->is_saved = false;
-	return 0;
+    efile->is_saved = false;
+    return 0;
 }
 
 
@@ -469,14 +469,14 @@ int insert_char_eFile(eFile * efile,
  */
 int remove_char_eFile(eFile * efile)
 {
-	if(efile == NULL)
-		return -1;
+    if(efile == NULL)
+        return -1;
 
-	if(remove_char_eLine(efile->current_line, efile->current_pos))
-		return -1;
+    if(remove_char_eLine(efile->current_line, efile->current_pos))
+        return -1;
 
-	efile->is_saved = false;
-	return 0;
+    efile->is_saved = false;
+    return 0;
 }
 
 
@@ -491,24 +491,24 @@ int remove_char_eFile(eFile * efile)
  * @return 0 on sucess or -1 in failure.
  */
 int insert_string_eFile(eFile * efile,
-		                char const * string,
-						size_t length)
+                        char const * string,
+                        size_t length)
 {
-	int result = 0;
-	if(efile == NULL)
-		return -1;
+    int result = 0;
+    if(efile == NULL)
+        return -1;
 
-	result = insert_string_eLine(efile->current_line,
-			                     string,
-								 length,
-								 efile->current_pos);
-	if(result == -1)
-	{
-		return -1;
-	}
+    result = insert_string_eLine(efile->current_line,
+                                 string,
+                                 length,
+                                 efile->current_pos);
+    if(result == -1)
+    {
+        return -1;
+    }
 
-	efile->is_saved = false;
-	return 0;
+    efile->is_saved = false;
+    return 0;
 }
 
 
@@ -522,21 +522,21 @@ int insert_string_eFile(eFile * efile,
  * @return 0 on sucess or -1 in failure.
  */
 int remove_string_eFile(eFile *efile,
-		                size_t length)
+                        size_t length)
 {
-	int result = 0;
+    int result = 0;
 
-	if(efile == NULL)
-		return -1;
+    if(efile == NULL)
+        return -1;
 
-	result = remove_string_eLine(efile->current_line,
-			                     length,
-								 efile->current_pos);
-	if(result)
-	{
-		return -1;
-	}
+    result = remove_string_eLine(efile->current_line,
+                                 length,
+                                 efile->current_pos);
+    if(result)
+    {
+        return -1;
+    }
 
-	efile->is_saved = false;
-	return 0;
+    efile->is_saved = false;
+    return 0;
 }

@@ -20,9 +20,9 @@
  * @enum Program mode enumeration
  */
 typedef enum {
-	DIR,
-	WRITE,
-	BAR
+    DIR,
+    WRITE,
+    BAR
 
 } MODE;
 
@@ -31,26 +31,26 @@ typedef enum {
  */
 typedef struct {
 
-	/** Screen */
-	eScreen * screen;
+    /** Screen */
+    eScreen * screen;
 
-	/** Current opened file */
-	eFile * file;
+    /** Current opened file */
+    eFile * file;
 
-	/** File bar */
-	eBar * bar;
+    /** File bar */
+    eBar * bar;
 
-	/** Directory */
-	eDirectory * directory;
+    /** Directory */
+    eDirectory * directory;
 
-	/** Current mode */
-	MODE mode;
+    /** Current mode */
+    MODE mode;
 
-	/** Last mode */
-	MODE lastmode;
+    /** Last mode */
+    MODE lastmode;
 
-	/** Help message */
-	char * help_msg;
+    /** Help message */
+    char * help_msg;
 
 } eManager;
 
@@ -82,7 +82,7 @@ void delete_eManager(eManager ** manager);
  * @param screen: eScreen pointer
  */
 void set_eScreen_eManager(eManager * manager,
-		                  eScreen * screen);
+                          eScreen * screen);
 
 
 /**
@@ -92,7 +92,7 @@ void set_eScreen_eManager(eManager * manager,
  * @param bar: eBar pointer
  */
 void set_eBar_eManager(eManager * manager,
-		               eBar * bar);
+                       eBar * bar);
 
 
 /**
@@ -103,7 +103,7 @@ void set_eBar_eManager(eManager * manager,
  * @param directory: eDirectory pointer
  */
 void set_eDirectory_eManager(eManager * manager,
-		                     eDirectory * directory);
+                             eDirectory * directory);
 
 
 /**
@@ -113,7 +113,7 @@ void set_eDirectory_eManager(eManager * manager,
  * @param file: eFile pointer
  */
 void set_eFile_eManager(eManager * manager,
-		                eFile * file);
+                        eFile * file);
 
 
 /**
@@ -161,8 +161,8 @@ unsigned int gety_cursor_eManager(eManager const * manager);
  * @note This is a recursive function.
  */
 int fill_directory_menu_eManager(eManager const * manager,
-		                         eDirectory const * directory,
-								 unsigned int level);
+                                 eDirectory const * directory,
+                                 unsigned int level);
 
 
 /**

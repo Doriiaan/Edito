@@ -21,14 +21,14 @@
  */
 typedef enum {
 
-	WDIR_BOX=0,
-	WDIR_ITEMS,
-	WBAR_BOX,
-	WBAR_ITEMS,
-	WFILE_BOX,
-	WFILE_LNUM,
-	WFILE_CNT,
-	WHELP
+    WDIR_BOX=0,
+    WDIR_ITEMS,
+    WBAR_BOX,
+    WBAR_ITEMS,
+    WFILE_BOX,
+    WFILE_LNUM,
+    WFILE_CNT,
+    WHELP
 
 } WINDOW_TYPE;
 
@@ -38,17 +38,17 @@ typedef enum {
  */
 typedef struct eWindow {
 
-	unsigned int width;
+    unsigned int width;
 
-	unsigned int height;
+    unsigned int height;
 
-	unsigned int x;
+    unsigned int x;
 
-	unsigned int y;
+    unsigned int y;
 
-	WINDOW * window;
+    WINDOW * window;
 
-	struct eWindow * orig;
+    struct eWindow * orig;
 
 } eWindow;
 
@@ -67,9 +67,9 @@ typedef struct eWindow {
  * @note delete_eWindow() must be called before exiting.
  */
 eWindow * create_eWindow(size_t height,
-		                 size_t width,
-						 unsigned int y,
-						 unsigned int x);
+                         size_t width,
+                         unsigned int y,
+                         unsigned int x);
 
 
 /**
@@ -88,10 +88,10 @@ eWindow * create_eWindow(size_t height,
  * @note delete_eWindow() must be called before exiting.
  */
 eWindow * create_der_eWindow(eWindow * orig,
-		                     size_t height,
-							 size_t width,
-							 unsigned int y,
-							 unsigned int x);
+                             size_t height,
+                             size_t width,
+                             unsigned int y,
+                             unsigned int x);
 
 
 /**
