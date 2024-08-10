@@ -23,7 +23,7 @@ all: project
 
 # Call "make project" in ./src
 project:
-	$(MAKE) -C src project 
+	$(MAKE) -C src project
 
 
 # Clean all

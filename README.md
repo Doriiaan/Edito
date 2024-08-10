@@ -1,6 +1,6 @@
 # Description
 
-Edito is a useful text editor for opening a directory and the directories under it. It lets you edit several files at once. 
+Edito is a useful text editor for opening a directory and the directories under it. It lets you edit several files at once.
 
 # Prerequisites
 

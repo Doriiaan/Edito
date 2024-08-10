@@ -1,3 +1,0 @@
-- [ ] Align structure
-- [ ] Create POPUP for warning and errors
-- [ ] print_screen don't have to take a eLine but a char matrice 
