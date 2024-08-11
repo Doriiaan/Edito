@@ -175,17 +175,22 @@ void update_bar_eScreen(eScreen * screen)
  *        file number window.
  *
  * @param screen: eScreen pointer
+ * @paral file: Boolean set to true if a file is displayed
  */
-void update_file_eScreen(eScreen * screen)
+void update_file_eScreen(eScreen * screen, bool file)
 {
-    int width = get_width_eScreen(screen, WFILE_LNUM);
-    int height = get_height_eScreen(screen, WFILE_LNUM);
+    if(file)
+    {
+        int width = get_width_eScreen(screen, WFILE_LNUM);
+        int height = get_height_eScreen(screen, WFILE_LNUM);
 
-    mvwvline(screen->windows[WFILE_LNUM]->window,
-             0,
-             width-1,
-             ACS_VLINE,
-             height);
+        mvwvline(screen->windows[WFILE_LNUM]->window,
+                 0,
+                 width-1,
+                 ACS_VLINE,
+                 height);
+    }
+
     wrefresh(screen->windows[WFILE_LNUM]->window);
     wrefresh(screen->windows[WFILE_CNT]->window);
 }
@@ -392,12 +397,12 @@ void print_line_eScreen(eScreen *screen,
 
 
 /**
- * @brief The erase_window() function erase the window designed by type.
+ * @brief The erase_window_eScreen() function erase the window designed by type.
  *
  * @param screen: eScreen pointer
  * @param type: Window type
  */
-void erase_window(eScreen *screen,
+void erase_window_eScreen(eScreen *screen,
                   WINDOW_TYPE type)
 {
     werase(screen->windows[type]->window);
@@ -483,6 +488,24 @@ int add_item_menu_eScreen(eScreen * screen,
                           char const * item)
 {
     return add_item_eMenu(screen->menus[type], item);
+}
+
+
+/**
+ * @brief The remove_item_menu_eScreen() function remove an item to the menu
+ *        designed by type.
+ *
+ * @param screen: eScreen pointer
+ * @param type: Menu type
+ * @param item_index: item index
+ *
+ * @return 0 in success or -1 in failure.
+ */
+int remove_item_menu_eScreen(eScreen *screen,
+                             MENU_TYPE type,
+                             int index_item)
+{
+    return delete_item_eMenu(screen->menus[type], index_item);
 }
 
 

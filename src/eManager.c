@@ -49,7 +49,7 @@ static void add_help_msg_eManager(eManager * manager,
                                   char const * message);
 
 /* CONSTANTS */
-char const * const DEFAULT_HELP_MESSAGE[sizeof(MODE)][6] =
+char const * const DEFAULT_HELP_MESSAGE[sizeof(MODE)][7] =
 {
     /* DIR */
     {
@@ -65,7 +65,7 @@ char const * const DEFAULT_HELP_MESSAGE[sizeof(MODE)][6] =
     {
         "Ctrl+Q: Quit",
         "Ctrl+D: Directory",
-        "Ctrl+B: BAR",
+        "Ctrl+B: Bar",
         "Ctrl+S: Save file",
         NULL
     },
@@ -77,6 +77,7 @@ char const * const DEFAULT_HELP_MESSAGE[sizeof(MODE)][6] =
         "Ctrl+F: File",
         "<- / -> : Left / Right",
         "Enter: Open file",
+        "Delete: Close file",
         NULL
     }
 };
@@ -223,7 +224,7 @@ bool run_eManager(eManager * manager)
                             gety_cursor_eManager(manager),
                             getx_cursor_eManager(manager),
                             WFILE_CNT);
-        update_file_eScreen(manager->screen);
+        update_file_eScreen(manager->screen, manager->file != NULL);
     }
     else if(manager->mode == BAR)
     {
@@ -439,6 +440,12 @@ bool process_ctrlf_eManager(eManager * manager)
 
 bool process_ESCAPE_eManager(eManager * manager)
 {
+    if(manager->lastmode == BAR)
+        if(count_eBar(manager->bar) == 0)
+            return true;
+    if(manager->lastmode == WRITE)
+        if(manager->file == NULL)
+            return true;
     change_mode_eManager(manager, manager->lastmode);
 
     return true;
@@ -633,6 +640,8 @@ bool process_BACKSPACE_eManager(eManager * manager)
 
         }
     }
+    if(manager->mode == BAR)
+        return process_DELETE_eManager(manager);
     return true;
 }
 
@@ -646,11 +655,11 @@ bool process_BACKSPACE_eManager(eManager * manager)
  */
 bool process_DELETE_eManager(eManager * manager)
 {
-    char *buffer = NULL;
-    int buffer_length = 0;
-
     if(manager->mode == WRITE)
     {
+        char *buffer = NULL;
+        int buffer_length = 0;
+
         /* In the middle of a line, remove current char */
         if(manager->file->current_pos < manager->file->current_line->length)
         {
@@ -675,6 +684,48 @@ bool process_DELETE_eManager(eManager * manager)
             free(buffer);
             buffer = NULL;
         }
+    }
+    if(manager->mode == BAR)
+    {
+        eFile *file = NULL;
+        unsigned int item_index = 0;
+
+        item_index = get_current_item_index_menu_eScreen(manager->screen,
+                                                         MBAR);
+
+        file = (eFile *) get_file_eBar(manager->bar, item_index);
+
+        if(file == manager->file)
+        {
+           set_eFile_eManager(manager, NULL);
+        }
+
+        // TODO: Si modifié, faire une popup qui demande à enregistrer
+        remove_file_eBar(manager->bar, item_index);
+        remove_item_menu_eScreen(manager->screen, MBAR, item_index);
+        refresh_menu_eScreen(manager->screen, MBAR);
+        close_eFile(file);
+
+        if(count_eBar(manager->bar) != 0)
+        {
+            item_index = (item_index == 0) ? 0 : item_index-1;
+            file = (eFile *) get_file_eBar(manager->bar, item_index);
+            move_pattern_item_menu_eScreen(manager->screen,
+                                           MBAR,
+                                           file->filename);
+            set_eFile_eManager(manager, file);
+            resize_file_eScreen(manager->screen,
+                                digit_number(manager->file->n_elines));
+            print_file_eManager(manager);
+        }
+        else
+        {
+            change_mode_eManager(manager, DIR);
+            update_bar_eScreen(manager->screen);
+            erase_window_eScreen(manager->screen, WFILE_CNT);
+            erase_window_eScreen(manager->screen, WFILE_LNUM);
+        }
+        update_file_eScreen(manager->screen, manager->file != NULL);
     }
     return true;
 }
@@ -1031,15 +1082,15 @@ int print_file_eManager(eManager const * manager)
     if(number == NULL)
         return -1;
 
-    erase_window(manager->screen, WFILE_CNT);
-    erase_window(manager->screen, WFILE_LNUM);
+    erase_window_eScreen(manager->screen, WFILE_CNT);
+    erase_window_eScreen(manager->screen, WFILE_LNUM);
 
     while(y_pos < height_w_cnt)
     {
         /* If there is at least one line left */
         if(current_line)
         {
-            sprintf(number, "%*d ", line_number_width, line_number);
+            sprintf(number, "%*d", line_number_width, line_number);
 
             /* print line number */
             print_line_eScreen(manager->screen,
@@ -1063,7 +1114,7 @@ int print_file_eManager(eManager const * manager)
         /* If there are no lines left */
         else
         {
-            sprintf(number, "%*c ", line_number_width, '~');
+            sprintf(number, "%*c", line_number_width, '~');
             print_line_eScreen(manager->screen,
                     WFILE_LNUM,
                     y_pos, 1,

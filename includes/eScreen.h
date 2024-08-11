@@ -78,8 +78,9 @@ void update_bar_eScreen(eScreen * screen);
  *        file number window.
  *
  * @param screen: eScreen pointer
+ * @paral file: Boolean set to true if a file is displayed
  */
-void update_file_eScreen(eScreen * screen);
+void update_file_eScreen(eScreen * screen, bool file);
 
 
 /**
@@ -191,12 +192,12 @@ void print_line_eScreen(eScreen *screen,
 
 
 /**
- * @brief The erase_window() function erase the window designed by type.
+ * @brief The erase_window_eScreen() function erase the window designed by type.
  *
  * @param screen: eScreen pointer
  * @param type: Window type
  */
-void erase_window(eScreen *screen,
+void erase_window_eScreen(eScreen *screen,
                   WINDOW_TYPE type);
 
 
@@ -230,6 +231,21 @@ void print_help_eScreen(eScreen * screen,
 int add_item_menu_eScreen(eScreen * screen,
                           MENU_TYPE type,
                           char const * item);
+
+
+/**
+ * @brief The remove_item_menu_eScreen() function remove an item to the menu
+ *        designed by type.
+ *
+ * @param screen: eScreen pointer
+ * @param type: Menu type
+ * @param item_index: item index
+ *
+ * @return 0 in success or -1 in failure.
+ */
+int remove_item_menu_eScreen(eScreen *screen,
+                             MENU_TYPE type,
+                             int index_item);
 
 
 /**

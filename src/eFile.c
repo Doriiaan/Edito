@@ -150,6 +150,7 @@ int open_eFile(eFile * efile)
         }
 
         add_empty_line_eFile(efile, 1);
+        efile->permissions = p_READWRITE;
         return 0;
     }
 
@@ -182,7 +183,7 @@ int open_eFile(eFile * efile)
             }
         }
 
-           if(efile->n_elines==0)
+        if(efile->n_elines==0)
             efile->first_file_line = current;
 
         /* Reinit for future lines */
@@ -216,10 +217,6 @@ void close_eFile(eFile *efile)
     if(efile == NULL)
         return;
 
-    efile->current_line = NULL;
-    efile->current_pos = 0;
-    efile->first_screen_line = NULL;
-
     eLine *current = efile->first_file_line, *temp=NULL;
 
     while(current)
@@ -228,6 +225,12 @@ void close_eFile(eFile *efile)
         delete_eLine(&current);
         current = temp;
     }
+
+    efile->n_elines = 0;
+    efile->first_file_line = NULL;
+    efile->first_screen_line = NULL;
+    efile->current_line = NULL;
+    efile->current_pos = 0;
     efile->is_saved = true;
 }
 
