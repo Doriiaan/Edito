@@ -105,8 +105,12 @@ int remove_file_eBar(eBar * bar,
     if(bar == NULL || index >= bar->n_files)
         return -1;
 
-    bar->files[index] = NULL;
+    for(unsigned int i = index; i+1 < bar->n_files; i++)
+    {
+        bar->files[i] = bar->files[i+1];
+    }
     bar->n_files--;
+    bar->files[bar->n_files] = NULL;
     return 0;
 }
 
@@ -159,7 +163,7 @@ bool is_file_in_eBar(eBar const * bar,
     if(bar == NULL ||file == NULL)
         return false;
 
-    for(unsigned int i; i<bar->n_files; i++)
+    for(unsigned int i=0; i<bar->n_files; i++)
     {
         if(!strcmp(bar->files[i]->filename, file->filename))
             return true;
