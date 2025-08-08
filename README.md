@@ -1,8 +1,16 @@
 # Description
 
-Edito is a useful text editor for opening a directory and the directories under it. It lets you edit several files at once.
+Edito is a high-performance IDE integrated into the Linux terminal.
+
+It is entirely coded in C and ncurses.
 
 ![alt text](https://github.com/Doriiaan/Edito/blob/main/doc/Edito.png)
+
+The features are as follows:
+- Open a folder as a project
+- Open folders and files within the project.
+- Change modes (directory, bar, file)
+- Edit and save files
 
 # Prerequisites
 
